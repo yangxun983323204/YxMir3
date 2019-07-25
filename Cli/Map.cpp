@@ -1,5 +1,5 @@
 #include "Map.h"
-
+#include "WILIndex.h"
 
 
 Map::Map()
@@ -76,7 +76,7 @@ int16_t Map::h()
 
 TileInfo Map::TileAt(uint32_t x, uint32_t y)
 {
-	return mTiles[y/2+(x/2)*mHeader->Height/2];
+	return mTiles[(y/2)+(x/2)*mHeader->Height/2];
 }
 
 CellInfo Map::CellAt(uint32_t x, uint32_t y)

@@ -50,16 +50,16 @@ void TestDrawMapRect()
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window* window = NULL;
 	SDL_Surface* screenSurface = NULL;
-	window = SDL_CreateWindow("TestWIL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("TestWIL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 492, SDL_WINDOW_SHOWN);
 	MyGfx *gfx = new MyGfx(window);
 
 	Map map;
 	map.Load("Map/D008.map");
-	int offsetX = 0;
-	int offsetY = 0;
-	for (size_t i = 0; i < 18; i++)
+	int offsetX = 100;
+	int offsetY = 100;
+	for (size_t i = 0; i < 24; i++)
 	{
-		for (size_t j = 0; j < 16; j++)
+		for (size_t j = 0; j < 24; j++)
 		{
 			auto tile = map.TileAt(i + offsetY, j + offsetX);
 			int fileIdx = tile.FileIndex;
@@ -70,7 +70,7 @@ void TestDrawMapRect()
 				continue;
 			auto filePath = WilList[fileIdx];
 			auto sprite = gfx->GetSprite(filePath, tile.TileIndex);
-			gfx->DrawCommand(sprite, j*48, i*32, 48, 32);
+			gfx->DrawCommand(sprite, j*96, i*64, 96, 64);
 		}
 	}
 	gfx->DrawCache();

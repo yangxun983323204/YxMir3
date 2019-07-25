@@ -2,6 +2,119 @@
 #include <string>
 using std::string;
 
+#define _IMAGE_TILES				0
+#define _IMAGE_TILES30				1
+#define _IMAGE_TILES5				2
+#define _IMAGE_SMTILES				3
+#define _IMAGE_HOUSES				4
+#define _IMAGE_CLIFFS				5
+#define _IMAGE_DUNGEONS				6
+#define _IMAGE_INNERS				7
+#define _IMAGE_FUNITURES			8
+#define _IMAGE_WALLS				9
+#define _IMAGE_SMOBJECTS			10
+#define _IMAGE_ANIMATIONS			11
+#define _IMAGE_OBJECT1				12
+#define _IMAGE_OBJECT2				13
+
+#define _IMAGE_INTER				70
+#define _IMAGE_M_HUMAN				71
+#define _IMAGE_M_WEAPON1			72
+#define _IMAGE_M_WEAPON2			73
+#define _IMAGE_M_WEAPON3			74
+#define _IMAGE_M_WEAPON4			75
+#define _IMAGE_M_WEAPON5			76
+#define _IMAGE_WM_HUMAN				77
+#define _IMAGE_WM_WEAPON1			78
+#define _IMAGE_WM_WEAPON2			79
+#define _IMAGE_WM_WEAPON3			80
+#define _IMAGE_WM_WEAPON4			81
+#define _IMAGE_WM_WEAPON5			82
+
+#define _IMAGE_M_HAIR				133
+#define _IMAGE_M_HELMET1			134
+#define _IMAGE_WM_HAIR				135
+#define _IMAGE_WM_HELMET1			136
+#define _IMAGE_M_HELMET2			146
+#define _IMAGE_WM_HELMET2			147
+
+#define _IMAGE_MAGIC				83
+#define _IMAGE_ITEM_INVENTORY		84
+#define _IMAGE_ITEM_EQUIP			85
+#define _IMAGE_ITEM_GROUND			86
+#define _IMAGE_MICON				87
+#define _IMAGE_PROGUSE				88
+#define _IMAGE_HORSE				89
+
+#define _IMAGE_MONSTER1				90
+#define _IMAGE_MONSTER2				91
+#define _IMAGE_MONSTER3				92
+#define _IMAGE_MONSTER4				93
+#define _IMAGE_MONSTER5				94
+#define _IMAGE_MONSTER6				95
+#define _IMAGE_MONSTER7				96
+#define _IMAGE_MONSTER8				97
+#define _IMAGE_MONSTER9				98
+#define _IMAGE_MONSTER10			99
+#define _IMAGE_MONSTER11			100
+#define _IMAGE_MONSTER12			101
+#define _IMAGE_MONSTER13			102
+#define _IMAGE_MONSTER14			103
+#define _IMAGE_MONSTER15			104
+#define _IMAGE_MONSTER16			105
+#define _IMAGE_MONSTER17			106
+#define _IMAGE_MONSTER18			107
+#define _IMAGE_MONSTER19			108
+#define _IMAGE_MONSTER20			109
+
+#define _IMAGE_SMONSTER1			110
+#define _IMAGE_SMONSTER2			111
+#define _IMAGE_SMONSTER3			112
+#define _IMAGE_SMONSTER4			113
+#define _IMAGE_SMONSTER5			114
+#define _IMAGE_SMONSTER6			115
+#define _IMAGE_SMONSTER7			116	
+#define _IMAGE_SMONSTER8			117
+#define _IMAGE_SMONSTER9			118
+#define _IMAGE_SMONSTER10			119	
+#define _IMAGE_SMONSTER11			120
+#define _IMAGE_SMONSTER12			121
+#define _IMAGE_SMONSTER13			122
+#define _IMAGE_SMONSTER14			123	
+#define _IMAGE_SMONSTER15			124
+#define _IMAGE_SMONSTER16			125
+#define _IMAGE_SMONSTER17			126
+#define _IMAGE_SMONSTER18			127	
+#define _IMAGE_SMONSTER19			128
+#define _IMAGE_SMONSTER20			129
+
+#define _IMAGE_NPC					130
+#define _IMAGE_MONMAGIC				131
+#define _MAX_MONSTER_IMAGE			132
+
+//死亡的怪物?
+#define _IMAGE_D_MONSTER1			137
+#define _IMAGE_D_SMONSTER1			138
+#define _IMAGE_MAGICEX				139
+#define _IMAGE_MONMAGICEX			140
+#define _IMAGE_STOREITEM			141
+#define _IMAGE_MONMAGICEX2			142
+#define _IMAGE_MONSTER54			143
+#define _IMAGE_FLAG					144
+#define _IMAGE_MONMAGICEX3			145
+#define _IMAGE_MonMagicEx4			148
+#define _IMAGE_MAGICEX2				149
+
+
+
+
+#define _IMAGE_INTEREX				70	//已经没有这个文件了，用gameinter代替
+
+
+#define _MAX_IMAGE					150
+
+
+
 static string WilList[150] =
 {
 	".\\Data\\tilesc.wil",								//0

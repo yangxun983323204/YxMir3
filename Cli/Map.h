@@ -24,7 +24,7 @@ struct MapLight
 struct MapHeader
 {
 	char Desc[20];
-	uint16_t Attr;
+	uint16_t Version;
 	int16_t Width;// 宽高的单位是cell
 	int16_t Height;
 	char EventFileIndex;
@@ -34,12 +34,12 @@ struct MapHeader
 struct TileInfo
 {
 	uint8_t FileIndex;
-	uint8_t TileIndex;
+	uint16_t TileIndex;
 };
 
 struct CellInfo
 {
-	uint8_t Flag;
+	uint8_t Flag;// 障碍层
 	uint8_t Obj1Ani;
 	uint8_t Obj2Ani;
 	uint8_t FileIndex2;
