@@ -151,6 +151,7 @@
     <ClInclude Include="MyGfx.h" />
     <ClInclude Include="SDLInc.h" />
     <ClInclude Include="Test.h" />
+    <ClInclude Include="WILIndex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageLib.cpp" />

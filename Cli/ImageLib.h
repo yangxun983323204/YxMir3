@@ -108,16 +108,18 @@ class ImageLib
 public:
 	ImageLib();
 	~ImageLib();
-
-	void Load(string wixPath);
+	// path可以传入wix或wil的路径，都会去加载wix文件
+	void Load(string path);
 	inline void BeginBatch();
 	inline void EndBatch();
 	Image *LoadImage(uint32_t index);
 	Image *LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor chooseColor2);
 
-	static string GUID(string wixPath, uint32_t index);
+	static void ExFileIdx(int &n);
+	static string GUID(string path, uint32_t index);
 private:
-	void SetPath(string wixPath);
+	void SetPath(string path);
+	void Clear();
 	
 	string mWixPath;
 	string mWilPath;

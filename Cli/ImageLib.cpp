@@ -1,4 +1,4 @@
-#include "ImageLib.h"
+ï»¿#include "ImageLib.h"
 #include <assert.h>
 
 const uint32_t MyColor::MaskR = 0x000000ff;
@@ -6,7 +6,7 @@ const uint32_t MyColor::MaskG = 0x0000ff00;
 const uint32_t MyColor::MaskB = 0x00ff0000;
 const uint32_t MyColor::MaskA = 0xff000000;
 
-const unsigned char ImageLib::KeyNone = 0xc0;// Í¸Ã÷
+const unsigned char ImageLib::KeyNone = 0xc0;// é€æ˜
 const unsigned char ImageLib::KeyConst = 0xc1;
 const unsigned char ImageLib::KeyOverlay1 = 0xc2;
 const unsigned char ImageLib::KeyOverlay2 = 0xc3;
@@ -23,14 +23,14 @@ ImageLib::ImageLib()
 ImageLib::~ImageLib()
 {
 	EndBatch();
-	delete mIdx3;
-	mIdx3 = nullptr;
+	Clear();
 }
 
-void ImageLib::Load(string wixPath)
+void ImageLib::Load(string path)
 {
-	SetPath(wixPath);
-	// ´ÓwilÎÄ¼ş»ñÈ¡°æ±¾ºÅ
+	SetPath(path);
+	Clear();
+	// ä»wilæ–‡ä»¶è·å–ç‰ˆæœ¬å·
 	auto fpeekVer = fopen(mWilPath.c_str(), "rb");
 	fseek(fpeekVer, 22, SEEK_SET);
 	fread(reinterpret_cast<void*>(&mVersion), 2, 1, fpeekVer);
@@ -90,7 +90,7 @@ Image *ImageLib::LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor choo
 	Image *img = new Image(block3);
 	dataLen = block3->ImgLength;
 	img->Pixels = new MyColor[img->Width * img->Height];
-	memset(reinterpret_cast<void*>(img->Pixels), 0, img->Width*img->Height * sizeof(MyColor));// ÖÃÎªºÚÉ«
+	memset(reinterpret_cast<void*>(img->Pixels), 0, img->Width*img->Height * sizeof(MyColor));// ç½®ä¸ºé»‘è‰²
 	auto rawbuffer = new int16_t[dataLen];
 	fseek(mWilFile, address, SEEK_SET);
 	fseek(mWilFile, WilOffset(mVersion), SEEK_CUR);
@@ -138,7 +138,7 @@ Image *ImageLib::LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor choo
 				chooseColor = chooseColor2;
 				for (size_t t = 0; t < cntCpy; t++)
 				{
-					// ¿¼ÂÇ²»ÔÚÕâÀï×öÑÕÉ«±ä¸ü£¬Ö»×ö¸ö±ê¼Ç
+					// è€ƒè™‘ä¸åœ¨è¿™é‡Œåšé¢œè‰²å˜æ›´ï¼Œåªåšä¸ªæ ‡è®°
 					img->Pixels[row*w + dstNowRowAt+t] = MyColor(rawbuffer[rawNowAt + t]);
 				}
 				rawNowAt += cntCpy;
@@ -154,8 +154,58 @@ Image *ImageLib::LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor choo
 	return img;
 }
 
-void ImageLib::SetPath(string wixPath)
+void ImageLib::SetPath(string path)
 {
-	mWixPath = wixPath;
-	mWilPath = wixPath.substr(0, wixPath.length() - 4) + ".wil";
+	mWixPath = path.substr(0, path.length() - 4) + ".wix";
+	mWilPath = path.substr(0, path.length() - 4) + ".wil";
+}
+
+void ImageLib::Clear()
+{
+	if (mIdx3 != nullptr) {
+		delete mIdx3;
+		mIdx3 = nullptr;
+	}
+	if (mWilFile != nullptr)
+	{
+		fclose(mWilFile);
+		mWilFile = nullptr;
+	}
+}
+
+void ImageLib::ExFileIdx(int & n)
+{
+	int m = n;
+	//__asm
+	//{
+	//	pusha
+
+	//	xor     ecx, ecx
+	//	mov		ebx, 0eh
+	//	mov     ecx, m; cl = nFileIdx
+	//	; ..........................
+	//	mov     eax, 77777777h
+	//	imul    ecx
+	//	sub     edx, ecx
+	//	sar     edx, 3
+	//	mov     eax, edx
+	//	shr     eax, 1Fh; Â·Ã»ÂºÃ…ÃÂ»
+	//	add     edx, eax
+	//	add     ecx, edx
+	//	mov     m, ecx
+
+	//	popa
+	//}
+	uint32_t b = 14;
+	int32_t c = m;
+	int32_t a = 0x77777777;
+	a *= c;
+	int32_t d = -c;
+	d >>= 3;
+	uint32_t a1 = d;
+	a1 >>= 0x1F;
+	d += a1;
+	c += d;
+	m = c;
+	n = m;
 }
