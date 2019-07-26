@@ -114,6 +114,7 @@ public:
 	inline void EndBatch();
 	Image *LoadImage(uint32_t index);
 	Image *LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor chooseColor2);
+	bool EnableAt(uint32_t index);
 
 	static void ExFileIdx(int &n);
 	static string GUID(string path, uint32_t index);

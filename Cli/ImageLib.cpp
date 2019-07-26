@@ -154,6 +154,15 @@ Image *ImageLib::LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor choo
 	return img;
 }
 
+bool ImageLib::EnableAt(uint32_t index)
+{
+	if (index >= mIdx3->Count)
+		return false;
+	if(mIdx3->Data[index] <= 0)
+		return false;
+	return true;
+}
+
 void ImageLib::SetPath(string path)
 {
 	mWixPath = path.substr(0, path.length() - 4) + ".wix";

@@ -13,6 +13,17 @@ public:
 	int16_t ShadowPosX;
 	int16_t ShadowPosY;
 	SDL_Surface* Surface;
+	uint16_t OverridW;
+	uint16_t OverridH;
+
+	inline uint16_t w()
+	{
+		return OverridW == 0 ? Surface->w : OverridW;
+	}
+	inline uint16_t h()
+	{
+		return OverridH == 0 ? Surface->h : OverridH;
+	}
 };
 
 struct DrawInfo
@@ -27,10 +38,17 @@ struct DrawInfo
 class MyGfx
 {
 public:
+	enum Layer
+	{
+		Bottom,
+		Mid,
+		Top,
+	};
+
 	MyGfx(SDL_Window* window);
 	~MyGfx();
 
-	void DrawCommand(Sprite * sprite, int x, int y, int w = 0, int h = 0);
+	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
 	void DrawCache();
 	Sprite* GetSprite(string wilPath, uint32_t index);
 	static Sprite* CreateSpriteFromImage(Image *image);
@@ -40,7 +58,9 @@ private:
 	std::map<string, Sprite*> mEnvSprites;// 动态加载地图所用精灵
 	std::map<string, Sprite*> mObjSprites;// 常驻其它精灵
 
-	std::vector<DrawInfo> mDrawCache;
+	std::vector<DrawInfo> mBottomCache;
+	std::vector<DrawInfo> mMidCache;
+	std::vector<DrawInfo> mTopCache;
 	SDL_Surface* mScreenSurface;
 
 	static bool DrawInfoSort(DrawInfo a, DrawInfo b);

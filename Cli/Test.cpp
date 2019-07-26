@@ -55,13 +55,14 @@ void TestDrawMapRect()
 
 	Map map;
 	map.Load("Map/D008.map");
-	int offsetX = 100;
-	int offsetY = 100;
-	for (size_t i = 0; i < 24; i++)
+	int offsetX = 0;
+	int offsetY = 0;
+	// 绘制从左上角开始的24*24个tile
+	for (size_t x = 0; x < 24; x++)
 	{
-		for (size_t j = 0; j < 24; j++)
+		for (size_t y = 0; y < 24; y++)
 		{
-			auto tile = map.TileAt(i + offsetY, j + offsetX);
+			auto tile = map.TileAt(x*2 + offsetY, y*2 + offsetX);// 一个tile横竖都是2个cell，因此坐标要乘以2
 			int fileIdx = tile.FileIndex;
 			ImageLib::ExFileIdx(fileIdx);
 			if ((fileIdx % 14) > 2)
@@ -70,7 +71,8 @@ void TestDrawMapRect()
 				continue;
 			auto filePath = WilList[fileIdx];
 			auto sprite = gfx->GetSprite(filePath, tile.TileIndex);
-			gfx->DrawCommand(sprite, j*96, i*64, 96, 64);
+			if(sprite)
+				gfx->DrawCommand(sprite, x*96, y*64,MyGfx::Layer::Bottom);
 		}
 	}
 	gfx->DrawCache();
