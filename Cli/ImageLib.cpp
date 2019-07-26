@@ -196,16 +196,21 @@ void ImageLib::ExFileIdx(int & n)
 
 	//	popa
 	//}
+#pragma region 64位c++改写
 	uint32_t b = 14;
 	int32_t c = m;
 	int32_t a = 0x77777777;
-	a *= c;
-	int32_t d = -c;
+	int64_t edx_eax = 0;
+	edx_eax = (int64_t)a*c;
+	a = edx_eax & 0x00000000ffffffff;
+	int32_t d = (edx_eax & 0xffffffff00000000) >> 32;
+	d -= c;
 	d >>= 3;
 	uint32_t a1 = d;
 	a1 >>= 0x1F;
 	d += a1;
 	c += d;
 	m = c;
+#pragma endregion
 	n = m;
 }
