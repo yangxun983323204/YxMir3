@@ -2,6 +2,7 @@
 #include "MyGfx.h"
 #include "Map.h"
 #include "WILIndex.h"
+#include "MapRenderer.h"
 
 void TestImageLib_Load() 
 {
@@ -36,6 +37,7 @@ void TestMyGfxCreateSpriteFromImage()
 	SDL_DestroyWindow(window);
 	//Quit SDL subsystems
 	SDL_Quit();
+	delete img;
 }
 
 void TestMapLoad()
@@ -46,13 +48,7 @@ void TestMapLoad()
 }
 void TestDrawMapRect() 
 {
-	// 还有问题，先不研究了
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_Window* window = NULL;
-	SDL_Surface* screenSurface = NULL;
-	window = SDL_CreateWindow("TestWIL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 492, SDL_WINDOW_SHOWN);
-	MyGfx *gfx = new MyGfx(window);
-
+	MyGfx *gfx = new MyGfx("map viewer",LayoutW,LayoutH);
 	Map map;
 	map.Load("Map/D008.map");
 	int offsetX = 0;
@@ -76,8 +72,21 @@ void TestDrawMapRect()
 		}
 	}
 	gfx->DrawCache();
-	SDL_Delay(20000);
+	SDL_Delay(5000);
 	delete gfx;
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+}
+
+void TestMapRender()
+{
+	MyGfx *gfx = new MyGfx("TestMapRender", LayoutW, LayoutH);
+	Map map;
+	map.Load("Map/D008.map");
+	MapRenderer *renderer = new MapRenderer();
+	renderer->mDebug = true;
+	renderer->SetMap(&map);
+	renderer->Draw(100, 100);
+	gfx->DrawCache();
+	SDL_Delay(5000);
+	delete renderer;
+	delete gfx;
 }

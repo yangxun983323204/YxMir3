@@ -2,20 +2,51 @@
 #include <algorithm>
 #include <string>
 
-MyGfx::MyGfx(SDL_Window* window)
+MyGfx *MyGfx::_inst = nullptr;
+
+MyGfx::MyGfx(std::string title, uint16_t w, uint16_t h)
 {
-	mWindow = window;
-	mScreenSurface = SDL_GetWindowSurface(window);
-	mBottomCache.reserve(800 * 600);
-	mMidCache.reserve(800 * 600);
-	mTopCache.reserve(800 * 600);
+	_inst = this;
+	mWindow = nullptr;
+	SDL_Init(SDL_INIT_VIDEO);
+	mWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+	mScreenSurface = SDL_GetWindowSurface(mWindow);
+	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
+	mMidCache.reserve(w * h);
+	mTopCache.reserve(w * h);
 }
 
 
 MyGfx::~MyGfx()
 {
+	auto p = mEnvSprites.begin();
+	auto end = mEnvSprites.end();
+	for (; p != end; p++)
+	{
+		delete p->second;
+		p->second = nullptr;
+	}
+	p = mObjSprites.begin();
+	end = mObjSprites.end();
+	for (; p != end; p++)
+	{
+		delete p->second;
+		p->second = nullptr;
+	}
+	mEnvSprites.clear();
+	mObjSprites.clear();
+
+	SDL_FreeSurface(mBgSurface);
 	SDL_FreeSurface(mScreenSurface);
+	if (_inst == this) {
+		_inst = nullptr;
+	}
+	SDL_DestroyWindow(mWindow);
+	SDL_Quit();
 }
+
+SDL_Rect srcRect;
+SDL_Rect dstRect;
 
 void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 {
@@ -28,7 +59,8 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 	switch (layer)
 	{
 	case MyGfx::Bottom:
-		mBottomCache.push_back(info);
+		GetDrawRect(&info, &srcRect, &dstRect);
+		SDL_BlitSurface(sprite->Surface, &srcRect, mBgSurface, &dstRect);
 		break;
 	case MyGfx::Mid:
 		mMidCache.push_back(info);
@@ -41,25 +73,12 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 	}
 }
 
-SDL_Rect srcRect;
-SDL_Rect dstRect;
 void MyGfx::DrawCache()
 {
-	if (mBottomCache.size() <= 0)
-		return;
-	std::sort(mBottomCache.begin(), mBottomCache.end(), MyGfx::DrawInfoSort);
-	// draw bottom
-	auto p = mBottomCache.begin();
-	auto end = mBottomCache.end();
-	for (; p < end; p++)
-	{
-		GetDrawRect(p._Ptr,&srcRect, &dstRect);
-		SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
-	}
-	mBottomCache.clear();
+	SDL_BlitSurface(mBgSurface, 0, mScreenSurface, 0);
 	// draw mid
-	p = mMidCache.begin();
-	end = mMidCache.end();
+	auto p = mMidCache.begin();
+	auto end = mMidCache.end();
 	for (; p < end; p++)
 	{
 		GetDrawRect(p._Ptr, &srcRect, &dstRect);
@@ -82,7 +101,7 @@ void MyGfx::DrawCache()
 Sprite * MyGfx::GetSprite(string wilPath, uint32_t index)
 {
 	auto key = wilPath + ":" + std::to_string(index);
-	if (mEnvSprites.count(key))
+	if (mEnvSprites.find(key)!=mEnvSprites.end())
 		return mEnvSprites[key];
 	else {
 		ImageLib lib;
@@ -119,13 +138,18 @@ inline void MyGfx::GetDrawRect(DrawInfo *info,__out SDL_Rect* srcRect, __out SDL
 {
 	srcRect->x = 0;
 	srcRect->y = 0;
-	srcRect->w = info->w == 0 ? info->sprite->Surface->w : info->w;
-	srcRect->h = info->h == 0 ? info->sprite->Surface->h : info->h;
+	srcRect->w = info->sprite->w();
+	srcRect->h = info->sprite->h();
 	// todo 坐标计算是有问题的
 	dstRect->x = info->x;
 	dstRect->y = info->y;
-	dstRect->w = info->w == 0 ? info->sprite->Surface->w : info->w;
-	dstRect->h = info->h == 0 ? info->sprite->Surface->h : info->h;
+	dstRect->w = info->sprite->w();
+	dstRect->h = info->sprite->h();
+}
+
+MyGfx * MyGfx::Instance()
+{
+	return _inst;
 }
 
 bool MyGfx::DrawInfoSort(DrawInfo a, DrawInfo b)

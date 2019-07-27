@@ -1,6 +1,4 @@
 #include "Map.h"
-#include "WILIndex.h"
-
 
 Map::Map()
 {
@@ -15,6 +13,11 @@ Map::Map()
 
 Map::~Map()
 {
+	delete mHeader;
+	delete mTiles;
+	delete mCells;
+	delete mDoors;
+	delete mCellDoorIndices;
 }
 
 void Map::Load(string mapPath)
@@ -24,8 +27,10 @@ void Map::Load(string mapPath)
 	auto f = fopen(mPath.c_str(), "rb");
 	mHeader = new MapHeader();
 	fread(reinterpret_cast<void*>(mHeader), sizeof(MapHeader), 1, f);
-	mTiles = new TileInfo[mHeader->Width*mHeader->Height/4];// 一个tile被分为田字形的4个cell
-	mCells = new CellInfo[mHeader->Width*mHeader->Height];
+	mTileCount = mHeader->Width*mHeader->Height / 4;
+	mTiles = new TileInfo[mTileCount];// 一个tile被分为田字形的4个cell
+	mCellCount = mHeader->Width*mHeader->Height;
+	mCells = new CellInfo[mCellCount];
 	fread(reinterpret_cast<void*>(mTiles), sizeof(TileInfo), mHeader->Width*mHeader->Height / 4, f);
 	fread(reinterpret_cast<void*>(mCells), sizeof(CellInfo), mHeader->Width*mHeader->Height, f);
 	fread(reinterpret_cast<void*>(&mDoorCount), sizeof(unsigned char), 1, f);
@@ -76,12 +81,19 @@ int16_t Map::h()
 
 TileInfo Map::TileAt(uint32_t x, uint32_t y)
 {
-	return mTiles[(y/2)+(x/2)*mHeader->Height/2];
+	auto idx = (y / 2) + (x / 2)*mHeader->Height / 2;
+	return mTiles[idx];
 }
 
 CellInfo Map::CellAt(uint32_t x, uint32_t y)
 {
 	return mCells[y + x*mHeader->Height];
+}
+
+bool Map::InMap(uint32_t x, uint32_t y)
+{
+	auto v = y + x*mHeader->Height;
+	return v>0 && v<mCellCount;
 }
 
 void Map::Clear()
