@@ -43,14 +43,14 @@ void TestMyGfxCreateSpriteFromImage()
 void TestMapLoad()
 {
 	Map map;
-	map.Load("Map/D008.map");
+	map.Load("Map/D001.map");
 	printf("map w:%d,h:%d", map.w(), map.h());
 }
 void TestDrawMapRect() 
 {
-	MyGfx *gfx = new MyGfx("map viewer",LayoutW,LayoutH);
+	MyGfx *gfx = new MyGfx(L"map viewer",LayoutW,LayoutH);
 	Map map;
-	map.Load("Map/D008.map");
+	map.Load("Map/D001.map");
 	int offsetX = 0;
 	int offsetY = 0;
 	// 绘制从左上角开始的24*24个tile
@@ -72,21 +72,52 @@ void TestDrawMapRect()
 		}
 	}
 	gfx->DrawCache();
-	SDL_Delay(5000);
+	gfx->onEvent = [gfx](SDL_Event* e) { 
+		if(e->type == SDL_QUIT)
+			gfx->Exit(); 
+	};
+	gfx->RunLoop();
 	delete gfx;
 }
 
 void TestMapRender()
 {
-	MyGfx *gfx = new MyGfx("TestMapRender", LayoutW, LayoutH);
+	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
 	Map map;
-	map.Load("Map/D008.map");
+	map.Load("Map/0.map");
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
-	renderer->Draw(100, 100);
-	gfx->DrawCache();
-	SDL_Delay(5000);
+	renderer->SetPos(400, 400);
+	gfx->onDraw = [gfx, renderer](float delta) {
+		renderer->Draw(delta);
+		gfx->DrawCache();
+	};
+	gfx->onEvent = [gfx, renderer](SDL_Event* e) {
+		if (e->type == SDL_QUIT)
+			gfx->Exit();  
+		else if (e->type == SDL_EventType::SDL_KEYDOWN)
+		{
+			switch (e->key.keysym.sym)
+			{
+			case SDLK_UP:
+				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Up);
+				break;
+			case SDLK_DOWN:
+				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Down);
+				break;
+			case SDLK_LEFT:
+				renderer->Scroll(Map::Horizontal::Left, Map::Vertical::None);
+				break;
+			case SDLK_RIGHT:
+				renderer->Scroll(Map::Horizontal::Right, Map::Vertical::None);
+				break;
+			default:
+				break;
+			}
+		}
+	};
+	gfx->RunLoop();
 	delete renderer;
 	delete gfx;
 }

@@ -1,15 +1,18 @@
 #include "MyGfx.h"
 #include <algorithm>
 #include <string>
+#include "Utils.h"
 
 MyGfx *MyGfx::_inst = nullptr;
 
-MyGfx::MyGfx(std::string title, uint16_t w, uint16_t h)
+MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 {
+	mCurrFrameTime = 0;
+	SetFPS(120);
 	_inst = this;
 	mWindow = nullptr;
 	SDL_Init(SDL_INIT_VIDEO);
-	mWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+	mWindow = SDL_CreateWindow(Wstr2Str(title).c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
 	mScreenSurface = SDL_GetWindowSurface(mWindow);
 	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
 	mMidCache.reserve(w * h);
@@ -47,6 +50,12 @@ MyGfx::~MyGfx()
 
 SDL_Rect srcRect;
 SDL_Rect dstRect;
+
+void MyGfx::SetFPS(uint16_t requireFPS)
+{
+	mRequireFPS = requireFPS;
+	mFrameTime = 1.0f / mRequireFPS;
+}
 
 void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 {
@@ -116,6 +125,42 @@ Sprite * MyGfx::GetSprite(string wilPath, uint32_t index)
 	}
 }
 
+void MyGfx::RunLoop()
+{
+	mLoop = true;
+	if (onDraw)
+		onDraw(mCurrFrameTime);
+
+	bool quit = false;
+	SDL_Event e;
+	uint32_t preTime = SDL_GetTicks();
+	uint32_t currTime = mFrameTime;
+	while (mLoop)
+	{
+		if(SDL_PollEvent(&e)!=0)
+		{
+			if (onEvent)
+				onEvent(&e);
+		}
+		else {
+			currTime = SDL_GetTicks();
+			mCurrFrameTime += (currTime-preTime)/1000.0f;
+			preTime = currTime;
+			if (mCurrFrameTime>= mFrameTime)
+			{
+				if (onDraw)
+					onDraw(mCurrFrameTime);
+				mCurrFrameTime = 0;
+			}
+		}
+	}
+}
+
+void MyGfx::Exit()
+{
+	mLoop = false;
+}
+
 Sprite* MyGfx::CreateSpriteFromImage(Image * image)
 {
 	auto sprite = new Sprite();
@@ -138,13 +183,13 @@ inline void MyGfx::GetDrawRect(DrawInfo *info,__out SDL_Rect* srcRect, __out SDL
 {
 	srcRect->x = 0;
 	srcRect->y = 0;
-	srcRect->w = info->sprite->w();
-	srcRect->h = info->sprite->h();
-	// todo 坐标计算是有问题的
+	srcRect->w = info->w;
+	srcRect->h = info->h;
+
 	dstRect->x = info->x;
 	dstRect->y = info->y;
-	dstRect->w = info->sprite->w();
-	dstRect->h = info->sprite->h();
+	dstRect->w = info->w;
+	dstRect->h = info->h;
 }
 
 MyGfx * MyGfx::Instance()

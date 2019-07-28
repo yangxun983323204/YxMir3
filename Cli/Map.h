@@ -48,8 +48,8 @@ struct CellInfo
 	uint8_t Flag;// ÕÏ°­²ã
 	uint8_t Obj1Ani;
 	uint8_t Obj2Ani;
-	uint8_t FileIndex2;
-	uint8_t FileIndex1;
+	uint8_t FileIdx2;
+	uint8_t FileIdx1;
 	uint16_t Obj1;// ·¿ÎÝ¼°Ê÷µÄ×ó°ë
 	uint16_t Obj2;// Ê÷µÄÓÒ°ë
 	// DoorIndex & 0X80 for whether there is a door
@@ -60,6 +60,10 @@ struct CellInfo
 	uint8_t DoorOffset;
 	uint16_t LightNEvent;
 
+	inline uint32_t FileIndex1() { return FileIdx1 & 0x0f; }
+	inline uint32_t FileIndex2() { return FileIdx2 & 0x0f; }
+	inline bool File1Enable() { return FileIdx1 != 0xff && Obj1 != 65535 && Obj1>0 && Obj1<0x7fffffff; }
+	inline bool File2Enable() { return FileIdx2 != 0xff && Obj2 != 65535 && Obj2>0 && Obj2<0x7fffffff; }
 	inline bool HasAnim1() { return Obj1Ani != 255; }
 	inline bool HasAnim2() { return Obj2Ani != 255; }
 	inline bool Obj1Blend() { return Obj1Ani & 0x80 >> 7; }
@@ -68,6 +72,8 @@ struct CellInfo
 	inline unsigned char Obj2AnimTickType() { return Obj2Ani & 0x70 >> 4; }
 	inline short Obj1AnimCount() { return Obj1Ani & 0x0f; }
 	inline short Obj2AnimCount() { return Obj2Ani & 0x0f; }
+	inline bool HasDoor() { return DoorOffset & 0x80 > 0 && DoorIndex & 0x7f>0; }
+	inline uint32_t DoorImgIdx() { return DoorOffset & 0x7f; }
 };
 
 struct DoorImageInfo
@@ -133,7 +139,7 @@ private:
 	unsigned char mDoorCount;
 	DoorInfo *mDoors;
 	uint8_t *mCellDoorIndices;
-	uint16_t mTileCount;
-	uint16_t mCellCount;
+	uint32_t mTileCount;
+	uint32_t mCellCount;
 };
 

@@ -3,6 +3,7 @@
 #include "ImageLib.h"
 #include <map>
 #include <vector>
+#include <functional>
 
 class Sprite
 {
@@ -56,15 +57,22 @@ public:
 		Top,
 	};
 
-	MyGfx(std::string title,uint16_t w,uint16_t h);
+	MyGfx(std::wstring title,uint16_t w,uint16_t h);
 	~MyGfx();
 
+	void SetFPS(uint16_t requireFPS);
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
 	void DrawCache();
 	Sprite* GetSprite(string wilPath, uint32_t index);
+	void RunLoop();
+	void Exit();
+
 	static Sprite* CreateSpriteFromImage(Image *image);
 	static inline void MyGfx::GetDrawRect(DrawInfo *info, __out SDL_Rect* srcRect, __out SDL_Rect* dstRect);
 	static MyGfx *Instance();
+
+	std::function<void(float delta)> onDraw;
+	std::function<void(SDL_Event*)> onEvent;
 private:
 	SDL_Window *mWindow;
 	std::map<string, Sprite*> mEnvSprites;// 动态加载地图所用精灵
@@ -74,6 +82,10 @@ private:
 	std::vector<DrawInfo> mTopCache;
 	SDL_Surface* mScreenSurface;
 	SDL_Surface* mBgSurface;
+	uint16_t mRequireFPS;
+	bool mLoop;
+	float mFrameTime;
+	float mCurrFrameTime;
 
 	static bool DrawInfoSort(DrawInfo a, DrawInfo b);
 	static MyGfx *_inst;
