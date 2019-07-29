@@ -32,6 +32,9 @@ void ImageLib::Load(string path)
 	Clear();
 	// 从wil文件获取版本号
 	auto fpeekVer = fopen(mWilPath.c_str(), "rb");
+	//assert(fpeekVer != nullptr);
+	if (fpeekVer == nullptr)
+		return;
 	fseek(fpeekVer, 22, SEEK_SET);
 	fread(reinterpret_cast<void*>(&mVersion), 2, 1, fpeekVer);
 	fclose(fpeekVer);

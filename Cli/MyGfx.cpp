@@ -30,23 +30,6 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 
 MyGfx::~MyGfx()
 {
-	auto p = mEnvSprites.begin();
-	auto end = mEnvSprites.end();
-	for (; p != end; p++)
-	{
-		delete p->second;
-		p->second = nullptr;
-	}
-	p = mObjSprites.begin();
-	end = mObjSprites.end();
-	for (; p != end; p++)
-	{
-		delete p->second;
-		p->second = nullptr;
-	}
-	mEnvSprites.clear();
-	mObjSprites.clear();
-
 	SDL_FreeSurface(mBgSurface);
 	SDL_FreeSurface(mScreenSurface);
 	SDL_DestroyWindow(mWindow);
@@ -136,24 +119,6 @@ void MyGfx::DrawCache()
 	mTopCache.clear();
 	//
 	SDL_UpdateWindowSurface(mWindow);
-}
-
-Sprite * MyGfx::GetSprite(string wilPath, uint32_t index)
-{
-	auto key = wilPath + ":" + std::to_string(index);
-	if (mEnvSprites.find(key)!=mEnvSprites.end())
-		return mEnvSprites[key];
-	else {
-		ImageLib lib;
-		lib.Load(wilPath);
-		if (!lib.EnableAt(index))
-			return nullptr;
-		auto img = lib.LoadImage(index);
-		Sprite *sprite = CreateSpriteFromImage(img);
-		delete img;
-		mEnvSprites[key] = sprite;
-		return sprite;
-	}
 }
 
 void MyGfx::RunLoop()

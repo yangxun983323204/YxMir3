@@ -73,7 +73,6 @@ public:
 	void DrawString(std::wstring str,int x,int y);
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
 	void DrawCache();
-	Sprite* GetSprite(string wilPath, uint32_t index);
 	void RunLoop();
 	void Exit();
 
@@ -89,8 +88,6 @@ public:
 	static TTF_Font *gFont;
 private:
 	SDL_Window *mWindow;
-	std::map<string, Sprite*> mEnvSprites;// 动态加载地图所用精灵
-	std::map<string, Sprite*> mObjSprites;// 常驻其它精灵
 
 	SDL_Rect mScreenRect;
 

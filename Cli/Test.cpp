@@ -3,6 +3,7 @@
 #include "Map.h"
 #include "WILIndex.h"
 #include "MapRenderer.h"
+#include "SpriteMgr.h"
 
 void TestImageLib_Load() 
 {
@@ -49,6 +50,7 @@ void TestMapLoad()
 void TestDrawMapRect() 
 {
 	MyGfx *gfx = new MyGfx(L"map viewer",LayoutW,LayoutH);
+	auto sMgr = SpriteMgr::Instance();
 	gfx->mDebug = true;
 	Map map;
 	map.Load("Map/0.map");
@@ -66,8 +68,7 @@ void TestDrawMapRect()
 				continue;
 			if (fileIdx > 69)
 				continue;
-			auto filePath = WilList[fileIdx];
-			auto sprite = gfx->GetSprite(filePath, tile.TileIndex);
+			auto sprite = sMgr->GetSprite(fileIdx, tile.TileIndex);
 			if(sprite)
 				gfx->DrawCommand(sprite, x*96, y*64,MyGfx::Layer::Bottom);
 		}
@@ -78,12 +79,14 @@ void TestDrawMapRect()
 			gfx->Exit(); 
 	};
 	gfx->RunLoop();
+	delete sMgr;
 	delete gfx;
 }
 
 void TestMapRender()
 {
 	MyGfx *gfx = new MyGfx(L"±ÈÆæ³Ç", LayoutW, LayoutH);
+	auto sMgr = SpriteMgr::Instance();
 	Map map;
 	map.Load("Map/0.map");
 	MapRenderer *renderer = new MapRenderer();
@@ -126,5 +129,6 @@ void TestMapRender()
 	};
 	gfx->RunLoop();
 	delete renderer;
+	delete sMgr;
 	delete gfx;
 }

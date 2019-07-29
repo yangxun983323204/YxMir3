@@ -1,5 +1,6 @@
 #include "MapRenderer.h"
 #include "WILIndex.h"
+#include "SpriteMgr.h"
 
 void MapRenderer::ScrollState::Set(Map::Horizontal x, Map::Vertical y)
 {
@@ -118,6 +119,7 @@ void MapRenderer::CalcCellDrawState(DrawState &info)
 void MapRenderer::DrawBG()
 {
 	auto gfx = MyGfx::Instance();
+	auto sMgr = SpriteMgr::Instance();
 	// 屏幕可以容纳17*17个cell,也就是可以容纳8.5*8.5个tile
 	for (int x = mTileState.MinX; x < mTileState.MaxX; x++)
 	{
@@ -134,8 +136,7 @@ void MapRenderer::DrawBG()
 				continue;
 			if (fileIdx > 69)
 				continue;
-			auto filePath = WilList[fileIdx];
-			auto sprite = gfx->GetSprite(filePath, tile.TileIndex);
+			auto sprite = sMgr->GetSprite(fileIdx, tile.TileIndex);
 			if (sprite)
 				gfx->DrawCommand(
 					sprite, 
@@ -150,6 +151,7 @@ void MapRenderer::DrawBG()
 void MapRenderer::DrawMid()
 {
 	auto gfx = MyGfx::Instance();
+	auto sMgr = SpriteMgr::Instance();
 	int fileIdx;
 	int imgIdx;
 	bool blend;
@@ -178,7 +180,7 @@ void MapRenderer::DrawMid()
 								blend = true;
 							//imgIdx += mMap->mAnimTileFrame[cell.Obj1AnimTickType()][cell.Obj1AnimCount()];// todo
 						}
-						auto sprite = gfx->GetSprite(WilList[fileIdx], imgIdx);// todo 此步骤耗时严重，从70多帧降到11帧，看来资源管理要单独弄模块
+						auto sprite = sMgr->GetSprite(fileIdx, imgIdx);// todo 此步骤耗时严重，从70多帧降到11帧，看来资源管理要单独弄模块
 						if (sprite != nullptr/* && sprite->w() == CellW && sprite->h() >= CellH*/) {
 							// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
 							drawX = (x + mCellState.OffsetX)*CellW + mScrollState.xScrolled;
