@@ -15,11 +15,11 @@ void MapRenderer::ScrollState::Set(Map::Horizontal x, Map::Vertical y)
 
 	if (y == Map::Vertical::Down) {
 		yDir = -1;
-		yNeedScroll = -CellW;
+		yNeedScroll = -CellH;
 	}
 	else if (y == Map::Vertical::Up) {
 		yDir = 1;
-		yNeedScroll = CellW;
+		yNeedScroll = CellH;
 	}
 	xType = x;
 	yType = y;
@@ -28,7 +28,7 @@ void MapRenderer::ScrollState::Set(Map::Horizontal x, Map::Vertical y)
 MapRenderer::MapRenderer()
 {
 	mDebug = false;
-	mScrollState.scrollSpeed = 1.0f;
+	mScrollState.scrollSpeed = 2.0f;
 	mScrollState.Reset();
 	CalcCellDrawState(mCellState);
 }
@@ -55,9 +55,7 @@ void MapRenderer::Draw(float delta)
 	if (mScrollState.IsScrolling()) {
 		if (!mScrollState.Update(delta))// 如果返回false，说明滚动结束
 		{
-			mX -= mScrollState.xDir;
-			mY -= mScrollState.yDir;
-			mScrollState.Reset();
+			SetPos(mX - mScrollState.xDir, mY - mScrollState.yDir);
 		}
 	}
 	DrawBG();
@@ -75,35 +73,41 @@ void MapRenderer::Scroll(Map::Horizontal x, Map::Vertical y)
 
 void MapRenderer::CalcTileDrawState(uint16_t x, uint16_t y, DrawState &info)
 {
+	uint8_t ext = 2;
 	// 默认屏幕可以容纳17*17个cell,也就是可以容纳8.5*8.5个tile
-	float cX = XCount / 2.0f;
-	float cY = YCount / 2.0f;
+
+	int cX = ceil(XCount / 2.0f) + ext * 2;
+	int cY = ceil(YCount / 2.0f) + ext * 2;
+
 	if (x % 2 ==0)
 	{
 		info.OffsetX = -CellW;
-		info.MinX = -ceil(cX / 2);
-		info.MaxX = floor(cX / 2);
+		info.MinX = -ceil(cX / 2.0f);
+		info.MaxX = floor(cX / 2.0f);
 	}
 	else {
-		info.OffsetX = CellW;
-		info.MinX = -floor(cX / 2);
-		info.MaxX = ceil(cX / 2);
+		info.OffsetX = 0;// -CellW;
+		info.MinX = -floor(cX / 2.0f);
+		info.MaxX = ceil(cX / 2.0f);
 	}
 	if (y % 2 == 0)
 	{
 		info.OffsetY = -CellH;
-		info.MinY = -ceil(cY / 2);
-		info.MaxY = floor(cY / 2);
+		info.MinY = -ceil(cY / 2.0f);
+		info.MaxY = floor(cY / 2.0f);
 	}
 	else {
-		info.OffsetX = CellH;
-		info.MinY = -floor(cY / 2);
-		info.MaxY = ceil(cY / 2);
+		info.OffsetY = 0;// -CellH;
+		info.MinY = -floor(cY / 2.0f);
+		info.MaxY = ceil(cY / 2.0f);
 	}
+	
+	info.OffsetX -= ext*CellW;
+	info.OffsetY -= ext*CellH;
 }
 void MapRenderer::CalcCellDrawState(DrawState &info)
 {
-	uint8_t ext = 16;// 上下左右均扩大ext的绘制范围，因为有些物体比较大
+	uint8_t ext = 36;// 上下左右均扩大ext的绘制范围，因为有些物体比较大
 	info.MinX = floor((ext * 2 + XCount) / 2.0f);
 	info.MaxX = ceil((ext * 2 + XCount) / 2.0f);
 	info.MinY = floor((ext * 2 + YCount) / 2.0f);
@@ -149,55 +153,38 @@ void MapRenderer::DrawMid()
 	int fileIdx;
 	int imgIdx;
 	bool blend;
-	for (int x = -mCellState.MinX; x < mCellState.MaxX; x++)
+	int drawX, drawY;
+	MyGfx::Layer layers[2]{ MyGfx::Layer::Mid , MyGfx::Layer::Top};
+	for (int x = -mCellState.MinX; x < mCellState.MaxX; ++x)
 	{
-		for (int y = -mCellState.MinY; y < mCellState.MaxY; y++)
+		for (int y = -mCellState.MinY; y < mCellState.MaxY; ++y)
 		{
 			if (!mMap->InMap(x+mX, y+mY))
 				continue;
 			auto cell = mMap->CellAt(x+mX, y+mY);
-			
-			if (cell.File1Enable())// 绘制中层
+			for (uint8_t i = 1; i < 3; i++)// 依次绘制中层和上层
 			{
-				fileIdx = cell.FileIndex1();
-				imgIdx = cell.Obj1;
-				blend = false;
-				if (fileIdx>2 && fileIdx<14)
+				if (cell.FileEnableOf(i))
 				{
-					if (cell.HasDoor())
-						imgIdx += cell.DoorImgIdx();
-					if (cell.HasAnim1())
-					{
-						if (cell.Obj1Blend())
-							blend = true;
-						//imgIdx += mMap->mAnimTileFrame[cell.Obj1AnimTickType()][cell.Obj1AnimCount()];// todo
-					}
-					auto sprite = gfx->GetSprite(WilList[fileIdx], imgIdx);
-					if (sprite != nullptr/* && sprite->w() == CellW && sprite->h() >= CellH*/) {
-						// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
-						gfx->DrawCommand(sprite, (x + mCellState.OffsetX)*CellW+mScrollState.xScrolled, (y + mCellState.OffsetY)*CellH - sprite->h()+mScrollState.yScrolled, MyGfx::Layer::Mid);
-					}
-				}
-			}
-			if (cell.File2Enable())// 绘制上层
-			{
-				fileIdx = cell.FileIndex2();
-				imgIdx = cell.Obj2;
-				blend = false;
-				if (fileIdx>2 && fileIdx<14)
-				{
-					if (cell.HasDoor())
-						imgIdx += cell.DoorImgIdx();
-					if (cell.HasAnim2())
-					{
-						if (cell.Obj2Blend())
-							blend = true;
-						//imgIdx += mMap->mAnimTileFrame[cell.Obj1AnimTickType()][cell.Obj1AnimCount()];// todo
-					}
-					auto sprite = gfx->GetSprite(WilList[fileIdx], imgIdx);
-					if (sprite != nullptr/* && sprite->w() == CellW && sprite->h() >= CellH*/) {
-						// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
-						gfx->DrawCommand(sprite, (x + mCellState.OffsetX)*CellW + mScrollState.xScrolled, (y + mCellState.OffsetY)*CellH - sprite->h() + mScrollState.yScrolled, MyGfx::Layer::Mid);
+					fileIdx = cell.FileIndexOf(i);
+					imgIdx = cell.ImgIndexOf(i);
+					blend = false;
+					if (fileIdx > 2 && fileIdx < 14) {
+						if (cell.HasDoor())
+							imgIdx += cell.DoorImgIdx();
+						if (cell.HasAnimOf(i))
+						{
+							if (cell.ObjBlendOf(i))
+								blend = true;
+							//imgIdx += mMap->mAnimTileFrame[cell.Obj1AnimTickType()][cell.Obj1AnimCount()];// todo
+						}
+						auto sprite = gfx->GetSprite(WilList[fileIdx], imgIdx);// todo 此步骤耗时严重，从70多帧降到11帧，看来资源管理要单独弄模块
+						if (sprite != nullptr/* && sprite->w() == CellW && sprite->h() >= CellH*/) {
+							// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
+							drawX = (x + mCellState.OffsetX)*CellW + mScrollState.xScrolled;
+							drawY = (y + mCellState.OffsetY)*CellH - sprite->h() + mScrollState.yScrolled;
+							gfx->DrawCommand(sprite, drawX, drawY, layers[i]);
+						}
 					}
 				}
 			}

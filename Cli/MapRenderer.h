@@ -40,7 +40,7 @@ private:
 			xScrolled += (xDir * CellW * scrollSpeed * delta);
 			yScrolled += (yDir * CellH * scrollSpeed * delta);
 			if ((xDir != 0 && abs(xScrolled) >= abs(xNeedScroll)) || (yDir != 0 && abs(yScrolled) >= abs(yNeedScroll))) {
-				xNeedScroll == xScrolled; yNeedScroll == yScrolled;
+				xScrolled = xNeedScroll; yScrolled = yNeedScroll;
 				return false;
 			}
 			else

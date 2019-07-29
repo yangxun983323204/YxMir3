@@ -32,7 +32,7 @@ void TestMyGfxCreateSpriteFromImage()
 	auto sprite = MyGfx::CreateSpriteFromImage(img);
 	SDL_BlitSurface(sprite->Surface, NULL, screenSurface, NULL);
 	SDL_UpdateWindowSurface(window);
-	SDL_Delay(2000);
+	SDL_Delay(1000);
 	SDL_FreeSurface(sprite->Surface);
 	SDL_DestroyWindow(window);
 	//Quit SDL subsystems
@@ -43,14 +43,15 @@ void TestMyGfxCreateSpriteFromImage()
 void TestMapLoad()
 {
 	Map map;
-	map.Load("Map/D001.map");
+	map.Load("Map/0.map");
 	printf("map w:%d,h:%d", map.w(), map.h());
 }
 void TestDrawMapRect() 
 {
 	MyGfx *gfx = new MyGfx(L"map viewer",LayoutW,LayoutH);
+	gfx->mDebug = true;
 	Map map;
-	map.Load("Map/D001.map");
+	map.Load("Map/0.map");
 	int offsetX = 0;
 	int offsetY = 0;
 	// 绘制从左上角开始的24*24个tile
@@ -114,6 +115,12 @@ void TestMapRender()
 				break;
 			default:
 				break;
+			}
+		}
+		else if (e->type == SDL_EventType::SDL_MOUSEBUTTONDOWN)
+		{
+			if (e->button.button == 1) {
+
 			}
 		}
 	};

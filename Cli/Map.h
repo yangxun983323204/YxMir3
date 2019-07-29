@@ -74,6 +74,49 @@ struct CellInfo
 	inline short Obj2AnimCount() { return Obj2Ani & 0x0f; }
 	inline bool HasDoor() { return DoorOffset & 0x80 > 0 && DoorIndex & 0x7f>0; }
 	inline uint32_t DoorImgIdx() { return DoorOffset & 0x7f; }
+	// ext
+	inline uint32_t FileIndexOf(uint8_t idx) {
+		if (idx == 1)
+			return FileIndex1();
+		else if (idx == 2)
+			return FileIndex2();
+	}
+	inline uint32_t ImgIndexOf(uint8_t idx) {
+		if (idx == 1)
+			return Obj1;
+		else if (idx == 2)
+			return Obj2;
+	}
+	inline bool FileEnableOf(uint8_t idx) {
+		if (idx == 1)
+			return File1Enable();
+		else if (idx == 2)
+			return File2Enable();
+	}
+	inline bool HasAnimOf(uint8_t idx) {
+		if (idx == 1)
+			return HasAnim1();
+		else if (idx == 2)
+			return HasAnim2();
+	}
+	inline bool ObjBlendOf(uint8_t idx) {
+		if (idx == 1)
+			return Obj1Blend();
+		else if (idx == 2)
+			return Obj2Blend();
+	}
+	inline unsigned char AnimTickTypeOf(uint8_t idx) {
+		if (idx == 1)
+			return Obj1AnimTickType();
+		else if (idx == 2)
+			return Obj2AnimTickType();
+	}
+	inline short AnimCountOf(uint8_t idx) {
+		if (idx == 1)
+			return Obj1AnimCount();
+		else if (idx == 2)
+			return Obj2AnimCount();
+	}
 };
 
 struct DoorImageInfo

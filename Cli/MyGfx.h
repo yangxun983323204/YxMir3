@@ -47,6 +47,14 @@ struct DrawInfo
 	// 不能在析构释放精灵，因为是gfx在统一管理
 };
 
+struct TempDrawInfo :public DrawInfo{
+	~TempDrawInfo()
+	{
+		delete sprite;
+		sprite = nullptr;
+	}
+};
+
 class MyGfx
 {
 public:
@@ -55,12 +63,14 @@ public:
 		Bottom,
 		Mid,
 		Top,
+		GUI,
 	};
 
 	MyGfx(std::wstring title,uint16_t w,uint16_t h);
 	~MyGfx();
 
 	void SetFPS(uint16_t requireFPS);
+	void DrawString(std::wstring str,int x,int y);
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
 	void DrawCache();
 	Sprite* GetSprite(string wilPath, uint32_t index);
@@ -73,16 +83,24 @@ public:
 
 	std::function<void(float delta)> onDraw;
 	std::function<void(SDL_Event*)> onEvent;
+
+	bool mDebug;
+
+	static TTF_Font *gFont;
 private:
 	SDL_Window *mWindow;
 	std::map<string, Sprite*> mEnvSprites;// 动态加载地图所用精灵
 	std::map<string, Sprite*> mObjSprites;// 常驻其它精灵
+
+	SDL_Rect mScreenRect;
 
 	std::vector<DrawInfo> mMidCache;
 	std::vector<DrawInfo> mTopCache;
 	SDL_Surface* mScreenSurface;
 	SDL_Surface* mBgSurface;
 	uint16_t mRequireFPS;
+	uint16_t mFPS;
+
 	bool mLoop;
 	float mFrameTime;
 	float mCurrFrameTime;

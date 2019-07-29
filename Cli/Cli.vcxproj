@@ -74,14 +74,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>./FLTK1.3.5/;$(IncludePath)</IncludePath>
+    <IncludePath>.\SDL2_ttfl-2.0.15\include;.\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>./FLTK1.3.5/;$(IncludePath)</IncludePath>
+    <IncludePath>.\SDL2_ttfl-2.0.15\include;.\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -151,6 +151,7 @@
     <ClInclude Include="MapRenderer.h" />
     <ClInclude Include="MyGfx.h" />
     <ClInclude Include="SDLInc.h" />
+    <ClInclude Include="SpriteMgr.h" />
     <ClInclude Include="Test.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="WILIndex.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapRenderer.cpp" />
     <ClCompile Include="MyGfx.cpp" />
+    <ClCompile Include="SpriteMgr.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,6 +4,7 @@
 #include "Utils.h"
 
 MyGfx *MyGfx::_inst = nullptr;
+TTF_Font *MyGfx::gFont = TTF_OpenFont("./Fonts/STSONG.TTF", 16);
 
 MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 {
@@ -12,6 +13,13 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 	_inst = this;
 	mWindow = nullptr;
 	SDL_Init(SDL_INIT_VIDEO);
+	if (gFont == nullptr) {
+		TTF_Init();
+		gFont = TTF_OpenFont("./Fonts/STSONG.TTF", 28);
+	}
+	mScreenRect.x = mScreenRect.y = 0;
+	mScreenRect.w = w;
+	mScreenRect.h = h;
 	mWindow = SDL_CreateWindow(Wstr2Str(title).c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
 	mScreenSurface = SDL_GetWindowSurface(mWindow);
 	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
@@ -41,11 +49,15 @@ MyGfx::~MyGfx()
 
 	SDL_FreeSurface(mBgSurface);
 	SDL_FreeSurface(mScreenSurface);
+	SDL_DestroyWindow(mWindow);
+
 	if (_inst == this) {
 		_inst = nullptr;
+		TTF_CloseFont(gFont);
+		gFont = nullptr;
+		TTF_Quit();
+		SDL_Quit();
 	}
-	SDL_DestroyWindow(mWindow);
-	SDL_Quit();
 }
 
 SDL_Rect srcRect;
@@ -55,6 +67,19 @@ void MyGfx::SetFPS(uint16_t requireFPS)
 {
 	mRequireFPS = requireFPS;
 	mFrameTime = 1.0f / mRequireFPS;
+}
+
+void MyGfx::DrawString(std::wstring str, int x, int y)
+{
+	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, Wstr2Str(str).c_str(), SDL_Color{0,255,0,255});
+	TempDrawInfo info;
+	info.x = x;
+	info.y = y;
+	info.w = textSurface->w;
+	info.h = textSurface->h;
+	mTopCache.push_back(info);
+	mTopCache[mTopCache.size()-1].sprite = new Sprite();
+	mTopCache[mTopCache.size() - 1].sprite->Surface = textSurface;
 }
 
 void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
@@ -84,6 +109,10 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 
 void MyGfx::DrawCache()
 {
+	if (mDebug)
+		DrawString(L"fps:" + std::to_wstring(mFPS), 0, 0);
+
+	SDL_FillRect(mScreenSurface, 0, 0);
 	SDL_BlitSurface(mBgSurface, 0, mScreenSurface, 0);
 	// draw mid
 	auto p = mMidCache.begin();
@@ -91,7 +120,8 @@ void MyGfx::DrawCache()
 	for (; p < end; p++)
 	{
 		GetDrawRect(p._Ptr, &srcRect, &dstRect);
-		SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
+		if(SDL_HasIntersection(&dstRect, &mScreenRect))
+			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
 	}
 	mMidCache.clear();
 	// draw top
@@ -100,7 +130,8 @@ void MyGfx::DrawCache()
 	for (; p < end; p++)
 	{
 		GetDrawRect(p._Ptr, &srcRect, &dstRect);
-		SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
+		if (SDL_HasIntersection(&dstRect, &mScreenRect))
+			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
 	}
 	mTopCache.clear();
 	//
@@ -118,7 +149,7 @@ Sprite * MyGfx::GetSprite(string wilPath, uint32_t index)
 		if (!lib.EnableAt(index))
 			return nullptr;
 		auto img = lib.LoadImage(index);
-		auto sprite = CreateSpriteFromImage(img);
+		Sprite *sprite = CreateSpriteFromImage(img);
 		delete img;
 		mEnvSprites[key] = sprite;
 		return sprite;
@@ -133,8 +164,8 @@ void MyGfx::RunLoop()
 
 	bool quit = false;
 	SDL_Event e;
-	uint32_t preTime = SDL_GetTicks();
-	uint32_t currTime = mFrameTime;
+	float preTime = SDL_GetTicks()/1000.0f;
+	float currTime = mFrameTime;
 	while (mLoop)
 	{
 		if(SDL_PollEvent(&e)!=0)
@@ -143,11 +174,13 @@ void MyGfx::RunLoop()
 				onEvent(&e);
 		}
 		else {
-			currTime = SDL_GetTicks();
-			mCurrFrameTime += (currTime-preTime)/1000.0f;
+			currTime = SDL_GetTicks()/1000.0f;
+			float delta = currTime - preTime;
+			mCurrFrameTime += delta;
 			preTime = currTime;
-			if (mCurrFrameTime>= mFrameTime)
+			if (mCurrFrameTime > mFrameTime)
 			{
+				mFPS = ceil(1 / mCurrFrameTime);
 				if (onDraw)
 					onDraw(mCurrFrameTime);
 				mCurrFrameTime = 0;
