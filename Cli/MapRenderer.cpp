@@ -109,10 +109,10 @@ void MapRenderer::CalcTileDrawState(uint16_t x, uint16_t y, DrawState &info)
 void MapRenderer::CalcCellDrawState(DrawState &info)
 {
 	uint8_t ext = 36;// 上下左右均扩大ext的绘制范围，因为有些物体比较大
-	info.MinX = floor((ext * 2 + XCount) / 2.0f);
-	info.MaxX = ceil((ext * 2 + XCount) / 2.0f);
-	info.MinY = floor((ext * 2 + YCount) / 2.0f);
-	info.MaxY = ceil((ext * 2 + YCount) / 2.0f);
+	info.MinX = -(floor(XCount / 2.0f)+ext);
+	info.MaxX = ceil(XCount / 2.0f)+ext;
+	info.MinY = -(floor(YCount / 2.0f)+ext);
+	info.MaxY = ceil(YCount / 2.0f)+ext;
 	info.OffsetX = floor(XCount / 2.0f);
 	info.OffsetY = floor(YCount / 2.0f);
 }
@@ -157,9 +157,9 @@ void MapRenderer::DrawMid()
 	bool blend;
 	int drawX, drawY;
 	MyGfx::Layer layers[2]{ MyGfx::Layer::Mid , MyGfx::Layer::Top};
-	for (int x = -mCellState.MinX; x < mCellState.MaxX; ++x)
+	for (int x = mCellState.MinX; x < mCellState.MaxX; ++x)
 	{
-		for (int y = -mCellState.MinY; y < mCellState.MaxY; ++y)
+		for (int y = mCellState.MinY; y < mCellState.MaxY; ++y)
 		{
 			if (!mMap->InMap(x+mX, y+mY))
 				continue;
