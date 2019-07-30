@@ -29,6 +29,7 @@ void MapRenderer::ScrollState::Set(Map::Horizontal x, Map::Vertical y)
 MapRenderer::MapRenderer()
 {
 	mDebug = false;
+	mRedrawBG = true;
 	mScrollState.scrollSpeed = 4.0f;
 	mScrollState.Reset();
 	CalcCellDrawState(mCellState);
@@ -54,6 +55,7 @@ void MapRenderer::SetPos(uint32_t x, uint32_t y)
 void MapRenderer::Draw(float delta)
 {
 	if (mScrollState.IsScrolling()) {
+		mRedrawBG = true;
 		if (!mScrollState.Update(delta))// 如果返回false，说明滚动结束
 		{
 			SetPos(mX - mScrollState.xDir, mY - mScrollState.yDir);
@@ -77,34 +79,37 @@ void MapRenderer::CalcTileDrawState(uint16_t x, uint16_t y, DrawState &info)
 	uint8_t ext = 2;
 	// 默认屏幕可以容纳17*17个cell,也就是可以容纳8.5*8.5个tile
 
-	int cX = ceil(XCount / 2.0f) + ext * 2;
-	int cY = ceil(YCount / 2.0f) + ext * 2;
+	int cX = floor(XCount / 2.0f);
+	int cY = floor(YCount / 2.0f);
 
-	if (x % 2 ==0)
+	if (x % 2 !=0)
 	{
-		info.OffsetX = -CellW;
+		info.OffsetX = -CellW*2;
 		info.MinX = -ceil(cX / 2.0f);
 		info.MaxX = floor(cX / 2.0f);
 	}
 	else {
-		info.OffsetX = 0;// -CellW;
+		info.OffsetX = -CellW;
 		info.MinX = -floor(cX / 2.0f);
 		info.MaxX = ceil(cX / 2.0f);
 	}
-	if (y % 2 == 0)
+	if (y % 2 != 0)
 	{
-		info.OffsetY = -CellH;
+		info.OffsetY = -CellH*2;
 		info.MinY = -ceil(cY / 2.0f);
 		info.MaxY = floor(cY / 2.0f);
 	}
 	else {
-		info.OffsetY = 0;// -CellH;
+		info.OffsetY = -CellH;
 		info.MinY = -floor(cY / 2.0f);
 		info.MaxY = ceil(cY / 2.0f);
 	}
-	
-	info.OffsetX -= ext*CellW;
-	info.OffsetY -= ext*CellH;
+	info.OffsetX += (-info.MinX)*96;
+	info.OffsetY += (-info.MinY)*64;
+	info.MinX -= ext;
+	info.MaxX += ext;
+	info.MinY -= ext;
+	info.MaxY += ext;
 }
 void MapRenderer::CalcCellDrawState(DrawState &info)
 {
@@ -118,12 +123,15 @@ void MapRenderer::CalcCellDrawState(DrawState &info)
 }
 void MapRenderer::DrawBG()
 {
+	if (!mRedrawBG)
+		return;
+	mRedrawBG = false;
 	auto gfx = MyGfx::Instance();
 	auto sMgr = SpriteMgr::Instance();
 	// 屏幕可以容纳17*17个cell,也就是可以容纳8.5*8.5个tile
-	for (int x = mTileState.MinX; x < mTileState.MaxX; x++)
+	for (int x = mTileState.MinX; x <= mTileState.MaxX; x++)
 	{
-		for (int y = mTileState.MinY; y < mTileState.MaxY; y++)
+		for (int y = mTileState.MinY; y <= mTileState.MaxY; y++)
 		{
 			int cx = x * 2 + mX;// 一个tile横竖都是2个cell，因此cell坐标要乘以2
 			int cy = y * 2 + mY;
@@ -140,8 +148,8 @@ void MapRenderer::DrawBG()
 			if (sprite)
 				gfx->DrawCommand(
 					sprite, 
-					(x-mTileState.MinX) * 96 + mTileState.OffsetX+ mScrollState.xScrolled,
-					(y-mTileState.MinY) * 64 + mTileState.OffsetY+ mScrollState.yScrolled,
+					x * 96 + mTileState.OffsetX + mScrollState.xScrolled,
+					y * 64 + mTileState.OffsetY + mScrollState.yScrolled,
 					MyGfx::Layer::Bottom
 				);
 		}
@@ -157,9 +165,9 @@ void MapRenderer::DrawMid()
 	bool blend;
 	int drawX, drawY;
 	MyGfx::Layer layers[2]{ MyGfx::Layer::Mid , MyGfx::Layer::Top};
-	for (int x = mCellState.MinX; x < mCellState.MaxX; ++x)
+	for (int x = mCellState.MinX; x <= mCellState.MaxX; ++x)
 	{
-		for (int y = mCellState.MinY; y < mCellState.MaxY; ++y)
+		for (int y = mCellState.MinY; y <= mCellState.MaxY; ++y)
 		{
 			if (!mMap->InMap(x+mX, y+mY))
 				continue;

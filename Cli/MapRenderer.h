@@ -72,5 +72,6 @@ private:
 	DrawState mCellState;
 	DrawState mTileState;
 	ScrollState mScrollState;
+	bool mRedrawBG;
 };
 
