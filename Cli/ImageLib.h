@@ -30,7 +30,7 @@ using std::string;
 struct Index3
 {
 	char Title[20];
-	int32_t Count;
+	int32_t ImgCount;
 	int32_t* Data;
 };
 struct LibHeader3
@@ -38,7 +38,7 @@ struct LibHeader3
 	int16_t HasCompress;
 	char Title[20];
 	int16_t Version;
-	int32_t Count;
+	int32_t ImgCount;
 };
 struct LibBlock3
 {
@@ -109,15 +109,16 @@ public:
 	ImageLib();
 	~ImageLib();
 	// path可以传入wix或wil的路径，都会去加载wix文件
-	void Load(string path);
+	bool Load(string path);
+	bool IsLoaded();
 	inline void BeginBatch();
 	inline void EndBatch();
 	Image *LoadImage(uint32_t index);
 	Image *LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor chooseColor2);
 	bool EnableAt(uint32_t index);
+	uint32_t ImgCount();
 
 	static void ExFileIdx(int &n);
-	static string GUID(string path, uint32_t index);
 private:
 	void SetPath(string path);
 	void Clear();
@@ -130,6 +131,7 @@ private:
 	FILE *mWilFile;
 
 	bool mBatch;
+	bool mLoaded;
 
 	inline static int WixOffset(int version) 
 	{

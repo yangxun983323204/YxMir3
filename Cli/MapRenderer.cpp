@@ -29,7 +29,7 @@ void MapRenderer::ScrollState::Set(Map::Horizontal x, Map::Vertical y)
 MapRenderer::MapRenderer()
 {
 	mDebug = false;
-	mScrollState.scrollSpeed = 2.0f;
+	mScrollState.scrollSpeed = 4.0f;
 	mScrollState.Reset();
 	CalcCellDrawState(mCellState);
 }
@@ -180,8 +180,8 @@ void MapRenderer::DrawMid()
 								blend = true;
 							//imgIdx += mMap->mAnimTileFrame[cell.Obj1AnimTickType()][cell.Obj1AnimCount()];// todo
 						}
-						auto sprite = sMgr->GetSprite(fileIdx, imgIdx);// todo 此步骤耗时严重，从70多帧降到11帧，看来资源管理要单独弄模块
-						if (sprite != nullptr/* && sprite->w() == CellW && sprite->h() >= CellH*/) {
+						auto sprite = sMgr->GetSprite(fileIdx, imgIdx);
+						if (sprite != nullptr) {
 							// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
 							drawX = (x + mCellState.OffsetX)*CellW + mScrollState.xScrolled;
 							drawY = (y + mCellState.OffsetY)*CellH - sprite->h() + mScrollState.yScrolled;

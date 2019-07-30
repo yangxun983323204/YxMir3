@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
 #include "WILIndex.h"
 #include "ImageLib.h"
 #include "MyGfx.h"
@@ -17,10 +16,16 @@ public:
 
 	static SpriteMgr *Instance();
 private:
+	struct LibImgCache
+	{
+		uint16_t size;
+		Sprite** sprites;
+	};
+
 	void ClearCache();
 
 	ImageLib mLibs[_MAX_IMAGE];
-	map<uint32_t, Sprite*> mSpriteMap[_MAX_IMAGE];
+	LibImgCache mSpriteMap[_MAX_IMAGE];
 
 	static SpriteMgr *_inst;
 };

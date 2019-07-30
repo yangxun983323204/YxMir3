@@ -26,15 +26,17 @@ ImageLib::~ImageLib()
 	Clear();
 }
 
-void ImageLib::Load(string path)
+bool ImageLib::Load(string path)
 {
 	SetPath(path);
 	Clear();
 	// 从wil文件获取版本号
 	auto fpeekVer = fopen(mWilPath.c_str(), "rb");
 	//assert(fpeekVer != nullptr);
-	if (fpeekVer == nullptr)
-		return;
+	if (fpeekVer == nullptr) {
+		mLoaded = false;
+		return false;
+	}
 	fseek(fpeekVer, 22, SEEK_SET);
 	fread(reinterpret_cast<void*>(&mVersion), 2, 1, fpeekVer);
 	fclose(fpeekVer);
@@ -42,10 +44,17 @@ void ImageLib::Load(string path)
 	FILE* f = fopen(mWixPath.c_str(), "rb");
 	mIdx3 = new Index3();
 	fread(reinterpret_cast<void*>(mIdx3), sizeof(Index3) - 4, 1, f);
-	mIdx3->Data = new int32_t[mIdx3->Count];
+	mIdx3->Data = new int32_t[mIdx3->ImgCount];
 	fseek(f, WixOffset(mVersion), SEEK_SET);
-	fread(reinterpret_cast<void*>(mIdx3->Data), sizeof(int32_t), mIdx3->Count, f);
+	fread(reinterpret_cast<void*>(mIdx3->Data), sizeof(int32_t), mIdx3->ImgCount, f);
 	fclose(f);
+	mLoaded = true;
+	return true;
+}
+
+bool ImageLib::IsLoaded()
+{
+	return mLoaded;
 }
 
 void ImageLib::BeginBatch()
@@ -75,8 +84,8 @@ Image *ImageLib::LoadImage(uint32_t index)
 Image *ImageLib::LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor chooseColor2)
 {
 	int32_t address;
-	assert(index < mIdx3->Count);
-	if (index >= mIdx3->Count)
+	assert(index < mIdx3->ImgCount);
+	if (index >= mIdx3->ImgCount)
 		return nullptr;
 	address = mIdx3->Data[index];
 	assert(address > 0);
@@ -159,11 +168,16 @@ Image *ImageLib::LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor choo
 
 bool ImageLib::EnableAt(uint32_t index)
 {
-	if (index >= mIdx3->Count)
+	if (index >= mIdx3->ImgCount)
 		return false;
 	if(mIdx3->Data[index] <= 0)
 		return false;
 	return true;
+}
+
+uint32_t ImageLib::ImgCount()
+{
+	return mIdx3->ImgCount;
 }
 
 void ImageLib::SetPath(string path)
