@@ -55,6 +55,16 @@ struct TempDrawInfo :public DrawInfo{
 	}
 };
 
+enum BlendType// ?
+{
+	Normal = 0,
+	Light,
+	LightInv,
+	InvNormal,
+	InvLight,
+	InvLightInv,
+};
+
 class MyGfx
 {
 public:
@@ -69,6 +79,7 @@ public:
 	MyGfx(std::wstring title,uint16_t w,uint16_t h);
 	~MyGfx();
 
+	const SDL_Rect *GetRenderRect();
 	void SetFPS(uint16_t requireFPS);
 	void DrawString(std::wstring str,int x,int y);
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);

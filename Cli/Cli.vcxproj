@@ -146,6 +146,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.h" />
+    <ClInclude Include="ActorRenderer.h" />
     <ClInclude Include="ImageLib.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapRenderer.h" />
@@ -157,6 +159,8 @@
     <ClInclude Include="WILIndex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="ActorRenderer.cpp" />
     <ClCompile Include="ImageLib.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />

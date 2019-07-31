@@ -46,6 +46,11 @@ MyGfx::~MyGfx()
 SDL_Rect srcRect;
 SDL_Rect dstRect;
 
+const SDL_Rect * MyGfx::GetRenderRect()
+{
+	return &mScreenRect;
+}
+
 void MyGfx::SetFPS(uint16_t requireFPS)
 {
 	mRequireFPS = requireFPS;
