@@ -193,7 +193,7 @@ void MapRenderer::DrawMid()
 							// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
 							drawX = (x + mCellState.OffsetX)*CellW + mScrollState.xScrolled;
 							drawY = (y + mCellState.OffsetY)*CellH - sprite->h() + mScrollState.yScrolled;
-							gfx->DrawCommand(sprite, drawX, drawY, layers[i]);
+							gfx->DrawCommand(sprite, drawX, drawY, layers[0]);
 						}
 					}
 				}
