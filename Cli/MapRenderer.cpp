@@ -46,10 +46,15 @@ void MapRenderer::SetMap(Map * map)
 
 void MapRenderer::SetPos(uint32_t x, uint32_t y)
 {
-	mX = x;
-	mY = y;
+	mPos.x = x;
+	mPos.y = y;
 	mScrollState.Reset();
-	CalcTileDrawState(mX, mY, mTileState);
+	CalcTileDrawState(x, y, mTileState);
+}
+
+MapPoint MapRenderer::GetPos()
+{
+	return mPos;
 }
 
 void MapRenderer::Draw(float delta)
@@ -58,7 +63,7 @@ void MapRenderer::Draw(float delta)
 		mRedrawBG = true;
 		if (!mScrollState.Update(delta))// 如果返回false，说明滚动结束
 		{
-			SetPos(mX - mScrollState.xDir, mY - mScrollState.yDir);
+			SetPos(mPos.x - mScrollState.xDir, mPos.y - mScrollState.yDir);
 		}
 	}
 	DrawBG();
@@ -133,8 +138,8 @@ void MapRenderer::DrawBG()
 	{
 		for (int y = mTileState.MinY; y <= mTileState.MaxY; y++)
 		{
-			int cx = x * 2 + mX;// 一个tile横竖都是2个cell，因此cell坐标要乘以2
-			int cy = y * 2 + mY;
+			int cx = x * 2 + mPos.x;// 一个tile横竖都是2个cell，因此cell坐标要乘以2
+			int cy = y * 2 + mPos.y;
 			if (!mMap->InMap(cx, cy))
 				continue;
 			auto tile = mMap->TileAt(cx, cy);
@@ -169,9 +174,9 @@ void MapRenderer::DrawMid()
 	{
 		for (int y = mCellState.MinY; y <= mCellState.MaxY; ++y)
 		{
-			if (!mMap->InMap(x+mX, y+mY))
+			if (!mMap->InMap(x+mPos.x, y+mPos.y))
 				continue;
-			auto cell = mMap->CellAt(x+mX, y+mY);
+			auto cell = mMap->CellAt(x+ mPos.x, y+ mPos.y);
 			for (uint8_t i = 1; i < 3; i++)// 依次绘制中层和上层
 			{
 				if (cell.FileEnableOf(i))

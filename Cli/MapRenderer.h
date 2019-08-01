@@ -9,6 +9,7 @@ public:
 	~MapRenderer();
 	void SetMap(Map *map);
 	void SetPos(uint32_t x, uint32_t y);
+	MapPoint GetPos();
 	void Draw(float delta);
 	void Scroll(Map::Horizontal x, Map::Vertical y);
 	bool mDebug;
@@ -67,8 +68,7 @@ private:
 	void DrawDebugGrid();
 
 	Map *mMap;
-	uint32_t mX;
-	uint32_t mY;
+	MapPoint mPos;
 	DrawState mCellState;
 	DrawState mTileState;
 	ScrollState mScrollState;

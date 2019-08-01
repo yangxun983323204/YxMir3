@@ -16,7 +16,8 @@ public:
 	void Draw(uint32_t delta);
 	bool HasActor();
 private:
-	bool IsFarLeftScreen();
+	virtual Sprite* GetSprite();
+	virtual void CaclScreenPos(int32_t &x, int32_t &y);
 
 	MapRenderer *mMapRenderer;
 	Actor *mActor;

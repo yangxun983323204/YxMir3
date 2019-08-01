@@ -2,6 +2,7 @@
 #pragma once
 #include "WILIndex.h"
 #include <stdint.h>
+#include "Map.h"
 
 using std::wstring;
 
@@ -41,10 +42,14 @@ struct Feature
 	{
 		switch (Gender)
 		{
-		case 0:
+		case (int)ActorGender::Man:
 			return _IMAGE_M_HUMAN;
-		case 1:
+		case (int)ActorGender::Woman:
 			return _IMAGE_WM_HUMAN;
+		case (int)ActorGender::Monster:
+			return _IMAGE_MONSTER1;
+		case (int)ActorGender::Npc:
+			return _IMAGE_NPC;
 		default:
 			break;
 		}
@@ -92,8 +97,7 @@ public:
 	Feature mFeature;
 	uint8_t mMotion;
 	uint8_t mDir;
-	uint16_t PosX;
-	uint16_t PosY;
+	MapPoint mPos;
 	uint8_t mMoveSpeed;
 	uint8_t mLightRange;
 };

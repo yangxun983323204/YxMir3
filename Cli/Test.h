@@ -7,6 +7,7 @@ void TestMyGfxCreateSpriteFromImage();
 void TestMapLoad();
 void TestDrawMapRect();
 void TestMapRender();
+void TestActorRender();
 
 inline void Test() 
 {
@@ -16,4 +17,5 @@ inline void Test()
 	TestMapLoad();
 	TestDrawMapRect();
 	TestMapRender();
+	TestActorRender();
 }
