@@ -143,7 +143,7 @@ void TestActorRender()
 	renderer->SetPos(400, 400);
 
 	Actor actor;
-	actor.mPos = { 400,400 };
+	actor.mPos = { 400,405 };
 	actor.mFeature.Gender = (uint8_t)ActorGender::Monster;
 	actor.mFeature.Dress = 0;
 	actor.mFeature.Hair = 0;

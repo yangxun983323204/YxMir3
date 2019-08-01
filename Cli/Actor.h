@@ -2,7 +2,7 @@
 #pragma once
 #include "WILIndex.h"
 #include <stdint.h>
-#include "Map.h"
+#include "Common.h"
 
 using std::wstring;
 
@@ -97,7 +97,7 @@ public:
 	Feature mFeature;
 	uint8_t mMotion;
 	uint8_t mDir;
-	MapPoint mPos;
+	Vector2UInt mPos;
 	uint8_t mMoveSpeed;
 	uint8_t mLightRange;
 };

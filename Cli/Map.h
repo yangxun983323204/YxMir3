@@ -17,13 +17,6 @@ using std::string;
 #define LayoutW  CellW*XCount
 #define LayoutH  CellH*YCount
 
-
-struct MapPoint
-{
-	uint32_t x;
-	uint32_t y;
-};
-
 #pragma pack(1)
 
 struct MapLight

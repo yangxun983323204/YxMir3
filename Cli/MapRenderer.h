@@ -1,6 +1,7 @@
 #pragma once
 #include "Map.h"
 #include "MyGfx.h"
+#include "Common.h"
 
 class MapRenderer
 {
@@ -9,7 +10,8 @@ public:
 	~MapRenderer();
 	void SetMap(Map *map);
 	void SetPos(uint32_t x, uint32_t y);
-	MapPoint GetPos();
+	Vector2UInt GetPos();
+	Vector2Float GetCellScrollOffset();
 	void Draw(float delta);
 	void Scroll(Map::Horizontal x, Map::Vertical y);
 	bool mDebug;
@@ -68,7 +70,7 @@ private:
 	void DrawDebugGrid();
 
 	Map *mMap;
-	MapPoint mPos;
+	Vector2UInt mPos;
 	DrawState mCellState;
 	DrawState mTileState;
 	ScrollState mScrollState;

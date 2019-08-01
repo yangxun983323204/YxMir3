@@ -52,9 +52,14 @@ void MapRenderer::SetPos(uint32_t x, uint32_t y)
 	CalcTileDrawState(x, y, mTileState);
 }
 
-MapPoint MapRenderer::GetPos()
+Vector2UInt MapRenderer::GetPos()
 {
 	return mPos;
+}
+
+Vector2Float MapRenderer::GetCellScrollOffset()
+{
+	return Vector2Float{ mScrollState.xScrolled, mScrollState.yScrolled };
 }
 
 void MapRenderer::Draw(float delta)

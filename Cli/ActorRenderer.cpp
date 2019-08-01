@@ -55,10 +55,13 @@ void ActorRenderer::CaclScreenPos(int32_t & x, int32_t & y)
 {
 	auto centerPos = mMapRenderer->GetPos();
 	auto myPos = mActor->mPos;
+	auto scroll = mMapRenderer->GetCellScrollOffset();
 	x = myPos.x - centerPos.x;
 	y = myPos.y - centerPos.y;
 	x *= CellW;
 	y *= CellH;
 	x += (CellW * XCount / 2);
 	y += (CellH * YCount / 2);
+	x += scroll.x;
+	y += scroll.y;
 }
