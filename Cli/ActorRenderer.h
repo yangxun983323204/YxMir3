@@ -15,9 +15,10 @@ public:
 	void SetActor(Actor *actor);
 	void Draw(uint32_t delta);
 	bool HasActor();
-private:
+protected:
 	virtual Sprite* GetSprite();
 	virtual void CaclScreenPos(int32_t &x, int32_t &y);
+	void OnMotionChanged();// 当actor动作或方向变化时，更新动画帧的参数
 
 	MapRenderer *mMapRenderer;
 	Actor *mActor;
@@ -25,4 +26,8 @@ private:
 	uint8_t mEffectImgLibIdx;// todo
 	uint32_t mCurrFrame;
 	uint32_t mCurrDelay;
+
+	uint32_t mFstFrame;
+	uint32_t mEndFrame;
+	uint16_t mFrameDelay;
 };

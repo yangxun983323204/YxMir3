@@ -133,34 +133,21 @@ struct DoorInfo {
 
 #pragma pack()
 
-enum class Direction
-{
-	Up = 1,
-	Down,
-	Left,
-	Right,
-
-	UpRight,
-	DownRight,
-	DownLeft,
-	TopLeft
-};
-
 class Map
 {
 public:
 	enum class Horizontal
 	{
-		None = 0,
-		Left = 3,
-		Right
+		None = -1,
+		Left = 6,
+		Right = 2
 	};
 
 	enum class Vertical
 	{
-		None = 0,
-		Up = 1,
-		Down
+		None = -1,
+		Up = 0,
+		Down = 4
 	};
 
 	Map();

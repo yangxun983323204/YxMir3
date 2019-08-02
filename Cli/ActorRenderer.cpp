@@ -1,6 +1,9 @@
 #include "ActorRenderer.h"
 #include "SpriteMgr.h"
 #include "MyGfx.h"
+#include "AnimDef.h"
+
+using namespace std::placeholders;
 
 
 ActorRenderer::ActorRenderer()
@@ -22,7 +25,20 @@ void ActorRenderer::SetActor(Actor * actor)
 	mActor = actor;
 	if (mActor!=nullptr)
 	{
-		mImgLibIdx = mActor->mFeature.ImgLibIdx();
+		mActor->onMotionChange = std::bind(&ActorRenderer::OnMotionChanged, this);
+		mImgLibIdx = mActor->mFeature.ImgLibIdxBase();
+		switch (actor->mFeature.Gender)
+		{
+		case ActorGender::Man:
+		case ActorGender::Woman:
+		case ActorGender::Npc:
+			break;
+		case ActorGender::Monster:
+			mImgLibIdx += (mActor->mFeature.Dress / 10);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -64,4 +80,29 @@ void ActorRenderer::CaclScreenPos(int32_t & x, int32_t & y)
 	y += (CellH * YCount / 2);
 	x += scroll.x;
 	y += scroll.y;
+}
+
+void ActorRenderer::OnMotionChanged()
+{
+	switch (mActor->mFeature.Gender)
+	{
+	case ActorGender::Man:
+	case ActorGender::Woman:
+		mFstFrame = HeroAnim[mActor->mMotion].First + mActor->mFeature.Dress*_MAX_HERO_FRAME + (uint16_t)mActor->mDir * 10;
+		mEndFrame = mFstFrame + HeroAnim[mActor->mMotion].Count;
+		mFrameDelay = HeroAnim[mActor->mMotion].Delay;
+		break;
+	case ActorGender::Npc:
+		mFstFrame = NPCAnim[mActor->mMotion].First + mActor->mFeature.Dress*_MAX_NPC_FRAME + (uint16_t)mActor->mDir * 10;
+		mEndFrame = mFstFrame + NPCAnim[mActor->mMotion].Count;
+		mFrameDelay = NPCAnim[mActor->mMotion].Delay;
+		break;
+	case ActorGender::Monster:
+		mFstFrame = MonsterAnim[mActor->mMotion].First + (mActor->mFeature.Dress % 10)*_MAX_MON_FRAME + (uint16_t)mActor->mDir * 10 - 1;
+		mEndFrame = mFstFrame + MonsterAnim[mActor->mMotion].Count;
+		mFrameDelay = MonsterAnim[mActor->mMotion].Delay;
+		break;
+	default:
+		break;
+	}
 }

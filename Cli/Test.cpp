@@ -144,7 +144,7 @@ void TestActorRender()
 
 	Actor actor;
 	actor.mPos = { 400,405 };
-	actor.mFeature.Gender = (uint8_t)ActorGender::Monster;
+	actor.mFeature.Gender = ActorGender::Woman;
 	actor.mFeature.Dress = 0;
 	actor.mFeature.Hair = 0;
 	actor.mFeature.Weapon = 1;
