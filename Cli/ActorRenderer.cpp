@@ -53,6 +53,7 @@ void ActorRenderer::Draw(uint32_t delta)
 		int x, y;
 		CaclScreenPos(x, y);
 		gfx->DrawCommand(sprite, x, y, MyGfx::Layer::Top);
+		gfx->DrawGizmoCross(x, y);
 	}
 }
 

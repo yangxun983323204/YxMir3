@@ -83,6 +83,7 @@ public:
 	void SetFPS(uint16_t requireFPS);
 	void DrawString(std::wstring str,int x,int y);
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
+	void DrawGizmoCross(int x, int y);
 	void DrawCache();
 	void RunLoop();
 	void Exit();
@@ -112,6 +113,11 @@ private:
 	bool mLoop;
 	float mFrameTime;
 	float mCurrFrameTime;
+
+	static bool Inited;
+	static uint16_t	BuiltinSpriteCount;
+	static Sprite** BuiltinSprite;
+	static void Init();
 
 	static bool DrawInfoSort(DrawInfo a, DrawInfo b);
 	static MyGfx *_inst;

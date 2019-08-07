@@ -156,6 +156,8 @@ void MapRenderer::DrawBG()
 				continue;
 			auto sprite = sMgr->GetSprite(fileIdx, tile.TileIndex);
 			if (sprite)
+				sprite->PivotX = 0;
+				sprite->PivotY = 0;
 				gfx->DrawCommand(
 					sprite, 
 					x * 96 + mTileState.OffsetX + mScrollState.xScrolled,
@@ -200,6 +202,8 @@ void MapRenderer::DrawMid()
 						}
 						auto sprite = sMgr->GetSprite(fileIdx, imgIdx);
 						if (sprite != nullptr) {
+							sprite->PivotX = 0;
+							sprite->PivotY = 0;
 							// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
 							drawX = (x + mCellState.OffsetX)*CellW + mScrollState.xScrolled;
 							drawY = (y + mCellState.OffsetY)*CellH - sprite->h() + mScrollState.yScrolled;
