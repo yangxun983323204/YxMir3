@@ -91,8 +91,8 @@ void TestMapRender()
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
 	renderer->SetPos(400, 400);
-	gfx->onDraw = [gfx, renderer](float delta) {
-		renderer->Draw(delta);
+	gfx->onDraw = [gfx, renderer](uint32_t deltaMs) {
+		renderer->Draw(deltaMs/1000.0f);
 		gfx->DrawCache();
 	};
 	gfx->onEvent = [gfx, renderer](SDL_Event* e) {
@@ -143,21 +143,23 @@ void TestActorRender()
 	renderer->SetPos(400, 400);
 
 	Actor actor;
-	actor.mPos = { 400,405 };
-	actor.mFeature.Gender = ActorGender::Woman;
-	actor.mFeature.Dress = 0;
-	actor.mFeature.Hair = 0;
-	actor.mFeature.Weapon = 1;
+	actor.SetPos({ 400,407 });
+	actor.SetFeature({
+		ActorGender::Woman,
+		8,0,1
+	});
+	actor.SetMotion(_MT_RUN);
 	ActorRenderer aRenderer;
 	aRenderer.SetActor(&actor);
 	aRenderer.SetMapRenderer(renderer);
+	aRenderer.Debug = true;
 
-	gfx->onDraw = [gfx, renderer,&aRenderer](float delta) {
-		renderer->Draw(delta);
-		aRenderer.Draw(delta);
+	gfx->onDraw = [gfx, renderer,&aRenderer](uint32_t deltaMs) {
+		renderer->Draw(deltaMs/1000.0f);
+		aRenderer.Draw(deltaMs);
 		gfx->DrawCache();
 	};
-	gfx->onEvent = [gfx, renderer](SDL_Event* e) {
+	gfx->onEvent = [gfx, renderer,&actor](SDL_Event* e) {
 		if (e->type == SDL_QUIT)
 			gfx->Exit();
 		else if (e->type == SDL_EventType::SDL_KEYDOWN)
@@ -165,15 +167,19 @@ void TestActorRender()
 			switch (e->key.keysym.sym)
 			{
 			case SDLK_UP:
+				actor.SetDir(Direction::Up);
 				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Up);
 				break;
 			case SDLK_DOWN:
+				actor.SetDir(Direction::Down);
 				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Down);
 				break;
 			case SDLK_LEFT:
+				actor.SetDir(Direction::Left);
 				renderer->Scroll(Map::Horizontal::Left, Map::Vertical::None);
 				break;
 			case SDLK_RIGHT:
+				actor.SetDir(Direction::Right);
 				renderer->Scroll(Map::Horizontal::Right, Map::Vertical::None);
 				break;
 			default:

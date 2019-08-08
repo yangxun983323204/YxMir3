@@ -22,8 +22,8 @@ void MyGfx::Init()
 	uint8_t half_down = floor(size / 2.0f);
 	// ¡°+¡±·ûºÅ¾«Áé
 	auto cross = new Sprite();
-	cross->PivotX = half_up;
-	cross->PivotY = -half_up;
+	cross->PivotX = -half_down;
+	cross->PivotY = -half_down;
 	cross->Surface = SDL_CreateRGBSurface(0, size, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
 	SDL_FillRect(cross->Surface, 0, 0x000000);
 	SDL_LockSurface(cross->Surface);
@@ -87,7 +87,7 @@ const SDL_Rect * MyGfx::GetRenderRect()
 void MyGfx::SetFPS(uint16_t requireFPS)
 {
 	mRequireFPS = requireFPS;
-	mFrameTime = 1.0f / mRequireFPS;
+	mFrameTime = 1000 / mRequireFPS;
 }
 
 void MyGfx::DrawString(std::wstring str, int x, int y)
@@ -178,8 +178,8 @@ void MyGfx::RunLoop()
 
 	bool quit = false;
 	SDL_Event e;
-	float preTime = SDL_GetTicks()/1000.0f;
-	float currTime = mFrameTime;
+	auto preTime = SDL_GetTicks();
+	auto currTime = mFrameTime;
 	while (mLoop)
 	{
 		if(SDL_PollEvent(&e)!=0)
@@ -188,13 +188,13 @@ void MyGfx::RunLoop()
 				onEvent(&e);
 		}
 		else {
-			currTime = SDL_GetTicks()/1000.0f;
-			float delta = currTime - preTime;
+			currTime = SDL_GetTicks();
+			auto delta = currTime - preTime;
 			mCurrFrameTime += delta;
 			preTime = currTime;
 			if (mCurrFrameTime > mFrameTime)
 			{
-				mFPS = ceil(1 / mCurrFrameTime);
+				mFPS = ceil(1 / (mCurrFrameTime/1000.0f));
 				if (onDraw)
 					onDraw(mCurrFrameTime);
 				mCurrFrameTime = 0;
@@ -233,7 +233,7 @@ inline void MyGfx::GetDrawRect(DrawInfo *info,__out SDL_Rect* srcRect, __out SDL
 	srcRect->w = info->w;
 	srcRect->h = info->h;
 
-	dstRect->x = info->x - info->sprite->PivotX;
+	dstRect->x = info->x + info->sprite->PivotX;
 	dstRect->y = info->y + info->sprite->PivotY;
 	dstRect->w = info->w;
 	dstRect->h = info->h;

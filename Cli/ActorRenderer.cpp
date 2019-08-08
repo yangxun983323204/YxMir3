@@ -8,6 +8,11 @@ using namespace std::placeholders;
 
 ActorRenderer::ActorRenderer()
 {
+	mMapRenderer = nullptr;
+	mActor = nullptr;
+	mCurrFrame = 0;
+	mCurrDelay = 0;
+	Debug = false;
 }
 
 
@@ -26,20 +31,21 @@ void ActorRenderer::SetActor(Actor * actor)
 	if (mActor!=nullptr)
 	{
 		mActor->onMotionChange = std::bind(&ActorRenderer::OnMotionChanged, this);
-		mImgLibIdx = mActor->mFeature.ImgLibIdxBase();
-		switch (actor->mFeature.Gender)
+		mImgLibIdx = mActor->GetFeature().ImgLibIdxBase();
+		switch (actor->GetFeature().Gender)
 		{
 		case ActorGender::Man:
 		case ActorGender::Woman:
 		case ActorGender::Npc:
 			break;
 		case ActorGender::Monster:
-			mImgLibIdx += (mActor->mFeature.Dress / 10);
+			mImgLibIdx += (mActor->GetFeature().Dress / 10);
 			break;
 		default:
 			break;
 		}
 	}
+	OnMotionChanged();
 }
 
 void ActorRenderer::Draw(uint32_t delta)
@@ -47,13 +53,14 @@ void ActorRenderer::Draw(uint32_t delta)
 	if (mActor == nullptr)
 		return;
 	auto gfx = MyGfx::Instance();
-	auto sprite = GetSprite();
+	auto sprite = GetSprite(delta);
 	if (sprite != nullptr)
 	{
 		int x, y;
 		CaclScreenPos(x, y);
 		gfx->DrawCommand(sprite, x, y, MyGfx::Layer::Top);
-		gfx->DrawGizmoCross(x, y);
+		if(Debug)
+			gfx->DrawGizmoCross(x, y);
 	}
 }
 
@@ -62,16 +69,23 @@ bool ActorRenderer::HasActor()
 	return mActor!=nullptr;
 }
 
-Sprite * ActorRenderer::GetSprite()
+Sprite * ActorRenderer::GetSprite(uint32_t delta)
 {
-	mCurrFrame = 0;
+	mCurrDelay += delta;
+	if (mCurrDelay>=mFrameDelay)
+	{
+		mCurrFrame += 1;
+		mCurrDelay -= mFrameDelay;
+		if (mCurrFrame >= mEndFrame)
+			mCurrFrame = mFstFrame;
+	}
 	return SpriteMgr::Instance()->GetSprite(mImgLibIdx, mCurrFrame);;
 }
 
 void ActorRenderer::CaclScreenPos(int32_t & x, int32_t & y)
 {
 	auto centerPos = mMapRenderer->GetPos();
-	auto myPos = mActor->mPos;
+	auto myPos = mActor->GetPos();
 	auto scroll = mMapRenderer->GetCellScrollOffset();
 	x = myPos.x - centerPos.x;
 	y = myPos.y - centerPos.y;
@@ -85,25 +99,29 @@ void ActorRenderer::CaclScreenPos(int32_t & x, int32_t & y)
 
 void ActorRenderer::OnMotionChanged()
 {
-	switch (mActor->mFeature.Gender)
+	switch (mActor->GetFeature().Gender)
 	{
 	case ActorGender::Man:
 	case ActorGender::Woman:
-		mFstFrame = HeroAnim[mActor->mMotion].First + mActor->mFeature.Dress*_MAX_HERO_FRAME + (uint16_t)mActor->mDir * 10;
-		mEndFrame = mFstFrame + HeroAnim[mActor->mMotion].Count;
-		mFrameDelay = HeroAnim[mActor->mMotion].Delay;
+		mFstFrame = HeroAnim[mActor->GetMotion()].First + mActor->GetFeature().Dress*_MAX_HERO_FRAME + (uint16_t)mActor->GetDir() * 10;
+		mEndFrame = mFstFrame + HeroAnim[mActor->GetMotion()].Count;
+		mFrameCount = HeroAnim[mActor->GetMotion()].Count;
+		mFrameDelay = HeroAnim[mActor->GetMotion()].Delay;
 		break;
 	case ActorGender::Npc:
-		mFstFrame = NPCAnim[mActor->mMotion].First + mActor->mFeature.Dress*_MAX_NPC_FRAME + (uint16_t)mActor->mDir * 10;
-		mEndFrame = mFstFrame + NPCAnim[mActor->mMotion].Count;
-		mFrameDelay = NPCAnim[mActor->mMotion].Delay;
+		mFstFrame = NPCAnim[mActor->GetMotion()].First + mActor->GetFeature().Dress*_MAX_NPC_FRAME + (uint16_t)mActor->GetDir() * 10;
+		mEndFrame = mFstFrame + NPCAnim[mActor->GetMotion()].Count;
+		mFrameCount = NPCAnim[mActor->GetMotion()].Count;
+		mFrameDelay = NPCAnim[mActor->GetMotion()].Delay;
 		break;
 	case ActorGender::Monster:
-		mFstFrame = MonsterAnim[mActor->mMotion].First + (mActor->mFeature.Dress % 10)*_MAX_MON_FRAME + (uint16_t)mActor->mDir * 10 - 1;
-		mEndFrame = mFstFrame + MonsterAnim[mActor->mMotion].Count;
-		mFrameDelay = MonsterAnim[mActor->mMotion].Delay;
+		mFstFrame = MonsterAnim[mActor->GetMotion()].First + (mActor->GetFeature().Dress % 10)*_MAX_MON_FRAME + (uint16_t)mActor->GetDir() * 10 - 1;
+		mEndFrame = mFstFrame + MonsterAnim[mActor->GetMotion()].Count;
+		mFrameCount = MonsterAnim[mActor->GetMotion()].Count;
+		mFrameDelay = MonsterAnim[mActor->GetMotion()].Delay;
 		break;
 	default:
 		break;
 	}
+	mCurrFrame = mFstFrame;
 }

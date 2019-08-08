@@ -92,7 +92,7 @@ public:
 	static inline void MyGfx::GetDrawRect(DrawInfo *info, __out SDL_Rect* srcRect, __out SDL_Rect* dstRect);
 	static MyGfx *Instance();
 
-	std::function<void(float delta)> onDraw;
+	std::function<void(uint32_t deltaMs)> onDraw;
 	std::function<void(SDL_Event*)> onEvent;
 
 	bool mDebug;
@@ -111,8 +111,8 @@ private:
 	uint16_t mFPS;
 
 	bool mLoop;
-	float mFrameTime;
-	float mCurrFrameTime;
+	uint32_t mFrameTime;//ms
+	uint32_t mCurrFrameTime;//ms
 
 	static bool Inited;
 	static uint16_t	BuiltinSpriteCount;

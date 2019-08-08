@@ -15,8 +15,10 @@ public:
 	void SetActor(Actor *actor);
 	void Draw(uint32_t delta);
 	bool HasActor();
+
+	bool Debug;
 protected:
-	virtual Sprite* GetSprite();
+	virtual Sprite* GetSprite(uint32_t delta);
 	virtual void CaclScreenPos(int32_t &x, int32_t &y);
 	void OnMotionChanged();// 当actor动作或方向变化时，更新动画帧的参数
 
@@ -24,10 +26,11 @@ protected:
 	Actor *mActor;
 	uint8_t mImgLibIdx;
 	uint8_t mEffectImgLibIdx;// todo
+
 	uint32_t mCurrFrame;
 	uint32_t mCurrDelay;
-
 	uint32_t mFstFrame;
 	uint32_t mEndFrame;
 	uint16_t mFrameDelay;
+	uint16_t mFrameCount;
 };

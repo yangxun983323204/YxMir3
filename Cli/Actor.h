@@ -83,6 +83,15 @@ public:
 
 	std::function<void()> onMotionChange;
 
+	Feature GetFeature();
+	void SetFeature(Feature f);
+	uint8_t GetMotion();
+	void SetMotion(uint8_t m);
+	Direction GetDir();
+	void SetDir(Direction dir);
+	Vector2UInt GetPos();
+	void SetPos(Vector2UInt v2i);
+private:
 	uint32_t mGUID;
 	wstring mName;
 	wstring mGuildName;
