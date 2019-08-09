@@ -90,7 +90,8 @@ using std::string;
 
 #define _IMAGE_NPC					130
 #define _IMAGE_MONMAGIC				131
-#define _MAX_MONSTER_IMAGE			132
+// 原为132
+#define _MAX_MONSTER_IMAGE			42
 
 //死亡的怪物?
 #define _IMAGE_D_MONSTER1			137
@@ -107,8 +108,8 @@ using std::string;
 
 
 
-
-#define _IMAGE_INTEREX				70	//已经没有这个文件了，用gameinter代替
+//已经没有这个文件了，用gameinter代替
+#define _IMAGE_INTEREX				70	
 
 
 #define _MAX_IMAGE					150

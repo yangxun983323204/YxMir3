@@ -18,8 +18,8 @@ public:
 
 	bool Debug;
 protected:
-	virtual Sprite* GetSprite(uint32_t delta);
-	virtual void CaclScreenPos(int32_t &x, int32_t &y);
+	Sprite* GetSprite(uint32_t delta);
+	void CaclScreenPos(int32_t &x, int32_t &y);
 	void OnMotionChanged();// 当actor动作或方向变化时，更新动画帧的参数
 
 	MapRenderer *mMapRenderer;

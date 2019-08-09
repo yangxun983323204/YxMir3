@@ -5,42 +5,9 @@
 
 MyGfx *MyGfx::_inst = nullptr;
 TTF_Font *MyGfx::gFont = TTF_OpenFont("./Fonts/STSONG.TTF", 16);
-//
-bool MyGfx::Inited = false;
-uint16_t MyGfx::BuiltinSpriteCount = 0;
-Sprite** MyGfx::BuiltinSprite = nullptr;
-
-void MyGfx::Init()
-{
-	if (MyGfx::Inited)
-		return;
-	Inited = true;
-	BuiltinSpriteCount = 1;
-	BuiltinSprite = new Sprite*[BuiltinSpriteCount];
-	uint8_t size = 15;
-	uint8_t half_up = ceil(size / 2.0f);
-	uint8_t half_down = floor(size / 2.0f);
-	// ¡°+¡±·ûºÅ¾«Áé
-	auto cross = new Sprite();
-	cross->PivotX = -half_down;
-	cross->PivotY = -half_down;
-	cross->Surface = SDL_CreateRGBSurface(0, size, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
-	SDL_FillRect(cross->Surface, 0, 0x000000);
-	SDL_LockSurface(cross->Surface);
-	auto p = (uint32_t*)(cross->Surface->pixels);
-	for (uint8_t i = 0; i < size; i++)
-	{
-		p[half_down * size + i] = 0xff0000ff;
-		p[i * size + half_down] = 0xff0000ff;
-	}
-	SDL_UnlockSurface(cross->Surface);
-	BuiltinSprite[0] = cross;
-}
-//
 
 MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 {
-	Init();
 	mCurrFrameTime = 0;
 	SetFPS(120);
 	_inst = this;
@@ -126,17 +93,6 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 	default:
 		break;
 	}
-}
-
-void MyGfx::DrawGizmoCross(int x, int y)
-{
-	DrawInfo info;
-	info.sprite = BuiltinSprite[0];
-	info.x = x;
-	info.y = y;
-	info.w = info.sprite->w();
-	info.h = info.sprite->h();
-	mTopCache.push_back(info);
 }
 
 void MyGfx::DrawCache()

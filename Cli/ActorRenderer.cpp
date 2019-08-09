@@ -58,9 +58,27 @@ void ActorRenderer::Draw(uint32_t delta)
 	{
 		int x, y;
 		CaclScreenPos(x, y);
+		// todo draw shadow
+		Sprite* shadow = nullptr;
+		auto f = mActor->GetFeature();
+		if (f.IsMonster() && f.Dress >= 200)// 3G?
+			shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + 1, mCurrFrame);
+		else
+			shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, mCurrFrame);
+		if (shadow)
+			gfx->DrawCommand(shadow, x + sprite->ShadowPosX, y + sprite->ShadowPosY, MyGfx::Layer::Top);
+		// todo draw weapon
+		// todo draw horse
+		// draw actor
 		gfx->DrawCommand(sprite, x, y, MyGfx::Layer::Top);
-		if(Debug)
-			gfx->DrawGizmoCross(x, y);
+		if (Debug) {
+			gfx->DrawCommand(
+				SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
+				x, y, MyGfx::Layer::Top);
+		}
+		// todo draw hair
+		// todo draw effect
+		// todo draw shield
 	}
 }
 

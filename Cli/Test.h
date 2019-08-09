@@ -11,11 +11,11 @@ void TestActorRender();
 
 inline void Test() 
 {
-	TestImageLib_Load();
-	TestImageLib_LoadImage();
-	TestMyGfxCreateSpriteFromImage();
-	TestMapLoad();
-	TestDrawMapRect();
-	TestMapRender();
+	//TestImageLib_Load();
+	//TestImageLib_LoadImage();
+	//TestMyGfxCreateSpriteFromImage();
+	//TestMapLoad();
+	//TestDrawMapRect();
+	//TestMapRender();
 	TestActorRender();
 }

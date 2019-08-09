@@ -2,9 +2,44 @@
 #include <assert.h>
 
 SpriteMgr *SpriteMgr::_inst = nullptr;
+//
+bool SpriteMgr::Inited = false;
+uint16_t SpriteMgr::BuiltinSpriteCount = 0;
+Sprite** SpriteMgr::BuiltinSprite = nullptr;
+
+const uint8_t SpriteMgr::IdxBuiltinCross = 0;
+
+void SpriteMgr::Init()
+{
+	if (SpriteMgr::Inited)
+		return;
+	Inited = true;
+	BuiltinSpriteCount = 1;
+	BuiltinSprite = new Sprite*[BuiltinSpriteCount];
+	uint8_t size = 15;
+	uint8_t half_up = ceil(size / 2.0f);
+	uint8_t half_down = floor(size / 2.0f);
+	// “+”符号精灵
+	auto cross = new Sprite();
+	cross->PivotX = -half_down + CellW / 2;// 坐标在左上角，因此要绘制在格子中心，需要向右下移半格
+	cross->PivotY = -half_down + CellH / 2;
+	cross->Surface = SDL_CreateRGBSurface(0, size, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
+	SDL_FillRect(cross->Surface, 0, 0x000000);
+	SDL_LockSurface(cross->Surface);
+	auto p = (uint32_t*)(cross->Surface->pixels);
+	for (uint8_t i = 0; i < size; i++)
+	{
+		p[half_down * size + i] = 0xff0000ff;
+		p[i * size + half_down] = 0xff0000ff;
+	}
+	SDL_UnlockSurface(cross->Surface);
+	BuiltinSprite[IdxBuiltinCross] = cross;
+}
+//
 
 SpriteMgr::SpriteMgr()
 {
+	Init();
 }
 
 
@@ -52,6 +87,11 @@ Sprite * SpriteMgr::GetSprite(uint32_t fileIdx, uint32_t imgIdx)
 		mSpriteMap[fileIdx].sprites[imgIdx] = sprite;
 		return sprite;
 	}
+}
+
+Sprite * SpriteMgr::GetBuiltinSprite(uint8_t idx)
+{
+	return BuiltinSprite[idx];
 }
 
 SpriteMgr * SpriteMgr::Instance()
