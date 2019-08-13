@@ -13,6 +13,8 @@ public:
 
 	void InitLibs();
 	Sprite *GetSprite(uint32_t fileIdx,uint32_t imgIdx);
+	// 有些影子是用原图变换出来的，并无直接素材
+	Sprite *GetProjShadow(Sprite *base,Sprite::ShadowType type);
 	Sprite *GetBuiltinSprite(uint8_t idx);
 
 	static SpriteMgr *Instance();
@@ -27,6 +29,8 @@ private:
 		Sprite** sprites;
 	};
 
+	Sprite* CreateOrthShadow(Sprite *base);
+	Sprite* CreateProjShadow(Sprite *base);
 	void ClearCache();
 
 	ImageLib mLibs[_MAX_IMAGE];

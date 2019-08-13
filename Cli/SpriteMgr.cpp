@@ -89,6 +89,21 @@ Sprite * SpriteMgr::GetSprite(uint32_t fileIdx, uint32_t imgIdx)
 	}
 }
 
+Sprite * SpriteMgr::GetProjShadow(Sprite * base, Sprite::ShadowType type)
+{
+	if (base->_shadow == nullptr || base->_shadowType != type) {
+		if (base->_shadow) {
+			delete base->_shadow;
+			base->_shadow = nullptr;
+		}
+		if (type == Sprite::ShadowType::Orth)
+			base->_shadow = CreateOrthShadow(base);
+		else if (type == Sprite::ShadowType::Proj)
+			base->_shadow = CreateProjShadow(base);
+	}
+	return base->_shadow;
+}
+
 Sprite * SpriteMgr::GetBuiltinSprite(uint8_t idx)
 {
 	return BuiltinSprite[idx];
@@ -102,6 +117,16 @@ SpriteMgr * SpriteMgr::Instance()
 		_inst->InitLibs();
 	}
 	return _inst;
+}
+
+Sprite * SpriteMgr::CreateOrthShadow(Sprite * base)
+{
+	return nullptr;// TODO
+}
+
+Sprite * SpriteMgr::CreateProjShadow(Sprite * base)
+{
+	return nullptr;// TODO
 }
 
 void SpriteMgr::ClearCache()

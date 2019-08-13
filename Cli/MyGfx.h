@@ -7,7 +7,13 @@
 
 class Sprite
 {
+	friend class SpriteMgr;
 public:
+	enum class ShadowType 
+	{
+		Orth,
+		Proj,
+	};
 	int16_t PivotX;
 	int16_t PivotY;
 	bool HasShadow;
@@ -21,6 +27,15 @@ public:
 		PivotX = PivotY = ShadowPosX = ShadowPosY = OverridW = OverridH = 0;
 		Surface = nullptr;
 		HasShadow = false;
+		_shadow = nullptr;
+		_shadowType = ShadowType::Proj;
+	}
+	~Sprite()
+	{
+		if (_shadow != nullptr) {
+			delete _shadow;
+			_shadow = nullptr;
+		}
 	}
 
 	inline uint16_t w()
@@ -31,6 +46,9 @@ public:
 	{
 		return OverridH == 0 ? Surface->h : OverridH;
 	}
+private:
+	Sprite* _shadow;
+	ShadowType _shadowType;
 };
 
 struct DrawInfo
