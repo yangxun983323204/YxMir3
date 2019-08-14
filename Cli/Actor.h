@@ -66,6 +66,15 @@ struct Feature
 		}
 		return 0;
 	}
+
+	bool operator ==(const Feature &f)
+	{
+		return
+			this->Gender == f.Gender &&
+			this->Dress == f.Dress &&
+			this->Hair == f.Hair &&
+			this->Weapon == f.Weapon;
+	}
 };
 
 struct FeatureEx

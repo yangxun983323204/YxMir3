@@ -177,7 +177,7 @@ Sprite* MyGfx::CreateSpriteFromImage(Image * image)
 		(void*)(image->Pixels), 
 		image->Width, image->Height,
 		32, 4 * image->Width,
-		MyColor::MaskR, MyColor::MaskG, MyColor::MaskB, MyColor::MaskA);
+		ImageLib::MaskR, ImageLib::MaskG, ImageLib::MaskB, ImageLib::MaskA);
 
 	return sprite;
 }

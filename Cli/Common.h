@@ -5,6 +5,11 @@ struct Vector2UInt
 {
 	uint32_t x;
 	uint32_t y;
+
+	bool operator ==(const Vector2UInt &v2) 
+	{
+		return this->x == v2.x && this->y == v2.y;
+	}
 };
 
 struct Vector2Int

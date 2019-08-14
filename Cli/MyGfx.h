@@ -32,6 +32,7 @@ public:
 	}
 	~Sprite()
 	{
+		SDL_FreeSurface(Surface);
 		if (_shadow != nullptr) {
 			delete _shadow;
 			_shadow = nullptr;

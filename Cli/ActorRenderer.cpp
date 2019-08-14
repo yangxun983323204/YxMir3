@@ -61,7 +61,9 @@ void ActorRenderer::Draw(uint32_t delta)
 		// todo draw shadow
 		Sprite* shadow = nullptr;
 		auto f = mActor->GetFeature();
-		if (f.IsMonster() && f.Dress >= 200)// 3G?
+		if (f.IsMan() || f.IsWoman())
+			shadow = SpriteMgr::Instance()->GetShadow(sprite, Sprite::ShadowType::Proj);
+		else if (f.IsMonster() && f.Dress >= 200)// 3G?
 			shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + 1, mCurrFrame);
 		else
 			shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, mCurrFrame);

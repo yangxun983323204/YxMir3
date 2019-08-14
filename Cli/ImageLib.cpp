@@ -1,10 +1,10 @@
 ﻿#include "ImageLib.h"
 #include <assert.h>
 
-const uint32_t MyColor::MaskR = 0x000000ff;
-const uint32_t MyColor::MaskG = 0x0000ff00;
-const uint32_t MyColor::MaskB = 0x00ff0000;
-const uint32_t MyColor::MaskA = 0xff000000;
+const uint32_t ImageLib::MaskR = 0x000000ff;
+const uint32_t ImageLib::MaskG = 0x0000ff00;
+const uint32_t ImageLib::MaskB = 0x00ff0000;
+const uint32_t ImageLib::MaskA = 0xff000000;
 
 const unsigned char ImageLib::KeyNone = 0xc0;// 透明
 const unsigned char ImageLib::KeyConst = 0xc1;

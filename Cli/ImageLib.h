@@ -71,11 +71,6 @@ struct MyColor
 	float RateR() { return r / 255.0f; }
 	float RateG() { return g / 255.0f; }
 	float RateB() { return b / 255.0f; }
-
-	const static uint32_t MaskR;
-	const static uint32_t MaskG;
-	const static uint32_t MaskB;
-	const static uint32_t MaskA;
 };
 struct Image
 {
@@ -119,6 +114,10 @@ public:
 	uint32_t ImgCount();
 
 	static void ExFileIdx(int &n);
+	const static uint32_t MaskR;
+	const static uint32_t MaskG;
+	const static uint32_t MaskB;
+	const static uint32_t MaskA;
 private:
 	void SetPath(string path);
 	void Clear();
