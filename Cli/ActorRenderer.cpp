@@ -10,8 +10,6 @@ ActorRenderer::ActorRenderer()
 {
 	mMapRenderer = nullptr;
 	mActor = nullptr;
-	mCurrFrame = 0;
-	mCurrDelay = 0;
 	Debug = false;
 }
 
@@ -52,36 +50,42 @@ void ActorRenderer::Draw(uint32_t delta)
 {
 	if (mActor == nullptr)
 		return;
-	auto gfx = MyGfx::Instance();
 	auto sprite = GetSprite(delta);
 	if (sprite != nullptr)
 	{
-		int x, y;
-		CaclScreenPos(x, y);
-		// todo draw shadow
-		Sprite* shadow = nullptr;
-		auto f = mActor->GetFeature();
-		if (f.IsMan() || f.IsWoman())
-			shadow = SpriteMgr::Instance()->GetShadow(sprite, Sprite::ShadowType::Proj);
-		else if (f.IsMonster() && f.Dress >= 200)// 3G?
-			shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + 1, mCurrFrame);
-		else
-			shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, mCurrFrame);
-		if (shadow)
-			gfx->DrawCommand(shadow, x + sprite->ShadowPosX, y + sprite->ShadowPosY, MyGfx::Layer::Top);
-		// todo draw weapon
-		// todo draw horse
-		// draw actor
-		gfx->DrawCommand(sprite, x, y, MyGfx::Layer::Top);
-		if (Debug) {
-			gfx->DrawCommand(
-				SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
-				x, y, MyGfx::Layer::Top);
-		}
-		// todo draw hair
-		// todo draw effect
-		// todo draw shield
+		Vector2Int pos;
+		CaclScreenPos(pos.x, pos.y);
+		DrawImpl(delta, pos, sprite);
 	}
+}
+
+void ActorRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite *actorSprite)
+{
+	// 暂时保留在这，等各子类完成，这个方法清空
+	auto gfx = MyGfx::Instance();
+	// todo draw shadow
+	Sprite* shadow = nullptr;
+	auto f = mActor->GetFeature();
+	if (f.IsMan() || f.IsWoman())
+		shadow = SpriteMgr::Instance()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
+	else if (f.IsMonster() && f.Dress >= 200)// 3G?
+		shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + 1, _anim.Current);
+	else
+		shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, _anim.Current);
+	if (shadow)
+		gfx->DrawCommand(shadow, pos.x + actorSprite->ShadowPosX, pos.y + actorSprite->ShadowPosY, MyGfx::Layer::Top);
+	// todo draw weapon
+	// todo draw horse
+	// draw actor
+	gfx->DrawCommand(actorSprite, pos.x, pos.y, MyGfx::Layer::Top);
+	if (Debug) {
+		gfx->DrawCommand(
+			SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
+			pos.x, pos.y, MyGfx::Layer::Top);
+	}
+	// todo draw hair
+	// todo draw effect
+	// todo draw shield
 }
 
 bool ActorRenderer::HasActor()
@@ -91,15 +95,8 @@ bool ActorRenderer::HasActor()
 
 Sprite * ActorRenderer::GetSprite(uint32_t delta)
 {
-	mCurrDelay += delta;
-	if (mCurrDelay>=mFrameDelay)
-	{
-		mCurrFrame += 1;
-		mCurrDelay -= mFrameDelay;
-		if (mCurrFrame >= mEndFrame)
-			mCurrFrame = mFstFrame;
-	}
-	return SpriteMgr::Instance()->GetSprite(mImgLibIdx, mCurrFrame);;
+	_anim.Update(delta);
+	return SpriteMgr::Instance()->GetSprite(mImgLibIdx, _anim.Current);;
 }
 
 void ActorRenderer::CaclScreenPos(int32_t & x, int32_t & y)
@@ -123,25 +120,15 @@ void ActorRenderer::OnMotionChanged()
 	{
 	case ActorGender::Man:
 	case ActorGender::Woman:
-		mFstFrame = HeroAnim[mActor->GetMotion()].First + mActor->GetFeature().Dress*_MAX_HERO_FRAME + (uint16_t)mActor->GetDir() * 10;
-		mEndFrame = mFstFrame + HeroAnim[mActor->GetMotion()].Count;
-		mFrameCount = HeroAnim[mActor->GetMotion()].Count;
-		mFrameDelay = HeroAnim[mActor->GetMotion()].Delay;
+		_anim.Reset(HeroAnim[mActor->GetMotion()], mActor->GetFeature().Dress*_MAX_HERO_FRAME + (uint16_t)mActor->GetDir() * 10);
 		break;
 	case ActorGender::Npc:
-		mFstFrame = NPCAnim[mActor->GetMotion()].First + mActor->GetFeature().Dress*_MAX_NPC_FRAME + (uint16_t)mActor->GetDir() * 10;
-		mEndFrame = mFstFrame + NPCAnim[mActor->GetMotion()].Count;
-		mFrameCount = NPCAnim[mActor->GetMotion()].Count;
-		mFrameDelay = NPCAnim[mActor->GetMotion()].Delay;
+		_anim.Reset(NPCAnim[mActor->GetMotion()], mActor->GetFeature().Dress*_MAX_NPC_FRAME + (uint16_t)mActor->GetDir() * 10);
 		break;
 	case ActorGender::Monster:
-		mFstFrame = MonsterAnim[mActor->GetMotion()].First + (mActor->GetFeature().Dress % 10)*_MAX_MON_FRAME + (uint16_t)mActor->GetDir() * 10 - 1;
-		mEndFrame = mFstFrame + MonsterAnim[mActor->GetMotion()].Count;
-		mFrameCount = MonsterAnim[mActor->GetMotion()].Count;
-		mFrameDelay = MonsterAnim[mActor->GetMotion()].Delay;
+		_anim.Reset(MonsterAnim[mActor->GetMotion()], (mActor->GetFeature().Dress % 10)*_MAX_MON_FRAME + (uint16_t)mActor->GetDir() * 10 - 1);
 		break;
 	default:
 		break;
 	}
-	mCurrFrame = mFstFrame;
 }

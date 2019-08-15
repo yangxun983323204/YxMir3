@@ -6,6 +6,9 @@
 #include "SpriteMgr.h"
 #include "Actor.h"
 #include "ActorRenderer.h"
+#include "HeroRenderer.h"
+#include "Hero.h"
+#include "MyHeroRenderer.h"
 
 void TestImageLib_Load() 
 {
@@ -103,16 +106,16 @@ void TestMapRender()
 			switch (e->key.keysym.sym)
 			{
 			case SDLK_UP:
-				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Up);
+				renderer->Scroll(Horizontal::None, Vertical::Up);
 				break;
 			case SDLK_DOWN:
-				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Down);
+				renderer->Scroll(Horizontal::None, Vertical::Down);
 				break;
 			case SDLK_LEFT:
-				renderer->Scroll(Map::Horizontal::Left, Map::Vertical::None);
+				renderer->Scroll(Horizontal::Left, Vertical::None);
 				break;
 			case SDLK_RIGHT:
-				renderer->Scroll(Map::Horizontal::Right, Map::Vertical::None);
+				renderer->Scroll(Horizontal::Right, Vertical::None);
 				break;
 			default:
 				break;
@@ -132,7 +135,6 @@ void TestMapRender()
 }
 void TestActorRender() 
 {
-	// todo
 	MyGfx *gfx = new MyGfx(L"±ÈÆæ³Ç", LayoutW, LayoutH);
 	auto sMgr = SpriteMgr::Instance();
 	Map map;
@@ -140,21 +142,22 @@ void TestActorRender()
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
-	renderer->SetPos(400, 400);
+	renderer->SetPos(400, 390);
 
-	Actor actor;
-	actor.SetPos({ 400,407 });
+	Hero actor;
+	actor.SetPos({ 400,390 });
 	actor.SetFeature({
 		ActorGender::Woman,
-		8,0,1
+		8,2,32
 	});
 	actor.SetMotion(_MT_RUN);
-	ActorRenderer aRenderer;
+	MyHeroRenderer aRenderer;
 	aRenderer.SetActor(&actor);
 	aRenderer.SetMapRenderer(renderer);
 	aRenderer.Debug = true;
 
-	gfx->onDraw = [gfx, renderer,&aRenderer](uint32_t deltaMs) {
+	gfx->onDraw = [gfx, renderer,&aRenderer,&actor](uint32_t deltaMs) {
+		actor.Update(deltaMs);
 		renderer->Draw(deltaMs/1000.0f);
 		aRenderer.Draw(deltaMs);
 		gfx->DrawCache();
@@ -167,20 +170,24 @@ void TestActorRender()
 			switch (e->key.keysym.sym)
 			{
 			case SDLK_UP:
-				actor.SetDir(Direction::Up);
-				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Up);
+				actor.Walk(Direction::Up);
+				//actor.SetDir(Direction::Up);
+				//renderer->Scroll(Map::Horizontal::None, Map::Vertical::Up);
 				break;
 			case SDLK_DOWN:
-				actor.SetDir(Direction::Down);
-				renderer->Scroll(Map::Horizontal::None, Map::Vertical::Down);
+				actor.Walk(Direction::Down);
+				//actor.SetDir(Direction::Down);
+				//renderer->Scroll(Map::Horizontal::None, Map::Vertical::Down);
 				break;
 			case SDLK_LEFT:
-				actor.SetDir(Direction::Left);
-				renderer->Scroll(Map::Horizontal::Left, Map::Vertical::None);
+				actor.Walk(Direction::Left);
+				//actor.SetDir(Direction::Left);
+				//renderer->Scroll(Map::Horizontal::Left, Map::Vertical::None);
 				break;
 			case SDLK_RIGHT:
-				actor.SetDir(Direction::Right);
-				renderer->Scroll(Map::Horizontal::Right, Map::Vertical::None);
+				actor.Walk(Direction::Right);
+				//actor.SetDir(Direction::Right);
+				//renderer->Scroll(Map::Horizontal::Right, Map::Vertical::None);
 				break;
 			default:
 				break;

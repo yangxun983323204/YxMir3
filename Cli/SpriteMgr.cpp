@@ -1,5 +1,6 @@
 #include "SpriteMgr.h"
 #include <assert.h>
+#include "Common.h"
 
 SpriteMgr *SpriteMgr::_inst = nullptr;
 //
@@ -133,13 +134,14 @@ Sprite * SpriteMgr::CreateOrthShadow(Sprite * base)
 	shadow->Surface = dst;
 	return shadow;
 }
-
+const static uint8_t projX = 36;
+// 矩形变换为平行四边形，顶边水平右移projX,竖直除以2
 Sprite * SpriteMgr::CreateProjShadow(Sprite * base)
 {
 	auto src = base->Surface;
 	int sw = src->w;
 	int sh = src->h;
-	int w = src->w * 2;
+	int w = src->w + projX;
 	int h = src->h / 2;
 	auto dst = SDL_CreateRGBSurface(
 		0, w, h,
@@ -150,7 +152,7 @@ Sprite * SpriteMgr::CreateProjShadow(Sprite * base)
 	{
 		for (int x = 0; x < w; x++)
 		{
-			int offsetX = floor(sw*(1-(float)y / h));
+			int offsetX = floor(projX*(1-(float)y / h));
 			int sx = x - offsetX;
 			int sy = y * 2;
 			if (sx < 0 || sx >= sw)

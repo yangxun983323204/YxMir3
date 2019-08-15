@@ -26,7 +26,7 @@ struct Feature
 	inline bool IsWoman() { return Gender == ActorGender::Woman; }
 	inline bool IsMonster() { return Gender == ActorGender::Monster; }
 	inline bool IsNPC() { return Gender == ActorGender::Npc; }
-	inline bool HasWeapon() { return  Weapon != 0; }
+	inline bool HasWeapon() { return  Weapon != _WEAPON_NONE; }
 
 	inline uint16_t ImgLibIdxBase() 
 	{
@@ -91,6 +91,8 @@ public:
 	~Actor();
 
 	std::function<void()> onMotionChange;
+	std::function<void(Direction, uint16_t)> onMove;
+	std::function<void()> onMoved;
 
 	Feature GetFeature();
 	void SetFeature(Feature f);
@@ -100,7 +102,12 @@ public:
 	void SetDir(Direction dir);
 	Vector2UInt GetPos();
 	void SetPos(Vector2UInt v2i);
-private:
+	void Update(uint32_t delta);
+protected:
+	void Move(Direction dir, uint16_t speed);
+
+	ScrollState _moveState;
+
 	uint32_t mGUID;
 	wstring mName;
 	wstring mGuildName;

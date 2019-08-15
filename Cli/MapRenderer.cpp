@@ -2,30 +2,6 @@
 #include "WILIndex.h"
 #include "SpriteMgr.h"
 
-void MapRenderer::ScrollState::Set(Map::Horizontal x, Map::Vertical y)
-{
-	Reset();
-	if (x == Map::Horizontal::Right) {
-		xDir = -1;
-		xNeedScroll = -CellW;
-	}
-	else if (x == Map::Horizontal::Left) {
-		xDir = 1;
-		xNeedScroll = CellW;
-	}
-
-	if (y == Map::Vertical::Down) {
-		yDir = -1;
-		yNeedScroll = -CellH;
-	}
-	else if (y == Map::Vertical::Up) {
-		yDir = 1;
-		yNeedScroll = CellH;
-	}
-	xType = x;
-	yType = y;
-}
-
 MapRenderer::MapRenderer()
 {
 	mDebug = false;
@@ -77,8 +53,50 @@ void MapRenderer::Draw(float delta)
 	if (mDebug)
 		DrawDebugGrid();
 }
-
-void MapRenderer::Scroll(Map::Horizontal x, Map::Vertical y)
+void MapRenderer::SetScrollSpeed(float cellPerSec)
+{
+	mScrollState.scrollSpeed = cellPerSec;
+}
+void MapRenderer::Scroll(Direction dir)
+{
+	Horizontal x = Horizontal::None;
+	Vertical y = Vertical::None;
+	switch (dir)
+	{
+	case Direction::Up:
+		y = Vertical::Up;
+		break;
+	case Direction::UpRight:
+		x = Horizontal::Right;
+		y = Vertical::Up;
+		break;
+	case Direction::Right:
+		x = Horizontal::Right;
+		break;
+	case Direction::DownRight:
+		x = Horizontal::Right;
+		y = Vertical::Down;
+		break;
+	case Direction::Down:
+		y = Vertical::Down;
+		break;
+	case Direction::DownLeft:
+		x = Horizontal::Left;
+		y = Vertical::Down;
+		break;
+	case Direction::Left:
+		x = Horizontal::Left;
+		break;
+	case Direction::UpLeft:
+		x = Horizontal::Left;
+		y = Vertical::Up;
+		break;
+	default:
+		break;
+	}
+	Scroll(x, y);
+}
+void MapRenderer::Scroll(Horizontal x, Vertical y)
 {
 	if(!mScrollState.IsScrolling())
 		mScrollState.Set(x, y);

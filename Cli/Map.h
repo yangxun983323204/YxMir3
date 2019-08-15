@@ -7,16 +7,6 @@ using std::string;
 // TileInfo[w*h/4]   一个tile包含4个cell
 // CellInfo[w*h]
 //=============================================
-
-
-// 为了让角色居中，因此让屏幕水平和竖直方向都显示奇数个格子
-#define CellW 48
-#define CellH 32
-#define XCount 17
-#define YCount 17
-#define LayoutW  CellW*XCount
-#define LayoutH  CellH*YCount
-
 #pragma pack(1)
 
 struct MapLight
@@ -136,20 +126,6 @@ struct DoorInfo {
 class Map
 {
 public:
-	enum class Horizontal
-	{
-		None = -1,
-		Left = 6,
-		Right = 2
-	};
-
-	enum class Vertical
-	{
-		None = -1,
-		Up = 0,
-		Down = 4
-	};
-
 	Map();
 	~Map();
 	void Load(string mapPath);
@@ -158,6 +134,7 @@ public:
 	TileInfo TileAt(uint32_t x, uint32_t y);
 	CellInfo CellAt(uint32_t x, uint32_t y);
 	bool InMap(uint32_t x, uint32_t y);
+
 private:
 	void Clear();
 

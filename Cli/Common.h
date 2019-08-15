@@ -1,6 +1,14 @@
 ﻿#pragma once
 #include <stdint.h>
 
+// 为了让角色居中，因此让屏幕水平和竖直方向都显示奇数个格子
+#define CellW 48
+#define CellH 32
+#define XCount 17
+#define YCount 17
+#define LayoutW  CellW*XCount
+#define LayoutH  CellH*YCount
+
 struct Vector2UInt
 {
 	uint32_t x;
@@ -39,7 +47,81 @@ enum class Direction
 	Down,
 	DownLeft,
 	Left,
-	TopLeft
+	UpLeft
+};
+
+enum class Horizontal
+{
+	None = -1,
+	Left = 6,
+	Right = 2
+};
+
+enum class Vertical
+{
+	None = -1,
+	Up = 0,
+	Down = 4
+};
+
+struct ScrollState
+{
+	Horizontal xType;
+	Vertical yType;
+	int8_t xNeedScroll;
+	int8_t yNeedScroll;
+	float xScrolled;
+	float yScrolled;
+	int8_t xDir;
+	int8_t yDir;
+	float scrollSpeed;// 滚动cell数/每秒
+
+	inline bool Update(float delta)
+	{
+		xScrolled += (xDir * CellW * scrollSpeed * delta);
+		yScrolled += (yDir * CellH * scrollSpeed * delta);
+		if ((xDir != 0 && abs(xScrolled) >= abs(xNeedScroll)) || (yDir != 0 && abs(yScrolled) >= abs(yNeedScroll))) {
+			xScrolled = xNeedScroll; yScrolled = yNeedScroll;
+			return false;
+		}
+		else
+			return true;
+	}
+	inline void Reset()
+	{
+		xNeedScroll = 0; yNeedScroll = 0;
+		xScrolled = 0; yScrolled = 0;
+		xDir = 0; yDir = 0;
+	}
+
+	inline bool IsScrolling()
+	{
+		return (xNeedScroll != xScrolled) || (yNeedScroll != yScrolled);
+	}
+
+	inline void ScrollState::Set(Horizontal x, Vertical y)
+	{
+		Reset();
+		if (x == Horizontal::Right) {
+			xDir = -1;
+			xNeedScroll = -CellW;
+		}
+		else if (x == Horizontal::Left) {
+			xDir = 1;
+			xNeedScroll = CellW;
+		}
+
+		if (y == Vertical::Down) {
+			yDir = -1;
+			yNeedScroll = -CellH;
+		}
+		else if (y == Vertical::Up) {
+			yDir = 1;
+			yNeedScroll = CellH;
+		}
+		xType = x;
+		yType = y;
+	}
 };
 
 #define _MAX_HERO_KIND				10
@@ -115,3 +197,27 @@ enum class Direction
 #define _MAX_MAGIC					52
 #define _MAX_EXPLOSION				8
 #pragma endregion
+
+
+#define _DEFAULT_SPELLFRAME			10
+#define _DEFAULT_DELAYTIME			300
+
+#define _HAIR_NONE					0
+#define _MAX_HAIR					30
+
+#define _WEAPON_NONE				0		
+#define _MAX_WEAPON					50
+
+#define _HORSE_NONE					0
+#define _MAX_HORSE					4
+
+#define	_MAX_WEAPON_MTN				25
+#define	_MAX_WEAPON_FRAME			3000
+
+#define	_START_HORSE_FRAME			2320
+#define	_START_HORSE_MTN			29
+#define	_MAX_HORSE_FRAME			400
+
+#define _SPEED_WALK					1
+#define _SPEED_RUN					2
+#define _SPEED_HORSERUN				3

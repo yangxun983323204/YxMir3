@@ -9,7 +9,32 @@ struct FrameAnim
 	uint16_t Count;
 	uint16_t Delay;
 };
+struct AnimInstance : FrameAnim
+{
+	uint16_t End;
+	uint16_t Current;
+	uint16_t CurrentDelay;
 
+	inline void Reset(const FrameAnim& anim,int offset) {
+		this->First = anim.First+offset;
+		this->Count = anim.Count;
+		this->Delay = anim.Delay;
+		this->End = this->First + this->Count;
+		this->Current = this->First;
+		this->CurrentDelay = 0;
+	}
+	inline void Update(uint32_t delta)
+	{
+		CurrentDelay += delta;
+		if (CurrentDelay >= Delay)
+		{
+			Current += 1;
+			CurrentDelay -= Delay;
+			if (Current >= End)
+				Current = First;
+		}
+	}
+};
 // todo
 struct EffectFrameAnim :FrameAnim
 {
