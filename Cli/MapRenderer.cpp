@@ -6,7 +6,7 @@ MapRenderer::MapRenderer()
 {
 	mDebug = false;
 	mRedrawBG = true;
-	mScrollState.scrollSpeed = 4.0f;
+	mScrollState.scrollSpeed = 4/1000.0f;
 	mScrollState.Reset();
 	CalcCellDrawState(mCellState);
 }
@@ -20,12 +20,11 @@ void MapRenderer::SetMap(Map * map)
 	mMap = map;
 }
 
-void MapRenderer::SetPos(uint32_t x, uint32_t y)
+void MapRenderer::SetPos(Vector2UInt pos)
 {
-	mPos.x = x;
-	mPos.y = y;
+	mPos = pos;
 	mScrollState.Reset();
-	CalcTileDrawState(x, y, mTileState);
+	CalcTileDrawState(mPos.x, mPos.y, mTileState);
 }
 
 Vector2UInt MapRenderer::GetPos()
@@ -38,13 +37,13 @@ Vector2Float MapRenderer::GetCellScrollOffset()
 	return Vector2Float{ mScrollState.xScrolled, mScrollState.yScrolled };
 }
 
-void MapRenderer::Draw(float delta)
+void MapRenderer::Draw(uint32_t delta)
 {
 	if (mScrollState.IsScrolling()) {
 		mRedrawBG = true;
 		if (!mScrollState.Update(delta))// 如果返回false，说明滚动结束
 		{
-			SetPos(mPos.x - mScrollState.xDir, mPos.y - mScrollState.yDir);
+			SetPos(Vector2UInt{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
 		}
 	}
 	DrawBG();
@@ -57,7 +56,7 @@ void MapRenderer::SetScrollSpeed(float cellPerSec)
 {
 	mScrollState.scrollSpeed = cellPerSec;
 }
-void MapRenderer::Scroll(Direction dir)
+void MapRenderer::Scroll(Direction dir,uint8_t count)
 {
 	Horizontal x = Horizontal::None;
 	Vertical y = Vertical::None;
@@ -94,12 +93,12 @@ void MapRenderer::Scroll(Direction dir)
 	default:
 		break;
 	}
-	Scroll(x, y);
+	Scroll(x, y, count);
 }
-void MapRenderer::Scroll(Horizontal x, Vertical y)
+void MapRenderer::Scroll(Horizontal x, Vertical y, uint8_t count)
 {
 	if(!mScrollState.IsScrolling())
-		mScrollState.Set(x, y);
+		mScrollState.Set(x, y, count);
 }
 
 void MapRenderer::CalcTileDrawState(uint16_t x, uint16_t y, DrawState &info)

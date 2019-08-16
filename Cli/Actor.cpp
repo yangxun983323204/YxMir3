@@ -8,6 +8,8 @@ Actor::Actor()
 	mDir = Direction::Down;
 	mMoveSpeed = 1;
 	mLightRange = 72;
+	_action.Enable = true;
+	_actionCache.Enable = false;
 }
 
 
@@ -60,57 +62,75 @@ Vector2UInt Actor::GetPos()
 	return mPos;
 }
 
+Action Actor::GetAction()
+{
+	return _action;
+}
+
 void Actor::SetPos(Vector2UInt v2i)
 {
 	if (mPos == v2i)
 		return;
 	mPos = v2i;
 }
-void Actor::Move(Direction dir, uint16_t speed)
+bool Actor::Move(Direction dir, uint16_t speed)
 {
-	if (_moveState.IsScrolling())
-		return;
+	if (_moveState.IsScrolling()) {
+		return false;
+	}
+	uint32_t ms = GetAction().Duration;
+	_moveState.scrollSpeed = speed / (ms/1000.0f);
+	uint8_t cnt = speed;
 	switch (dir)
 	{
 	case Direction::Up:
-		_moveState.Set(Horizontal::None, Vertical::Up);
+		_moveState.Set(Horizontal::None, Vertical::Up, cnt);
 		break;
 	case Direction::UpRight:
-		_moveState.Set(Horizontal::Right, Vertical::Up);
+		_moveState.Set(Horizontal::Right, Vertical::Up, cnt);
 		break;
 	case Direction::Right:
-		_moveState.Set(Horizontal::Right, Vertical::None);
+		_moveState.Set(Horizontal::Right, Vertical::None, cnt);
 		break;
 	case Direction::DownRight:
-		_moveState.Set(Horizontal::Right, Vertical::Down);
+		_moveState.Set(Horizontal::Right, Vertical::Down, cnt);
 		break;
 	case Direction::Down:
-		_moveState.Set(Horizontal::None, Vertical::Down);
+		_moveState.Set(Horizontal::None, Vertical::Down, cnt);
 		break;
 	case Direction::DownLeft:
-		_moveState.Set(Horizontal::Left, Vertical::Down);
+		_moveState.Set(Horizontal::Left, Vertical::Down, cnt);
 		break;
 	case Direction::Left:
-		_moveState.Set(Horizontal::Left, Vertical::None);
+		_moveState.Set(Horizontal::Left, Vertical::None, cnt);
 		break;
 	case Direction::UpLeft:
-		_moveState.Set(Horizontal::Left, Vertical::Up);
+		_moveState.Set(Horizontal::Left, Vertical::Up, cnt);
 		break;
 	default:
-		_moveState.Set(Horizontal::None, Vertical::None);
+		_moveState.Set(Horizontal::None, Vertical::None, cnt);
 		break;
 	}
 	SetDir(dir);
 	if (onMove)
 		onMove(dir, speed);
+	return true;
 }
 
 void Actor::Update(uint32_t delta)
 {
+	if (!_action.IsDone())
+		_action.Update(delta);
 	if (_moveState.IsScrolling())
 	{
-		if (!_moveState.Update(delta/1000.0f)) {
-			if (mFeature.IsMan() || mFeature.IsWoman())
+		if (!_moveState.Update(delta)) {
+			if (_actionCache.Enable)
+			{
+				_action.Current = _action.Duration;
+				HandleAction(_actionCache);
+				_actionCache.Enable = false;
+			}
+			else if (mFeature.IsMan() || mFeature.IsWoman())
 				SetMotion(_MT_STAND);
 			else if (mFeature.IsMonster())
 				SetMotion(_MT_MON_STAND);
@@ -118,5 +138,16 @@ void Actor::Update(uint32_t delta)
 				onMoved();
 		}
 	}
-	
+	_actionCache.Enable = false;
+}
+
+void Actor::HandleAction(Action act)
+{
+	if (_action.IsDone())
+	{
+		HandleActionImpl(act);
+	}
+	else {
+		_actionCache = act;
+	}
 }

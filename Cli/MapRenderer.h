@@ -9,13 +9,13 @@ public:
 	MapRenderer();
 	~MapRenderer();
 	void SetMap(Map *map);
-	void SetPos(uint32_t x, uint32_t y);
+	void SetPos(Vector2UInt pos);
 	Vector2UInt GetPos();
 	Vector2Float GetCellScrollOffset();
-	void Draw(float delta);
+	void Draw(uint32_t delta);
 	void SetScrollSpeed(float cellPerSec);
-	void Scroll(Direction dir);
-	void Scroll(Horizontal x, Vertical y);
+	void Scroll(Direction dir, uint8_t count=1);
+	void Scroll(Horizontal x, Vertical y, uint8_t count=1);
 	bool mDebug;
 private:
 	struct DrawState

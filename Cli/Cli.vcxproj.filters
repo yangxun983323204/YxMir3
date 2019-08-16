@@ -63,6 +63,12 @@
     <ClInclude Include="MyHeroRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="InputMgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Delegate.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -99,6 +105,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MyHeroRenderer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="InputMgr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

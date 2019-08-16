@@ -6,10 +6,9 @@ class Hero :
 public:
 	Hero();
 	~Hero();
-
+protected:
 	void Walk(Direction dir);
 	void Run(Direction dir);
-protected:
-	
+	virtual void HandleActionImpl(Action act);
 };
 

@@ -141,10 +141,10 @@ char *alloca();
 /* @} *//* Cast operators */
 
 /* Define a four character code as a Uint32 */
-#define SDL_FOURCC(A, B, C, D) \
+#define SDL_FOURCC(A, B, Cls, D) \
     ((SDL_static_cast(Uint32, SDL_static_cast(Uint8, (A))) << 0) | \
      (SDL_static_cast(Uint32, SDL_static_cast(Uint8, (B))) << 8) | \
-     (SDL_static_cast(Uint32, SDL_static_cast(Uint8, (C))) << 16) | \
+     (SDL_static_cast(Uint32, SDL_static_cast(Uint8, (Cls))) << 16) | \
      (SDL_static_cast(Uint32, SDL_static_cast(Uint8, (D))) << 24))
 
 /**

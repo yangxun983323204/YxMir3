@@ -21,6 +21,7 @@ ActorRenderer::~ActorRenderer()
 void ActorRenderer::SetMapRenderer(MapRenderer *mapRenderer)
 {
 	mMapRenderer = mapRenderer;
+	mMapRenderer->SetPos(mActor->GetPos());
 }
 
 void ActorRenderer::SetActor(Actor * actor)

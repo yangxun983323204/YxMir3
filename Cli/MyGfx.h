@@ -3,7 +3,9 @@
 #include "ImageLib.h"
 #include <map>
 #include <vector>
-#include <functional>
+#include "Delegate.hpp"
+
+using Yx::Delegate;
 
 class Sprite
 {
@@ -110,8 +112,8 @@ public:
 	static inline void MyGfx::GetDrawRect(DrawInfo *info, __out SDL_Rect* srcRect, __out SDL_Rect* dstRect);
 	static MyGfx *Instance();
 
-	std::function<void(uint32_t deltaMs)> onDraw;
-	std::function<void(SDL_Event*)> onEvent;
+	Delegate<void(uint32_t deltaMs)> onDraw;
+	Delegate<void(SDL_Event*)> onEvent;
 
 	bool mDebug;
 

@@ -8,6 +8,7 @@ void TestMapLoad();
 void TestDrawMapRect();
 void TestMapRender();
 void TestActorRender();
+void TestInputMgr();
 
 inline void Test() 
 {
@@ -17,5 +18,6 @@ inline void Test()
 	//TestMapLoad();
 	//TestDrawMapRect();
 	//TestMapRender();
-	TestActorRender();
+	//TestActorRender();
+	TestInputMgr();
 }

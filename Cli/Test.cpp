@@ -9,6 +9,7 @@
 #include "HeroRenderer.h"
 #include "Hero.h"
 #include "MyHeroRenderer.h"
+#include "InputMgr.h"
 
 void TestImageLib_Load() 
 {
@@ -76,7 +77,7 @@ void TestDrawMapRect()
 		}
 	}
 	gfx->DrawCache();
-	gfx->onEvent = [gfx](SDL_Event* e) { 
+	gfx->onEvent += [gfx](SDL_Event* e) { 
 		if(e->type == SDL_QUIT)
 			gfx->Exit(); 
 	};
@@ -93,12 +94,12 @@ void TestMapRender()
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
-	renderer->SetPos(400, 400);
-	gfx->onDraw = [gfx, renderer](uint32_t deltaMs) {
-		renderer->Draw(deltaMs/1000.0f);
+	renderer->SetPos(Vector2UInt{ 400, 400 });
+	gfx->onDraw += [gfx, renderer](uint32_t deltaMs) {
+		renderer->Draw(deltaMs);
 		gfx->DrawCache();
 	};
-	gfx->onEvent = [gfx, renderer](SDL_Event* e) {
+	gfx->onEvent += [gfx, renderer](SDL_Event* e) {
 		if (e->type == SDL_QUIT)
 			gfx->Exit();  
 		else if (e->type == SDL_EventType::SDL_KEYDOWN)
@@ -142,7 +143,7 @@ void TestActorRender()
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
-	renderer->SetPos(400, 390);
+	renderer->SetPos(Vector2UInt{ 400, 390 });
 
 	Hero actor;
 	actor.SetPos({ 400,390 });
@@ -156,13 +157,13 @@ void TestActorRender()
 	aRenderer.SetMapRenderer(renderer);
 	aRenderer.Debug = true;
 
-	gfx->onDraw = [gfx, renderer,&aRenderer,&actor](uint32_t deltaMs) {
+	gfx->onDraw += [gfx, renderer,&aRenderer,&actor](uint32_t deltaMs) {
 		actor.Update(deltaMs);
-		renderer->Draw(deltaMs/1000.0f);
+		renderer->Draw(deltaMs);
 		aRenderer.Draw(deltaMs);
 		gfx->DrawCache();
 	};
-	gfx->onEvent = [gfx, renderer,&actor](SDL_Event* e) {
+	gfx->onEvent += [gfx, renderer,&actor](SDL_Event* e) {
 		if (e->type == SDL_QUIT)
 			gfx->Exit();
 		else if (e->type == SDL_EventType::SDL_KEYDOWN)
@@ -170,22 +171,22 @@ void TestActorRender()
 			switch (e->key.keysym.sym)
 			{
 			case SDLK_UP:
-				actor.Walk(Direction::Up);
+				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Up));
 				//actor.SetDir(Direction::Up);
 				//renderer->Scroll(Map::Horizontal::None, Map::Vertical::Up);
 				break;
 			case SDLK_DOWN:
-				actor.Walk(Direction::Down);
+				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Down));
 				//actor.SetDir(Direction::Down);
 				//renderer->Scroll(Map::Horizontal::None, Map::Vertical::Down);
 				break;
 			case SDLK_LEFT:
-				actor.Walk(Direction::Left);
+				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Left));
 				//actor.SetDir(Direction::Left);
 				//renderer->Scroll(Map::Horizontal::Left, Map::Vertical::None);
 				break;
 			case SDLK_RIGHT:
-				actor.Walk(Direction::Right);
+				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Right));
 				//actor.SetDir(Direction::Right);
 				//renderer->Scroll(Map::Horizontal::Right, Map::Vertical::None);
 				break;
@@ -200,6 +201,46 @@ void TestActorRender()
 			}
 		}
 	};
+	gfx->RunLoop();
+	delete renderer;
+	delete sMgr;
+	delete gfx;
+}
+void TestInputMgr() 
+{
+	MyGfx *gfx = new MyGfx(L"±ÈÆæ³Ç", LayoutW, LayoutH);
+	auto sMgr = SpriteMgr::Instance();
+	Map map;
+	map.Load("Map/0.map");
+	MapRenderer *renderer = new MapRenderer();
+	renderer->mDebug = true;
+	renderer->SetMap(&map);
+	Hero actor;
+	actor.SetPos({ 400,390 });
+	actor.SetFeature({
+		ActorGender::Woman,
+		8,2,32
+	});
+	actor.HandleAction(Action(_MT_STAND, ActorGender::Man, Direction::Down));
+	MyHeroRenderer aRenderer;
+	aRenderer.SetActor(&actor);
+	aRenderer.SetMapRenderer(renderer);
+	aRenderer.Debug = true;
+
+	InputMgr input;
+	input.SetGfx(gfx);
+	input.onSysQuit += [&gfx]() { gfx->Exit(); };
+	input.onWalk += [&actor](Direction dir) { actor.HandleAction(Action(_MT_WALK,ActorGender::Man,dir)); };
+	input.onRun += [&actor](Direction dir) { actor.HandleAction(Action(_MT_RUN, ActorGender::Man, dir)); };
+
+	gfx->onDraw += [gfx, renderer,&input, &aRenderer, &actor](uint32_t deltaMs) {
+		input.Update(deltaMs);
+		actor.Update(deltaMs);
+		renderer->Draw(deltaMs);
+		aRenderer.Draw(deltaMs);
+		gfx->DrawCache();
+	};
+	
 	gfx->RunLoop();
 	delete renderer;
 	delete sMgr;

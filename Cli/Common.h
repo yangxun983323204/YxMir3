@@ -8,6 +8,8 @@
 #define YCount 17
 #define LayoutW  CellW*XCount
 #define LayoutH  CellH*YCount
+#define PI 3.1415926f
+#define Rad2Deg (360 / (PI * 2))
 
 struct Vector2UInt
 {
@@ -74,12 +76,13 @@ struct ScrollState
 	float yScrolled;
 	int8_t xDir;
 	int8_t yDir;
-	float scrollSpeed;// 滚动cell数/每秒
+	float scrollSpeed;// 滚动cell数/每s
+	uint8_t count;
 
-	inline bool Update(float delta)
+	inline bool Update(uint32_t delta)
 	{
-		xScrolled += (xDir * CellW * scrollSpeed * delta);
-		yScrolled += (yDir * CellH * scrollSpeed * delta);
+		xScrolled += (xDir * CellW * scrollSpeed * delta / 1000.0f);
+		yScrolled += (yDir * CellH * scrollSpeed * delta / 1000.0f);
 		if ((xDir != 0 && abs(xScrolled) >= abs(xNeedScroll)) || (yDir != 0 && abs(yScrolled) >= abs(yNeedScroll))) {
 			xScrolled = xNeedScroll; yScrolled = yNeedScroll;
 			return false;
@@ -99,25 +102,30 @@ struct ScrollState
 		return (xNeedScroll != xScrolled) || (yNeedScroll != yScrolled);
 	}
 
-	inline void ScrollState::Set(Horizontal x, Vertical y)
+	inline void ScrollState::Set(Horizontal x, Vertical y,uint8_t count=1)
 	{
 		Reset();
+
+		if (count <= 0)count = 1;
+		if (count > 2)count = 2;
+
+		this->count = count;
 		if (x == Horizontal::Right) {
 			xDir = -1;
-			xNeedScroll = -CellW;
+			xNeedScroll = -CellW*count;
 		}
 		else if (x == Horizontal::Left) {
 			xDir = 1;
-			xNeedScroll = CellW;
+			xNeedScroll = CellW*count;
 		}
 
 		if (y == Vertical::Down) {
 			yDir = -1;
-			yNeedScroll = -CellH;
+			yNeedScroll = -CellH*count;
 		}
 		else if (y == Vertical::Up) {
 			yDir = 1;
-			yNeedScroll = CellH;
+			yNeedScroll = CellH*count;
 		}
 		xType = x;
 		yType = y;

@@ -84,6 +84,59 @@ struct FeatureEx
 	uint16_t HairColor;
 };
 
+struct Action
+{
+	bool Enable;
+	ActorGender Gender;
+	uint8_t Motion;
+	uint32_t Current;
+	uint32_t Duration;
+	Direction Dir;
+	union ArgUni
+	{
+		uint32_t ui;
+		bool b;
+		float f;
+		int32_t si;
+	};
+	ArgUni Arg;
+	Action() {}
+	Action(uint32_t idx,ActorGender gender, Direction dir)
+	{
+		FrameAnim anim;
+		Gender = gender;
+		switch (gender)
+		{
+		case ActorGender::Man:
+		case ActorGender::Woman:
+			anim = HeroAnim[idx];
+			break;
+		case ActorGender::Npc:
+			anim = NPCAnim[idx];
+			break;
+		case ActorGender::Monster:
+			anim = MonsterAnim[idx];
+			break;
+		default:
+			break;
+		}
+		Motion = idx;
+		Current = 0;
+		Duration = idx==0?0:anim.Delay * anim.Count;// 站立状态立即完成
+		Dir = dir;
+		Enable = true;
+	}
+
+	void Update(uint32_t ms)
+	{
+		Current += ms;
+	}
+	bool IsDone()
+	{
+		return Current >= Duration;
+	}
+};
+
 class Actor
 {
 public:
@@ -101,10 +154,13 @@ public:
 	Direction GetDir();
 	void SetDir(Direction dir);
 	Vector2UInt GetPos();
+	Action GetAction();
 	void SetPos(Vector2UInt v2i);
 	void Update(uint32_t delta);
+	void HandleAction(Action act);
 protected:
-	void Move(Direction dir, uint16_t speed);
+	virtual void HandleActionImpl(Action act)=0;
+	bool Move(Direction dir, uint16_t speed);
 
 	ScrollState _moveState;
 
@@ -117,4 +173,7 @@ protected:
 	Vector2UInt mPos;
 	uint8_t mMoveSpeed;
 	uint8_t mLightRange;
+
+	Action _action;
+	Action _actionCache;
 };
