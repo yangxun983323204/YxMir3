@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 #include <string>
+#include "Common.h"
+
 using std::string;
 //=============================================
 // Head
@@ -63,6 +65,7 @@ struct CellInfo
 	inline short Obj2AnimCount() { return Obj2Ani & 0x0f; }
 	inline bool HasDoor() { return DoorOffset & 0x80 > 0 && DoorIndex & 0x7f>0; }
 	inline uint32_t DoorImgIdx() { return DoorOffset & 0x7f; }
+	inline bool Walkable() { return Flag & 0x01 ? true : false; }
 	// ext
 	inline uint32_t FileIndexOf(uint8_t idx) {
 		if (idx == 1)
@@ -134,7 +137,8 @@ public:
 	TileInfo TileAt(uint32_t x, uint32_t y);
 	CellInfo CellAt(uint32_t x, uint32_t y);
 	bool InMap(uint32_t x, uint32_t y);
-
+	bool Walkable(uint32_t x, uint32_t y);
+	bool NextWalkable(uint32_t x, uint32_t y,Direction dir);
 private:
 	void Clear();
 

@@ -134,7 +134,7 @@ private:
 	uint32_t mFrameTime;//ms
 	uint32_t mCurrFrameTime;//ms
 
-	static bool DrawInfoSort(DrawInfo a, DrawInfo b);
+	static bool DrawInfoSort(const DrawInfo &a, const DrawInfo &b);
 	static MyGfx *_inst;
 };
 

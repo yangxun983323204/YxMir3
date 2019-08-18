@@ -216,7 +216,8 @@ void TestInputMgr()
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
 	Hero actor;
-	actor.SetPos({ 400,390 });
+	actor.SetMap(&map);
+	actor.SetPos({ 398,391 });
 	actor.SetFeature({
 		ActorGender::Woman,
 		8,2,32

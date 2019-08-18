@@ -11,36 +11,44 @@ Hero::~Hero()
 {
 }
 
-void Hero::Walk(Direction dir)
+bool Hero::Walk(Action &act)
 {
 	if (_moveState.IsScrolling())
-		return;
+		return false;
+	SetDir(act.Dir);
+	if (!NextMoveable())
+		return false;
 	SetMotion(_MT_WALK);
-	Actor::Move(dir, _SPEED_WALK);
+	Actor::Move(act.Dir, _SPEED_WALK);
+	act.MarkMove(true, _SPEED_WALK);
+	return true;
 }
 
-void Hero::Run(Direction dir)
+bool Hero::Run(Action &act)
 {
 	if (_moveState.IsScrolling())
-		return;
+		return false;
+	SetDir(act.Dir);
+	if (!NextMoveable())
+		return false;
 	SetMotion(_MT_RUN);
-	Actor::Move(dir, _SPEED_RUN);
+	Actor::Move(act.Dir, _SPEED_RUN);
+	act.MarkMove(true, _SPEED_RUN);
+	return true;
 }
 
-void Hero::HandleActionImpl(Action act)
+bool Hero::HandleActionImpl(Action &act)
 {
-	_action = act;
 	switch (act.Motion)
 	{
 	case _MT_WALK:
-		Walk(act.Dir);
-		break;
+		return Walk(act);
 	case _MT_RUN:
-		Run(act.Dir);
-		break;
+		return Run(act);
 	case _MT_STAND:
 		SetMotion(_MT_STAND);
+		return true;
 	default:
-		break;
+		return false;
 	}
 }

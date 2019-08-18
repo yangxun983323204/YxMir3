@@ -131,8 +131,8 @@ void MapRenderer::CalcTileDrawState(uint16_t x, uint16_t y, DrawState &info)
 		info.MinY = -floor(cY / 2.0f);
 		info.MaxY = ceil(cY / 2.0f);
 	}
-	info.OffsetX += (-info.MinX)*96;
-	info.OffsetY += (-info.MinY)*64;
+	info.OffsetX += (-info.MinX+0.5f)*96;
+	info.OffsetY += (-info.MinY+0.5f)*64;
 	info.MinX -= ext;
 	info.MaxX += ext;
 	info.MinY -= ext;
@@ -146,7 +146,7 @@ void MapRenderer::CalcCellDrawState(DrawState &info)
 	info.MinY = -(floor(YCount / 2.0f)+ext);
 	info.MaxY = ceil(YCount / 2.0f)+ext;
 	info.OffsetX = floor(XCount / 2.0f);
-	info.OffsetY = floor(YCount / 2.0f);
+	info.OffsetY = ceil(YCount / 2.0f);
 }
 void MapRenderer::DrawBG()
 {
@@ -193,7 +193,6 @@ void MapRenderer::DrawMid()
 	int imgIdx;
 	bool blend;
 	int drawX, drawY;
-	MyGfx::Layer layers[2]{ MyGfx::Layer::Mid , MyGfx::Layer::Top};
 	for (int x = mCellState.MinX; x <= mCellState.MaxX; ++x)
 	{
 		for (int y = mCellState.MinY; y <= mCellState.MaxY; ++y)
@@ -201,7 +200,7 @@ void MapRenderer::DrawMid()
 			if (!mMap->InMap(x+mPos.x, y+mPos.y))
 				continue;
 			auto cell = mMap->CellAt(x+ mPos.x, y+ mPos.y);
-			for (uint8_t i = 1; i < 3; i++)// 依次绘制中层和上层
+			for (uint8_t i = 1; i < 3; i++)// 依次绘制左侧和右侧
 			{
 				if (cell.FileEnableOf(i))
 				{
@@ -224,7 +223,7 @@ void MapRenderer::DrawMid()
 							// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
 							drawX = (x + mCellState.OffsetX)*CellW + mScrollState.xScrolled;
 							drawY = (y + mCellState.OffsetY)*CellH - sprite->h() + mScrollState.yScrolled;
-							gfx->DrawCommand(sprite, drawX, drawY, layers[0]);
+							gfx->DrawCommand(sprite, drawX, drawY, MyGfx::Layer::Mid);
 						}
 					}
 				}

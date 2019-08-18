@@ -20,7 +20,7 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 	mScreenRect.x = mScreenRect.y = 0;
 	mScreenRect.w = w;
 	mScreenRect.h = h;
-	mWindow = SDL_CreateWindow(Wstr2Str(title).c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+	mWindow = SDL_CreateWindow(YxUtils::Wstr2Str(title).c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
 	mScreenSurface = SDL_GetWindowSurface(mWindow);
 	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
 	mMidCache.reserve(w * h);
@@ -59,7 +59,7 @@ void MyGfx::SetFPS(uint16_t requireFPS)
 
 void MyGfx::DrawString(std::wstring str, int x, int y)
 {
-	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, Wstr2Str(str).c_str(), SDL_Color{0,255,0,255});
+	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, YxUtils::Wstr2Str(str).c_str(), SDL_Color{0,255,0,255});
 	TempDrawInfo info;
 	info.x = x;
 	info.y = y;
@@ -100,7 +100,7 @@ void MyGfx::DrawCache()
 	if (mDebug)
 		DrawString(L"fps:" + std::to_wstring(mFPS), 0, 0);
 
-	SDL_FillRect(mScreenSurface, 0, 0);
+	SDL_FillRect(mScreenSurface, 0, 0xffffffff);
 	SDL_BlitSurface(mBgSurface, 0, mScreenSurface, 0);
 	// draw mid
 	auto p = mMidCache.begin();
@@ -200,7 +200,10 @@ MyGfx * MyGfx::Instance()
 	return _inst;
 }
 
-bool MyGfx::DrawInfoSort(DrawInfo a, DrawInfo b)
+bool MyGfx::DrawInfoSort(const DrawInfo &a, const DrawInfo &b)
 {
-	return (a.x+a.y) < (b.x+b.y);
+	if (a.x != b.x)
+		return a.y <= b.y;
+	else
+		return a.x <= b.x;
 }

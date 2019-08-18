@@ -30,7 +30,6 @@ namespace Yx {
 		{
 			return false;
 		}
-
 	private:
 		Cls*  _classPtr;
 		FuncType _func;
@@ -177,12 +176,10 @@ namespace Yx {
 		FuncList _funcList;
 	};
 
-
-	template<typename Cls, typename Ret, typename ...Args>
+	template<class Cls, typename Ret, typename ...Args>
 	auto BindClassFunc(Ret(Cls::*FuncType)(Args...), Cls* class_ptr) ->Binder<Cls, Ret, Args...>
 	{
 		return Binder<Cls, Ret, Args...>(FuncType, class_ptr);
 	}
-
 };
 

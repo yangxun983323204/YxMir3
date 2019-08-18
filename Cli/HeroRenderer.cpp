@@ -41,27 +41,20 @@ void HeroRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite * actorSprite
 
 	// 按从底至顶的顺序绘制一系列元素
 	if (shadow)
-		gfx->DrawCommand(shadow, pos.x + actorSprite->ShadowPosX, pos.y + actorSprite->ShadowPosY, MyGfx::Layer::Top);
+		gfx->DrawCommand(shadow, pos.x + actorSprite->ShadowPosX, pos.y + actorSprite->ShadowPosY, MyGfx::Layer::Mid);
 	auto dir = mActor->GetDir();
 	// 在某些方向，先画人再画武器，在另一些方向则相反
 	if (dir > Direction::Up && dir <= Direction::Down)
 	{
-		gfx->DrawCommand(actorSprite, pos.x, pos.y, MyGfx::Layer::Top);
+		gfx->DrawCommand(actorSprite, pos.x, pos.y, MyGfx::Layer::Mid);
 		if (weapon)
-			gfx->DrawCommand(weapon, pos.x, pos.y, MyGfx::Layer::Top);
+			gfx->DrawCommand(weapon, pos.x, pos.y, MyGfx::Layer::Mid);
 	}
 	else {
 		if (weapon)
-			gfx->DrawCommand(weapon, pos.x, pos.y, MyGfx::Layer::Top);
-		gfx->DrawCommand(actorSprite, pos.x, pos.y, MyGfx::Layer::Top);
+			gfx->DrawCommand(weapon, pos.x, pos.y, MyGfx::Layer::Mid);
+		gfx->DrawCommand(actorSprite, pos.x, pos.y, MyGfx::Layer::Mid);
 	}
 	if(hair)
-		gfx->DrawCommand(hair, pos.x, pos.y, MyGfx::Layer::Top);
-	//
-	if (Debug) {
-		gfx->DrawCommand(
-			SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
-			pos.x, pos.y, MyGfx::Layer::Top);
-	}
+		gfx->DrawCommand(hair, pos.x, pos.y, MyGfx::Layer::Mid);
 }
-

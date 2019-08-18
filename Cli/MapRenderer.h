@@ -16,6 +16,11 @@ public:
 	void SetScrollSpeed(float cellPerSec);
 	void Scroll(Direction dir, uint8_t count=1);
 	void Scroll(Horizontal x, Vertical y, uint8_t count=1);
+	void CompleteScroll() {
+		mRedrawBG = true;
+		mScrollState.CompleteIt();
+		SetPos(Vector2UInt{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
+	}
 	bool mDebug;
 private:
 	struct DrawState
@@ -39,7 +44,7 @@ private:
 	Vector2UInt mPos;
 	DrawState mCellState;
 	DrawState mTileState;
-	ScrollState mScrollState;
+	MoveState mScrollState;
 	bool mRedrawBG;
 };
 

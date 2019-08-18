@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <stdint.h>
+#include "WilIndex.h"
 
 // 为了让角色居中，因此让屏幕水平和竖直方向都显示奇数个格子
 #define CellW 48
@@ -64,72 +65,6 @@ enum class Vertical
 	None = -1,
 	Up = 0,
 	Down = 4
-};
-
-struct ScrollState
-{
-	Horizontal xType;
-	Vertical yType;
-	int8_t xNeedScroll;
-	int8_t yNeedScroll;
-	float xScrolled;
-	float yScrolled;
-	int8_t xDir;
-	int8_t yDir;
-	float scrollSpeed;// 滚动cell数/每s
-	uint8_t count;
-
-	inline bool Update(uint32_t delta)
-	{
-		xScrolled += (xDir * CellW * scrollSpeed * delta / 1000.0f);
-		yScrolled += (yDir * CellH * scrollSpeed * delta / 1000.0f);
-		if ((xDir != 0 && abs(xScrolled) >= abs(xNeedScroll)) || (yDir != 0 && abs(yScrolled) >= abs(yNeedScroll))) {
-			xScrolled = xNeedScroll; yScrolled = yNeedScroll;
-			return false;
-		}
-		else
-			return true;
-	}
-	inline void Reset()
-	{
-		xNeedScroll = 0; yNeedScroll = 0;
-		xScrolled = 0; yScrolled = 0;
-		xDir = 0; yDir = 0;
-	}
-
-	inline bool IsScrolling()
-	{
-		return (xNeedScroll != xScrolled) || (yNeedScroll != yScrolled);
-	}
-
-	inline void ScrollState::Set(Horizontal x, Vertical y,uint8_t count=1)
-	{
-		Reset();
-
-		if (count <= 0)count = 1;
-		if (count > 2)count = 2;
-
-		this->count = count;
-		if (x == Horizontal::Right) {
-			xDir = -1;
-			xNeedScroll = -CellW*count;
-		}
-		else if (x == Horizontal::Left) {
-			xDir = 1;
-			xNeedScroll = CellW*count;
-		}
-
-		if (y == Vertical::Down) {
-			yDir = -1;
-			yNeedScroll = -CellH*count;
-		}
-		else if (y == Vertical::Up) {
-			yDir = 1;
-			yNeedScroll = CellH*count;
-		}
-		xType = x;
-		yType = y;
-	}
 };
 
 #define _MAX_HERO_KIND				10
@@ -229,3 +164,152 @@ struct ScrollState
 #define _SPEED_WALK					1
 #define _SPEED_RUN					2
 #define _SPEED_HORSERUN				3
+
+struct MoveState
+{
+	Horizontal xType;
+	Vertical yType;
+	int8_t xNeedScroll;
+	int8_t yNeedScroll;
+	float xScrolled;
+	float yScrolled;
+	int8_t xDir;
+	int8_t yDir;
+	float scrollSpeed;// 滚动cell数/每s
+	uint8_t count;
+
+	inline bool Update(uint32_t delta)
+	{
+		xScrolled += (xDir * CellW * scrollSpeed * delta / 1000.0f);
+		yScrolled += (yDir * CellH * scrollSpeed * delta / 1000.0f);
+		if ((xDir != 0 && abs(xScrolled) >= abs(xNeedScroll)) || (yDir != 0 && abs(yScrolled) >= abs(yNeedScroll))) {
+			xScrolled = xNeedScroll; yScrolled = yNeedScroll;
+			return false;
+		}
+		else
+			return true;
+	}
+	inline void Reset()
+	{
+		xNeedScroll = 0; yNeedScroll = 0;
+		xScrolled = 0; yScrolled = 0;
+		xDir = 0; yDir = 0;
+	}
+
+	inline bool IsScrolling()
+	{
+		return (xNeedScroll != xScrolled) || (yNeedScroll != yScrolled);
+	}
+
+	inline void MoveState::Set(Horizontal x, Vertical y, uint8_t count = 1)
+	{
+		Reset();
+
+		if (count <= 0)count = 1;
+		if (count > 2)count = 2;
+
+		this->count = count;
+		if (x == Horizontal::Right) {
+			xDir = -1;
+			xNeedScroll = -CellW*count;
+		}
+		else if (x == Horizontal::Left) {
+			xDir = 1;
+			xNeedScroll = CellW*count;
+		}
+
+		if (y == Vertical::Down) {
+			yDir = -1;
+			yNeedScroll = -CellH*count;
+		}
+		else if (y == Vertical::Up) {
+			yDir = 1;
+			yNeedScroll = CellH*count;
+		}
+		xType = x;
+		yType = y;
+	}
+
+	inline void CompleteIt()
+	{
+		xScrolled = xNeedScroll;
+		yScrolled = yNeedScroll;
+	}
+};
+
+enum class ActorGender
+{
+	Man = 0,
+	Woman = 1,
+	Monster = 3,
+	Npc = 5,
+};
+
+struct Feature
+{
+	ActorGender Gender;
+	uint8_t Dress;
+	uint8_t Hair;
+	uint8_t	Weapon;
+
+	inline bool IsMan() { return Gender == ActorGender::Man; }
+	inline bool IsWoman() { return Gender == ActorGender::Woman; }
+	inline bool IsMonster() { return Gender == ActorGender::Monster; }
+	inline bool IsNPC() { return Gender == ActorGender::Npc; }
+	inline bool HasWeapon() { return  Weapon != _WEAPON_NONE; }
+
+	inline uint16_t ImgLibIdxBase()
+	{
+		switch (Gender)
+		{
+		case ActorGender::Man:
+			return _IMAGE_M_HUMAN;
+		case ActorGender::Woman:
+			return _IMAGE_WM_HUMAN;
+		case ActorGender::Monster:
+			return _IMAGE_MONSTER1;
+		case ActorGender::Npc:
+			return _IMAGE_NPC;
+		default:
+			break;
+		}
+	}
+
+	inline uint16_t HairImgLibIdx()
+	{
+		if (IsMan())
+			return _IMAGE_M_HAIR;
+		else if (IsWoman())
+			return _IMAGE_WM_HAIR;
+		else
+			return 0;
+	}
+
+	inline uint16_t WeaponImgLibIdx()
+	{
+		if (HasWeapon())
+		{
+			if (IsMan())
+				return _IMAGE_M_WEAPON1 + (Weapon - 1) / 10;
+			else if (IsWoman())
+				return _IMAGE_WM_WEAPON1 + (Weapon - 1) / 10;
+		}
+		return 0;
+	}
+
+	bool operator ==(const Feature &f)
+	{
+		return
+			this->Gender == f.Gender &&
+			this->Dress == f.Dress &&
+			this->Hair == f.Hair &&
+			this->Weapon == f.Weapon;
+	}
+};
+
+struct FeatureEx
+{
+	uint8_t Horse;
+	uint16_t DressColor;
+	uint16_t HairColor;
+};

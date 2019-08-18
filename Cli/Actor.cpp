@@ -10,6 +10,7 @@ Actor::Actor()
 	mLightRange = 72;
 	_action.Enable = true;
 	_actionCache.Enable = false;
+	_moveState.Reset();
 }
 
 
@@ -73,11 +74,12 @@ void Actor::SetPos(Vector2UInt v2i)
 		return;
 	mPos = v2i;
 }
+bool Actor::NextMoveable()
+{
+	return _map->NextWalkable(mPos.x, mPos.y,mDir);
+}
 bool Actor::Move(Direction dir, uint16_t speed)
 {
-	if (_moveState.IsScrolling()) {
-		return false;
-	}
 	uint32_t ms = GetAction().Duration;
 	_moveState.scrollSpeed = speed / (ms/1000.0f);
 	uint8_t cnt = speed;
@@ -112,40 +114,47 @@ bool Actor::Move(Direction dir, uint16_t speed)
 		break;
 	}
 	SetDir(dir);
-	if (onMove)
-		onMove(dir, speed);
 	return true;
 }
 
 void Actor::Update(uint32_t delta)
 {
-	if (!_action.IsDone())
-		_action.Update(delta);
-	if (_moveState.IsScrolling())
+	if (!_action.IsDone()) 
 	{
-		if (!_moveState.Update(delta)) {
-			if (_actionCache.Enable)
-			{
-				_action.Current = _action.Duration;
-				HandleAction(_actionCache);
-				_actionCache.Enable = false;
-			}
-			else if (mFeature.IsMan() || mFeature.IsWoman())
-				SetMotion(_MT_STAND);
-			else if (mFeature.IsMonster())
-				SetMotion(_MT_MON_STAND);
-			if (onMoved)
-				onMoved();
+		if (_moveState.IsScrolling()) {
+			if(!_moveState.Update(delta))
+				SetPos(Vector2UInt{ mPos.x - _moveState.xDir*_moveState.count, mPos.y - _moveState.yDir*_moveState.count });
 		}
+
+		_action.Update(delta);
+		if (_action.IsDone()) 
+		{
+			if (_moveState.IsScrolling())
+				CompleteMove();
+			if (onActionCompleted)
+				onActionCompleted(&_action);
+		}
+		_actionCache.Enable = false;
 	}
-	_actionCache.Enable = false;
+	else {
+		if (_actionCache.Enable) {
+			HandleAction(_actionCache);
+			_actionCache.Enable = false;
+		}
+		else if(_action.Motion != 0)
+			_actionCache=Action(0,mFeature.Gender,mDir);
+	}
 }
 
-void Actor::HandleAction(Action act)
+void Actor::HandleAction(Action &act)
 {
 	if (_action.IsDone())
 	{
-		HandleActionImpl(act);
+		if (HandleActionImpl(act)) {
+			_action = act;
+			if (onActionStart)
+				onActionStart(&_action);
+		}
 	}
 	else {
 		_actionCache = act;

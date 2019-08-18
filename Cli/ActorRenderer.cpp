@@ -2,6 +2,7 @@
 #include "SpriteMgr.h"
 #include "MyGfx.h"
 #include "AnimDef.h"
+#include "Utils.h"
 
 using namespace std::placeholders;
 
@@ -51,42 +52,49 @@ void ActorRenderer::Draw(uint32_t delta)
 {
 	if (mActor == nullptr)
 		return;
+	Vector2Int pos;
+	CaclScreenPos(pos.x, pos.y);
 	auto sprite = GetSprite(delta);
 	if (sprite != nullptr)
 	{
-		Vector2Int pos;
-		CaclScreenPos(pos.x, pos.y);
 		DrawImpl(delta, pos, sprite);
+	}
+	if (Debug) {
+		auto gfx = MyGfx::Instance();
+		// 绘制坐标信息
+		gfx->DrawCommand(
+			SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
+			pos.x, pos.y, MyGfx::Layer::Top);
+		char msg[256];
+		auto wpos = mActor->GetPos();
+		sprintf(msg,"(%d,%d)", wpos.x, wpos.y);
+		gfx->DrawString(YxUtils::Str2Wstr(msg), pos.x, pos.y+20);
 	}
 }
 
 void ActorRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite *actorSprite)
 {
 	// 暂时保留在这，等各子类完成，这个方法清空
-	auto gfx = MyGfx::Instance();
-	// todo draw shadow
-	Sprite* shadow = nullptr;
-	auto f = mActor->GetFeature();
-	if (f.IsMan() || f.IsWoman())
-		shadow = SpriteMgr::Instance()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
-	else if (f.IsMonster() && f.Dress >= 200)// 3G?
-		shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + 1, _anim.Current);
-	else
-		shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, _anim.Current);
-	if (shadow)
-		gfx->DrawCommand(shadow, pos.x + actorSprite->ShadowPosX, pos.y + actorSprite->ShadowPosY, MyGfx::Layer::Top);
-	// todo draw weapon
-	// todo draw horse
-	// draw actor
-	gfx->DrawCommand(actorSprite, pos.x, pos.y, MyGfx::Layer::Top);
-	if (Debug) {
-		gfx->DrawCommand(
-			SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
-			pos.x, pos.y, MyGfx::Layer::Top);
-	}
-	// todo draw hair
-	// todo draw effect
-	// todo draw shield
+	//auto gfx = MyGfx::Instance();
+	//// todo draw shadow
+	//Sprite* shadow = nullptr;
+	//auto f = mActor->GetFeature();
+	//if (f.IsMan() || f.IsWoman())
+	//	shadow = SpriteMgr::Instance()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
+	//else if (f.IsMonster() && f.Dress >= 200)// 3G?
+	//	shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + 1, _anim.Current);
+	//else
+	//	shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, _anim.Current);
+	//if (shadow)
+	//	gfx->DrawCommand(shadow, pos.x + actorSprite->ShadowPosX, pos.y + actorSprite->ShadowPosY, MyGfx::Layer::Top);
+	//// todo draw weapon
+	//// todo draw horse
+	//// draw actor
+	//gfx->DrawCommand(actorSprite, pos.x, pos.y, MyGfx::Layer::Top);
+	//
+	//// todo draw hair
+	//// todo draw effect
+	//// todo draw shield
 }
 
 bool ActorRenderer::HasActor()

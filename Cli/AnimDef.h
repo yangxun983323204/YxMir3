@@ -202,3 +202,63 @@ static FrameAnim NPCAnim[_MAX_NPC_MTN]{
 	
 	{ 2360, 2379, 100, _IMAGE_MAGIC,	_SKILL_SINSU, 3, 4, 150, 150, 150, 200, 150, 180, 255, 255, 255, _BLEND_NORMAL, 255 },	// 脚荐.
 };*/
+
+struct Action
+{
+	bool Enable;
+	bool Move;
+	ActorGender Gender;
+	uint8_t Motion;
+	uint32_t Current;
+	uint32_t Duration;
+	Direction Dir;
+	union ArgUni
+	{
+		uint32_t ui;
+		bool b;
+		float f;
+		int32_t si;
+	};
+	ArgUni Arg;
+	Action() {}
+	Action(uint32_t idx, ActorGender gender, Direction dir)
+	{
+		FrameAnim anim;
+		Gender = gender;
+		switch (gender)
+		{
+		case ActorGender::Man:
+		case ActorGender::Woman:
+			anim = HeroAnim[idx];
+			break;
+		case ActorGender::Npc:
+			anim = NPCAnim[idx];
+			break;
+		case ActorGender::Monster:
+			anim = MonsterAnim[idx];
+			break;
+		default:
+			break;
+		}
+		Motion = idx;
+		Current = 0;
+		Duration = idx == 0 ? 0 : anim.Delay * anim.Count;// 站立状态立即完成
+		Dir = dir;
+		Enable = true;
+		Move = false;
+	}
+	Action* MarkMove(bool move,uint8_t cellCount) 
+	{
+		Move = move;
+		Arg.ui = cellCount;
+		return this;
+	}
+	void Update(uint32_t ms)
+	{
+		Current += ms;
+	}
+	bool IsDone()
+	{
+		return Current >= Duration;
+	}
+};

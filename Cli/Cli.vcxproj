@@ -179,6 +179,7 @@
     <ClCompile Include="MyHeroRenderer.cpp" />
     <ClCompile Include="SpriteMgr.cpp" />
     <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

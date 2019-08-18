@@ -7,8 +7,7 @@ public:
 	Hero();
 	~Hero();
 protected:
-	void Walk(Direction dir);
-	void Run(Direction dir);
-	virtual void HandleActionImpl(Action act);
+	bool Hero::Walk(Action &act);
+	bool Hero::Run(Action &act);
+	virtual bool HandleActionImpl(Action &act);
 };
-

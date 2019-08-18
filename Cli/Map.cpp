@@ -96,6 +96,50 @@ bool Map::InMap(uint32_t x, uint32_t y)
 	return v>0 && v<mCellCount;
 }
 
+bool Map::Walkable(uint32_t x, uint32_t y)
+{
+	auto v = y + x*mHeader->Height;
+	return v>0 && v<mCellCount && mCells[v].Walkable();
+}
+
+bool Map::NextWalkable(uint32_t x, uint32_t y, Direction dir)
+{
+	switch (dir)
+	{
+	case Direction::Up:
+		y--;
+		break;
+	case Direction::UpRight:
+		x++;
+		y--;
+		break;
+	case Direction::Right:
+		x++;
+		break;
+	case Direction::DownRight:
+		x++;
+		y++;
+		break;
+	case Direction::Down:
+		y++;
+		break;
+	case Direction::DownLeft:
+		x--;
+		y++;
+		break;
+	case Direction::Left:
+		x--;
+		break;
+	case Direction::UpLeft:
+		x--;
+		y--;
+		break;
+	default:
+		break;
+	}
+	return Walkable(x,y);
+}
+
 void Map::Clear()
 {
 }
