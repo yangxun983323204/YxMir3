@@ -160,6 +160,7 @@
     <ClInclude Include="Hero.h" />
     <ClInclude Include="MyHeroRenderer.h" />
     <ClInclude Include="SDLInc.h" />
+    <ClInclude Include="SoundMgr.h" />
     <ClInclude Include="SpriteMgr.h" />
     <ClInclude Include="Test.h" />
     <ClInclude Include="Utils.h" />
@@ -177,6 +178,7 @@
     <ClCompile Include="MyGfx.cpp" />
     <ClCompile Include="Hero.cpp" />
     <ClCompile Include="MyHeroRenderer.cpp" />
+    <ClCompile Include="SoundMgr.cpp" />
     <ClCompile Include="SpriteMgr.cpp" />
     <ClCompile Include="Test.cpp" />
     <ClCompile Include="Utils.cpp" />

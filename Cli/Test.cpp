@@ -10,6 +10,7 @@
 #include "Hero.h"
 #include "MyHeroRenderer.h"
 #include "InputMgr.h"
+#include "SoundMgr.h"
 
 void TestImageLib_Load() 
 {
@@ -246,4 +247,9 @@ void TestInputMgr()
 	delete renderer;
 	delete sMgr;
 	delete gfx;
+}
+void TestSoundMgr_LoadList()
+{
+	auto mgr = new SoundMgr();
+	delete mgr;
 }

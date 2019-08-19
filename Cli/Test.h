@@ -9,6 +9,7 @@ void TestDrawMapRect();
 void TestMapRender();
 void TestActorRender();
 void TestInputMgr();
+void TestSoundMgr_LoadList();
 
 inline void Test() 
 {
@@ -20,4 +21,5 @@ inline void Test()
 	//TestMapRender();
 	//TestActorRender();
 	TestInputMgr();
+	TestSoundMgr_LoadList();
 }
