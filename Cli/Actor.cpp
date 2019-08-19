@@ -74,10 +74,6 @@ void Actor::SetPos(Vector2UInt v2i)
 		return;
 	mPos = v2i;
 }
-bool Actor::NextMoveable()
-{
-	return _map->NextWalkable(mPos.x, mPos.y,mDir);
-}
 bool Actor::Move(Direction dir, uint16_t speed)
 {
 	uint32_t ms = GetAction().Duration;

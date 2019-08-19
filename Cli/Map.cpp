@@ -104,42 +104,52 @@ bool Map::Walkable(uint32_t x, uint32_t y)
 
 bool Map::NextWalkable(uint32_t x, uint32_t y, Direction dir)
 {
-	switch (dir)
-	{
-	case Direction::Up:
-		y--;
-		break;
-	case Direction::UpRight:
-		x++;
-		y--;
-		break;
-	case Direction::Right:
-		x++;
-		break;
-	case Direction::DownRight:
-		x++;
-		y++;
-		break;
-	case Direction::Down:
-		y++;
-		break;
-	case Direction::DownLeft:
-		x--;
-		y++;
-		break;
-	case Direction::Left:
-		x--;
-		break;
-	case Direction::UpLeft:
-		x--;
-		y--;
-		break;
-	default:
-		break;
-	}
-	return Walkable(x,y);
+	return NextNWalkable(x, y, dir, 1);
+}
+
+bool Map::Next2Walkable(uint32_t x, uint32_t y, Direction dir)
+{
+	return NextNWalkable(x,y,dir,2);
 }
 
 void Map::Clear()
 {
+}
+
+bool Map::NextNWalkable(uint32_t x, uint32_t y, Direction dir, int n)
+{
+	switch (dir)
+	{
+	case Direction::Up:
+		y-=n;
+		break;
+	case Direction::UpRight:
+		x+=n;
+		y-=n;
+		break;
+	case Direction::Right:
+		x+=n;
+		break;
+	case Direction::DownRight:
+		x+=n;
+		y+=n;
+		break;
+	case Direction::Down:
+		y+=n;
+		break;
+	case Direction::DownLeft:
+		x-=n;
+		y+=n;
+		break;
+	case Direction::Left:
+		x-=n;
+		break;
+	case Direction::UpLeft:
+		x-=n;
+		y-=n;
+		break;
+	default:
+		break;
+	}
+	return Walkable(x, y);
 }

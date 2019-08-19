@@ -29,6 +29,11 @@ bool Hero::Run(Action &act)
 	if (_moveState.IsScrolling())
 		return false;
 	SetDir(act.Dir);
+	if (!Next2Moveable())// 第二格不能走，变为移动
+	{
+		act = Action(_MT_WALK, act.Gender, act.Dir);
+		return Walk(act);
+	}
 	if (!NextMoveable())
 		return false;
 	SetMotion(_MT_RUN);

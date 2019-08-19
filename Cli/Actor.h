@@ -38,7 +38,14 @@ public:
 	}
 protected:
 	virtual bool HandleActionImpl(Action &act)=0;
-	bool NextMoveable();
+	bool NextMoveable()
+	{
+		return _map->NextWalkable(mPos.x, mPos.y, mDir);
+	}
+	bool Next2Moveable()
+	{
+		return _map->Next2Walkable(mPos.x, mPos.y, mDir);
+	}
 	bool Move(Direction dir, uint16_t speed);
 
 	MoveState _moveState;

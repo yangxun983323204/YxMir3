@@ -139,9 +139,10 @@ public:
 	bool InMap(uint32_t x, uint32_t y);
 	bool Walkable(uint32_t x, uint32_t y);
 	bool NextWalkable(uint32_t x, uint32_t y,Direction dir);
+	bool Next2Walkable(uint32_t x, uint32_t y, Direction dir);
 private:
 	void Clear();
-
+	bool NextNWalkable(uint32_t x, uint32_t y, Direction dir,int n);
 	string mPath;
 	MapHeader *mHeader;
 	TileInfo *mTiles;
