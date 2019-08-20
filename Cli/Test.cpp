@@ -243,6 +243,9 @@ void TestInputMgr()
 		gfx->DrawCache();
 	};
 	
+	SoundMgr soudMgr;
+	soudMgr.PlayBgm("0", true);
+
 	gfx->RunLoop();
 	delete renderer;
 	delete sMgr;

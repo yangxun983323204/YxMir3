@@ -4,6 +4,7 @@
 
 SoundMgr::SoundMgr()
 {
+	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 512);
 	LoadWaveFileList("SoundList.wwl");
 	LoadBgmFileList("BgmList.wwl");
 }
@@ -22,6 +23,10 @@ SoundMgr::~SoundMgr()
 		delete[] _waveList;
 	}
 	if (_waveListHeader) delete _waveListHeader;
+	//
+	if(_bgmMusic)
+		Mix_FreeMusic(_bgmMusic);
+	Mix_CloseAudio();
 }
 
 bool SoundMgr::GetBgmFileName(char * mapName, char * mp3Name)
@@ -42,6 +47,21 @@ bool SoundMgr::GetBgmFileName(char * mapName, char * mp3Name)
 		}
 	}
 	return false;
+}
+
+void SoundMgr::PlayBgm(char * mapName, bool loop)
+{
+	char mp3[10];
+	GetBgmFileName(mapName, mp3);
+	string path = mp3;
+	path = "./Sound/" + path;
+	_bgmMusic = Mix_LoadMUS(path.c_str());
+	BgmFadeIn(5000, loop);
+}
+
+void SoundMgr::StopBgm()
+{
+	BgmFadeOut(5000);
 }
 
 void SoundMgr::LoadBgmFileList(string fileName)
@@ -105,4 +125,14 @@ char * SoundMgr::SeekWaveFile(int wavNum)
 			return _waveList[i]->Des;
 	}
 	return nullptr;
+}
+
+void SoundMgr::BgmFadeIn(uint32_t ms,bool loop)
+{
+	Mix_FadeInMusic(_bgmMusic, loop ? -1 : 0, ms);
+}
+
+void SoundMgr::BgmFadeOut(uint32_t ms)
+{
+	Mix_FadeOutMusic(ms);
 }

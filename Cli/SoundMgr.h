@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string>
 #include <map>
+#include "SDLInc.h"
 
 using std::string;
 
@@ -28,6 +29,8 @@ public:
 	~SoundMgr();
 	// 解析一些奇奇怪怪的文件格式
 	bool GetBgmFileName(char *mapName, char *mp3Name);
+	void PlayBgm(char* mapName,bool loop);
+	void StopBgm();
 private:
 	WaveListHeader *_bgmListHeader;
 	char *_bgmFileList;
@@ -38,5 +41,10 @@ private:
 	void LoadBgmFileList(string fileName);
 	void LoadWaveFileList(string fileName);
 	char* SeekWaveFile(int wavNum);
+	void BgmFadeIn(uint32_t ms, bool loop);
+	void BgmFadeOut(uint32_t ms);
+
+	Mix_Music *_bgmMusic;
+	Mix_Chunk *_wav;
 };
 
