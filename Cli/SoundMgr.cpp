@@ -7,6 +7,7 @@ SoundMgr::SoundMgr()
 	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 512);
 	LoadWaveFileList("SoundList.wwl");
 	LoadBgmFileList("BgmList.wwl");
+	_bgmMusic = nullptr;
 }
 
 
@@ -24,8 +25,11 @@ SoundMgr::~SoundMgr()
 	}
 	if (_waveListHeader) delete _waveListHeader;
 	//
-	if(_bgmMusic)
+	if (_bgmMusic) {
+		BgmFadeOut(0);
 		Mix_FreeMusic(_bgmMusic);
+		_bgmMusic = nullptr;
+	}
 	Mix_CloseAudio();
 }
 
@@ -134,5 +138,7 @@ void SoundMgr::BgmFadeIn(uint32_t ms,bool loop)
 
 void SoundMgr::BgmFadeOut(uint32_t ms)
 {
+	if (!Mix_PlayingMusic())
+		return;
 	Mix_FadeOutMusic(ms);
 }
