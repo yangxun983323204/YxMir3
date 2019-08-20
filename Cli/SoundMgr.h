@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 #include "SDLInc.h"
+#include "Singleton.hpp"
+#include "Sound3D.h"
 
 using std::string;
 
@@ -22,9 +24,12 @@ struct WaveListHeader
 };
 #pragma pack()
 
-class SoundMgr
+class SoundMgr:
+	public Singleton<SoundMgr>
 {
+	friend class Sound3D;
 public:
+	Vector2UInt Pos;
 	SoundMgr();
 	~SoundMgr();
 	// 解析一些奇奇怪怪的文件格式
@@ -32,19 +37,21 @@ public:
 	void PlayBgm(char* mapName,bool loop);
 	void StopBgm();
 private:
-	WaveListHeader *_bgmListHeader;
-	char *_bgmFileList;
-	WaveListHeader *_waveListHeader;
-	WaveListNode **_waveList;
-
-
 	void LoadBgmFileList(string fileName);
 	void LoadWaveFileList(string fileName);
 	char* SeekWaveFile(int wavNum);
 	void BgmFadeIn(uint32_t ms, bool loop);
 	void BgmFadeOut(uint32_t ms);
+	bool PlaySound(Sound3D *sound, bool loop, __out int *channel);
+	void StopSound(const int &channel);
 
+private:
+	WaveListHeader *_bgmListHeader;
+	char *_bgmFileList;
+	WaveListHeader *_waveListHeader;
+	WaveListNode **_waveList;
 	Mix_Music *_bgmMusic;
-	Mix_Chunk *_wav;
+	std::map<uint32_t, Sound3D*> _sounds;
+	static void OnChannelFinished(int channel);
 };
 

@@ -142,3 +142,30 @@ void SoundMgr::BgmFadeOut(uint32_t ms)
 		return;
 	Mix_FadeOutMusic(ms);
 }
+
+bool SoundMgr::PlaySound(Sound3D * sound, bool loop, int * channel)
+{
+	*channel = Mix_PlayChannel(-1, sound->_wav, loop);
+	if (*channel < 0)
+		return false;
+	else {
+		_sounds[*channel] = sound;
+		return true;
+	}
+}
+
+void SoundMgr::StopSound(const int &channel)
+{
+	if (Mix_Playing(channel))
+	{
+		Mix_FadeOutChannel(channel, 0);
+		_sounds[channel] = nullptr;
+	}
+}
+
+void SoundMgr::OnChannelFinished(int channel)
+{
+	auto sound = Instance()->_sounds[channel];
+	if (sound)
+		sound->OnSoundFinished();
+}

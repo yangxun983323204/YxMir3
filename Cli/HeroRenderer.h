@@ -10,4 +10,5 @@ public:
 
 protected:
 	virtual void DrawImpl(uint32_t delta, Vector2Int pos, Sprite *actorSprite);
+	void PlayActionSound();
 };

@@ -12,11 +12,13 @@ ActorRenderer::ActorRenderer()
 	mMapRenderer = nullptr;
 	mActor = nullptr;
 	Debug = false;
+	_sound = new Sound3D();
 }
 
 
 ActorRenderer::~ActorRenderer()
 {
+	delete _sound;
 }
 
 void ActorRenderer::SetMapRenderer(MapRenderer *mapRenderer)

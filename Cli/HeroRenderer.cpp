@@ -57,4 +57,50 @@ void HeroRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite * actorSprite
 	}
 	if(hair)
 		gfx->DrawCommand(hair, pos.x, pos.y, MyGfx::Layer::Mid);
+
+	PlayActionSound();
+}
+// todo
+void HeroRenderer::PlayActionSound()
+{
+	int waveNum = -1;
+	auto motion = mActor->GetMotion();
+	if (motion == _MT_WALK || motion == _MT_RUN || 
+		motion == _MT_HORSEWALK || motion == _MT_HORSERUN || 
+		motion == _MT_MOODEPO || motion == _MT_PUSHBACK)
+	{
+		if (_anim.Current == _anim.End - 5 || false/*ÐÐ¶¯Ô¤²âÊ§°Ü£¿*/) // ×ó½Å
+			waveNum = 1;
+		if (_anim.Current == _anim.End - 2 || false/*ÐÐ¶¯Ô¤²âÊ§°Ü£¿*/) // ÓÒ½Å
+			waveNum = 1;
+	}
+	else if (_anim.Current == _anim.First+1 && motion == _MT_HITTED)
+	{
+		// ÊÜ»÷ÒôÐ§
+	}
+	else if (_anim.Current == _anim.First + 2 && motion == _MT_HITTED)
+	{
+		// ÊÜ»÷ÒôÐ§2
+	}
+	else if (_anim.Current == _anim.First + 1 && motion == _MT_DIE)
+	{
+		// ËÀÍöÒôÐ§
+	}
+	else if (_anim.Current == _anim.First + 1 && motion >= _MT_ONEVSWING && motion <= _MT_SPEARHSWING)
+	{
+		// ¹¥»÷ÒôÐ§
+	}
+	else if (_anim.Current == _anim.First + 2 && motion >= _MT_ONEVSWING && motion <= _MT_SPEARHSWING)
+	{
+		// ¹¥»÷ÒôÐ§2
+	}
+	else if (_anim.Current == _anim.First + 1 && (motion == _MT_SPELL1|| motion == _MT_SPELL2))
+	{
+		// Ê©·¨ÒôÐ§
+	}
+	if (waveNum!=-1)
+	{
+		_sound->LoadWave(waveNum);
+		_sound->Play(false);
+	}
 }

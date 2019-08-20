@@ -4,6 +4,7 @@
 #include "Actor.h"
 #include "ImageLib.h"
 #include "MapRenderer.h"
+#include "Sound3D.h"
 
 class ActorRenderer
 {
@@ -29,4 +30,5 @@ protected:
 	uint8_t mEffectImgLibIdx;// todo
 
 	AnimInstance _anim;
+	Sound3D *_sound;
 };

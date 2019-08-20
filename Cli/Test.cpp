@@ -213,6 +213,8 @@ void TestInputMgr()
 	auto sMgr = SpriteMgr::Instance();
 	Map map;
 	map.Load("Map/0.map");
+	SoundMgr *soudMgr = SoundMgr::Instance();
+	soudMgr->PlayBgm("0", true);
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
@@ -224,10 +226,10 @@ void TestInputMgr()
 		8,2,32
 	});
 	actor.HandleAction(Action(_MT_STAND, ActorGender::Man, Direction::Down));
-	MyHeroRenderer aRenderer;
-	aRenderer.SetActor(&actor);
-	aRenderer.SetMapRenderer(renderer);
-	aRenderer.Debug = true;
+	MyHeroRenderer *aRenderer = new MyHeroRenderer();
+	aRenderer->SetActor(&actor);
+	aRenderer->SetMapRenderer(renderer);
+	aRenderer->Debug = true;
 
 	InputMgr input;
 	input.SetGfx(gfx);
@@ -239,20 +241,19 @@ void TestInputMgr()
 		input.Update(deltaMs);
 		actor.Update(deltaMs);
 		renderer->Draw(deltaMs);
-		aRenderer.Draw(deltaMs);
+		aRenderer->Draw(deltaMs);
 		gfx->DrawCache();
 	};
-	
-	SoundMgr soudMgr;
-	soudMgr.PlayBgm("0", true);
 
 	gfx->RunLoop();
+	delete aRenderer;
 	delete renderer;
+	SoundMgr::Destroy();
 	delete sMgr;
 	delete gfx;
 }
 void TestSoundMgr_LoadList()
 {
-	auto mgr = new SoundMgr();
-	delete mgr;
+	SoundMgr *soudMgr = SoundMgr::Instance();
+	SoundMgr::Destroy();
 }
