@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="GUI">
+      <UniqueIdentifier>{a139d8be-177d-440d-a449-8833215c51c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDLInc.h">
@@ -78,6 +81,12 @@
     <ClInclude Include="Singleton.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Graphic.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.hpp">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -127,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="Sound3D.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphic.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

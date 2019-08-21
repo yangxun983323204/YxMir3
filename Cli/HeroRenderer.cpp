@@ -103,4 +103,5 @@ void HeroRenderer::PlayActionSound()
 		_sound->LoadWave(waveNum);
 		_sound->Play(false);
 	}
+	_sound->UpdatePos(mActor->GetPos());
 }

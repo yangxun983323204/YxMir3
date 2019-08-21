@@ -21,6 +21,10 @@ struct Vector2UInt
 	{
 		return this->x == v2.x && this->y == v2.y;
 	}
+	static uint32_t Distance(Vector2UInt &v1, Vector2UInt &v2)
+	{
+		return sqrt(pow(v1.x-v2.x,2)+pow(v1.y-v2.y,2));
+	}
 };
 
 struct Vector2Int

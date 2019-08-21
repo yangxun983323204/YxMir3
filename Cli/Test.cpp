@@ -237,12 +237,14 @@ void TestInputMgr()
 	input.onWalk += [&actor](Direction dir) { actor.HandleAction(Action(_MT_WALK,ActorGender::Man,dir)); };
 	input.onRun += [&actor](Direction dir) { actor.HandleAction(Action(_MT_RUN, ActorGender::Man, dir)); };
 
-	gfx->onDraw += [gfx, renderer,&input, &aRenderer, &actor](uint32_t deltaMs) {
+	gfx->onDraw += [gfx, renderer,&input, &aRenderer, &actor,&soudMgr](uint32_t deltaMs) {
 		input.Update(deltaMs);
 		actor.Update(deltaMs);
 		renderer->Draw(deltaMs);
 		aRenderer->Draw(deltaMs);
 		gfx->DrawCache();
+		soudMgr->Pos = actor.GetPos();
+		soudMgr->Update();
 	};
 
 	gfx->RunLoop();

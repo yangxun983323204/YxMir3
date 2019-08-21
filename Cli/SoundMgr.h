@@ -36,6 +36,7 @@ public:
 	bool GetBgmFileName(char *mapName, char *mp3Name);
 	void PlayBgm(char* mapName,bool loop);
 	void StopBgm();
+	void Update();
 private:
 	void LoadBgmFileList(string fileName);
 	void LoadWaveFileList(string fileName);

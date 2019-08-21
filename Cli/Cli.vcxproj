@@ -151,7 +151,9 @@
     <ClInclude Include="AnimDef.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Delegate.hpp" />
+    <ClInclude Include="Graphic.h" />
     <ClInclude Include="HeroRenderer.h" />
+    <ClInclude Include="Image.hpp" />
     <ClInclude Include="ImageLib.h" />
     <ClInclude Include="InputMgr.h" />
     <ClInclude Include="Map.h" />
@@ -171,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorRenderer.cpp" />
+    <ClCompile Include="Graphic.cpp" />
     <ClCompile Include="HeroRenderer.cpp" />
     <ClCompile Include="ImageLib.cpp" />
     <ClCompile Include="InputMgr.cpp" />

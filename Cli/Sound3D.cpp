@@ -50,7 +50,7 @@ void Sound3D::Stop()
 	}
 }
 
-void Sound3D::UpdatePos(Vector2UInt & pos)
+void Sound3D::UpdatePos(Vector2UInt pos)
 {
 	_pos = pos;
 	_dirty = true;

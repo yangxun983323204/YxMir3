@@ -10,7 +10,6 @@ SoundMgr::SoundMgr()
 	_bgmMusic = nullptr;
 }
 
-
 SoundMgr::~SoundMgr()
 {
 	if (_bgmListHeader) delete _bgmListHeader;
@@ -66,6 +65,20 @@ void SoundMgr::PlayBgm(char * mapName, bool loop)
 void SoundMgr::StopBgm()
 {
 	BgmFadeOut(5000);
+}
+
+void SoundMgr::Update()
+{
+	for each (auto kv in _sounds)
+	{
+		Sound3D *sound = kv.second;
+		if (sound && sound->_isPlaying)
+		{
+			int rawAngle = (int(atan2(sound->_pos.y - Pos.y, sound->_pos.x - Pos.x) * Rad2Deg) + 360) % 360;
+			int clockwizeAngle = (rawAngle + 90) % 360;
+			Mix_SetPosition(kv.first, clockwizeAngle, Vector2UInt::Distance(Pos, sound->_pos));
+		}
+	}
 }
 
 void SoundMgr::LoadBgmFileList(string fileName)

@@ -14,7 +14,7 @@ public:
 	void LoadWave(string file);
 	void Play(bool loop);
 	void Stop();
-	void UpdatePos(Vector2UInt &pos);
+	void UpdatePos(Vector2UInt pos);
 	
 private:
 	Vector2UInt _pos;
