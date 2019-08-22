@@ -74,14 +74,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>.\SDL2_ttfl-2.0.15\include;.\SDL2_mixer-2.0.4\include;.\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\AppView\;.\GUI\;.\SDL2_ttfl-2.0.15\include;.\SDL2_mixer-2.0.4\include;.\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>.\SDL2_ttfl-2.0.15\include;.\SDL2_mixer-2.0.4\include;.\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\AppView\;.\GUI\;.\SDL2_ttfl-2.0.15\include;.\SDL2_mixer-2.0.4\include;.\SDL2-2.0.9\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -149,11 +149,17 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="ActorRenderer.h" />
     <ClInclude Include="AnimDef.h" />
+    <ClInclude Include="AppView\LoginView.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Delegate.hpp" />
-    <ClInclude Include="Graphic.h" />
+    <ClInclude Include="GUI\Button.h" />
+    <ClInclude Include="GUI\Canvas.h" />
+    <ClInclude Include="GUI\ClickDetector.hpp" />
+    <ClInclude Include="GUI\Graphic.h" />
+    <ClInclude Include="GUI\Image.h" />
+    <ClInclude Include="GUI\Selectable.hpp" />
+    <ClInclude Include="GUI\Text.h" />
     <ClInclude Include="HeroRenderer.h" />
-    <ClInclude Include="Image.hpp" />
     <ClInclude Include="ImageLib.h" />
     <ClInclude Include="InputMgr.h" />
     <ClInclude Include="Map.h" />
@@ -173,7 +179,12 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorRenderer.cpp" />
-    <ClCompile Include="Graphic.cpp" />
+    <ClCompile Include="AppView\LoginView.cpp" />
+    <ClCompile Include="GUI\Button.cpp" />
+    <ClCompile Include="GUI\Canvas.cpp" />
+    <ClCompile Include="GUI\Graphic.cpp" />
+    <ClCompile Include="GUI\Image.cpp" />
+    <ClCompile Include="GUI\Text.cpp" />
     <ClCompile Include="HeroRenderer.cpp" />
     <ClCompile Include="ImageLib.cpp" />
     <ClCompile Include="InputMgr.cpp" />

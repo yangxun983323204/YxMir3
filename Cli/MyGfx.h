@@ -102,15 +102,19 @@ public:
 
 	const SDL_Rect *GetRenderRect();
 	void SetFPS(uint16_t requireFPS);
+	void Resize(uint16_t w, uint16_t h);
 	void DrawString(std::wstring str,int x,int y);
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
+	void DrawCommand(Sprite * sprite, int x, int y,int w,int h, Layer layer);
 	void DrawCache();
 	void RunLoop();
 	void Exit();
 
 	static Sprite* CreateSpriteFromImage(Image *image);
-	static inline void MyGfx::GetDrawRect(DrawInfo *info, __out SDL_Rect* srcRect, __out SDL_Rect* dstRect);
+	static inline void MyGfx::GetDrawRect(DrawInfo *info,bool useOffset, __out SDL_Rect* srcRect, __out SDL_Rect* dstRect);
 	static MyGfx *Instance();
+	// 不管理生命周期
+	static Sprite *CreateTextSprite(std::wstring str);
 
 	Delegate<void(uint32_t deltaMs)> onDraw;
 	Delegate<void(SDL_Event*)> onEvent;
@@ -125,6 +129,7 @@ private:
 
 	std::vector<DrawInfo> mMidCache;
 	std::vector<DrawInfo> mTopCache;
+	std::vector<DrawInfo> mGuiCache;
 	SDL_Surface* mScreenSurface;
 	SDL_Surface* mBgSurface;
 	uint16_t mRequireFPS;

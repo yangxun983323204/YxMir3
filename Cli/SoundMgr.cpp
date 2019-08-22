@@ -52,6 +52,14 @@ bool SoundMgr::GetBgmFileName(char * mapName, char * mp3Name)
 	return false;
 }
 
+void SoundMgr::PlayMusic(char * fileName, bool loop)
+{
+	string path = fileName;
+	path = "./Sound/" + path;
+	_bgmMusic = Mix_LoadMUS(path.c_str());
+	BgmFadeIn(0, loop);
+}
+
 void SoundMgr::PlayBgm(char * mapName, bool loop)
 {
 	char mp3[10];

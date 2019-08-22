@@ -16,6 +16,9 @@
     <Filter Include="GUI">
       <UniqueIdentifier>{a139d8be-177d-440d-a449-8833215c51c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AppView">
+      <UniqueIdentifier>{22a80cc4-5993-4e9c-8506-b73e069ca343}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDLInc.h">
@@ -81,10 +84,28 @@
     <ClInclude Include="Singleton.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Graphic.h">
+    <ClInclude Include="GUI\Graphic.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Image.hpp">
+    <ClInclude Include="GUI\ClickDetector.hpp">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Button.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Canvas.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Image.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Text.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AppView\LoginView.h">
+      <Filter>AppView</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Selectable.hpp">
       <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -137,8 +158,26 @@
     <ClCompile Include="Sound3D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Graphic.cpp">
+    <ClCompile Include="GUI\Graphic.cpp">
       <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Selectable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Button.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Canvas.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Image.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Text.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="AppView\LoginView.cpp">
+      <Filter>AppView</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

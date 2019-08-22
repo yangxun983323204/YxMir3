@@ -1,42 +1,40 @@
 #include "SDLInc.h"
 #include <stdio.h>
-#include "Test.h"
+//#include "Test.h"
+#include "Common.h"
+#include "Singleton.hpp"
+#include "Delegate.hpp"
+#include "MyGfx.h"
+#include "SpriteMgr.h"
+#include "SoundMgr.h"
+#include "InputMgr.h"
+#include "./AppView/LoginView.h"
+
 
 int main(int argc, char* argv[])
 {
-	Test();
-	return 0;
-	SDL_Window* window = NULL;
-	SDL_Surface* screenSurface = NULL;
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-	}
-	else
-	{
-		window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,640,480, SDL_WINDOW_SHOWN);
-		if (window == NULL)
-		{
-			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-		}
-		else
-		{
-			//Get window surface
-			screenSurface = SDL_GetWindowSurface(window);
+	//Test();
+	MyGfx *gfx = new MyGfx(L"YxMir3", 800, 600);
+	auto sMgr = SpriteMgr::Instance();
+	SoundMgr *soudMgr = SoundMgr::Instance();
+	soudMgr->PlayMusic("start.mp3", true);
+	InputMgr input;
+	input.SetGfx(gfx);
+	input.onSysQuit += [&gfx]() { gfx->Exit(); };
 
-			SDL_Surface *img = SDL_LoadBMP("test.bmp");
-			if (img == nullptr)
-			{
-				printf("Unable to load image! SDL Error: %s\n", SDL_GetError());
-			}
-			SDL_BlitSurface(img, NULL, screenSurface, NULL);
+	LoginView *login = new LoginView();
 
-			SDL_UpdateWindowSurface(window);
-			SDL_Delay(2000);
-		}
-	}
-	SDL_DestroyWindow(window);
-	//Quit SDL subsystems
-	SDL_Quit();
+	gfx->onDraw += [gfx, &input, &soudMgr,&login](uint32_t deltaMs) {
+		input.Update(deltaMs);
+		soudMgr->Update();
+		login->Draw();
+		gfx->DrawCache();
+	};
+
+	gfx->RunLoop();
+	delete login;
+	SoundMgr::Destroy();
+	delete sMgr;
+	delete gfx;
 	return 0;
 }

@@ -25,6 +25,7 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
 	mMidCache.reserve(w * h);
 	mTopCache.reserve(w * h);
+	mGuiCache.reserve(w * h);
 }
 
 
@@ -57,6 +58,17 @@ void MyGfx::SetFPS(uint16_t requireFPS)
 	mFrameTime = 1000 / mRequireFPS;
 }
 
+void MyGfx::Resize(uint16_t w, uint16_t h)
+{
+	SDL_SetWindowSize(mWindow, w, h);
+	mScreenRect.w = w;
+	mScreenRect.h = h;
+	SDL_free(mScreenSurface);
+	mScreenSurface = SDL_GetWindowSurface(mWindow);
+	SDL_free(mBgSurface);
+	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
+}
+
 void MyGfx::DrawString(std::wstring str, int x, int y)
 {
 	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, YxUtils::Wstr2Str(str).c_str(), SDL_Color{0,255,0,255});
@@ -72,16 +84,21 @@ void MyGfx::DrawString(std::wstring str, int x, int y)
 
 void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 {
+	DrawCommand(sprite,x,y,sprite->w(),sprite->h(),layer);
+}
+
+void MyGfx::DrawCommand(Sprite * sprite, int x, int y, int w, int h, Layer layer)
+{
 	DrawInfo info;
 	info.sprite = sprite;
 	info.x = x;
 	info.y = y;
-	info.w = sprite->w();
-	info.h = sprite->h();
+	info.w = w;
+	info.h = h;
 	switch (layer)
 	{
 	case MyGfx::Bottom:
-		GetDrawRect(&info, &srcRect, &dstRect);
+		GetDrawRect(&info,false, &srcRect, &dstRect);
 		SDL_BlitSurface(sprite->Surface, &srcRect, mBgSurface, &dstRect);
 		break;
 	case MyGfx::Mid:
@@ -89,6 +106,9 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
 		break;
 	case MyGfx::Top:
 		mTopCache.push_back(info);
+		break;
+	case MyGfx::GUI:
+		mGuiCache.push_back(info);
 		break;
 	default:
 		break;
@@ -107,7 +127,7 @@ void MyGfx::DrawCache()
 	auto end = mMidCache.end();
 	for (; p < end; p++)
 	{
-		GetDrawRect(p._Ptr, &srcRect, &dstRect);
+		GetDrawRect(p._Ptr,true, &srcRect, &dstRect);
 		if(SDL_HasIntersection(&dstRect, &mScreenRect))
 			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
 	}
@@ -117,11 +137,21 @@ void MyGfx::DrawCache()
 	end = mTopCache.end();
 	for (; p < end; p++)
 	{
-		GetDrawRect(p._Ptr, &srcRect, &dstRect);
+		GetDrawRect(p._Ptr,true, &srcRect, &dstRect);
 		if (SDL_HasIntersection(&dstRect, &mScreenRect))
 			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
 	}
 	mTopCache.clear();
+	// draw gui
+	p = mGuiCache.begin();
+	end = mGuiCache.end();
+	for (; p < end; p++)
+	{
+		GetDrawRect(p._Ptr,false, &srcRect, &dstRect);
+		if (SDL_HasIntersection(&dstRect, &mScreenRect))
+			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
+	}
+	mGuiCache.clear();
 	//
 	SDL_UpdateWindowSurface(mWindow);
 }
@@ -182,15 +212,20 @@ Sprite* MyGfx::CreateSpriteFromImage(Image * image)
 	return sprite;
 }
 
-inline void MyGfx::GetDrawRect(DrawInfo *info,__out SDL_Rect* srcRect, __out SDL_Rect* dstRect)
+inline void MyGfx::GetDrawRect(DrawInfo *info,bool useOffset,__out SDL_Rect* srcRect, __out SDL_Rect* dstRect)
 {
 	srcRect->x = 0;
 	srcRect->y = 0;
 	srcRect->w = info->w;
 	srcRect->h = info->h;
-
-	dstRect->x = info->x + info->sprite->PivotX;
-	dstRect->y = info->y + info->sprite->PivotY;
+	if (useOffset) {
+		dstRect->x = info->x + info->sprite->PivotX;
+		dstRect->y = info->y + info->sprite->PivotY;
+	}
+	else {
+		dstRect->x = info->x;
+		dstRect->y = info->y;
+	}
 	dstRect->w = info->w;
 	dstRect->h = info->h;
 }
@@ -198,6 +233,14 @@ inline void MyGfx::GetDrawRect(DrawInfo *info,__out SDL_Rect* srcRect, __out SDL
 MyGfx * MyGfx::Instance()
 {
 	return _inst;
+}
+
+Sprite * MyGfx::CreateTextSprite(std::wstring str)
+{
+	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, YxUtils::Wstr2Str(str).c_str(), SDL_Color{ 0,255,0,255 });
+	Sprite *sp = new Sprite();
+	sp->Surface = textSurface;
+	return sp;
 }
 
 bool MyGfx::DrawInfoSort(const DrawInfo &a, const DrawInfo &b)
