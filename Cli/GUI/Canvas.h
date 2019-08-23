@@ -2,7 +2,8 @@
 #include "Graphic.h"
 #include "Selectable.hpp"
 #include <list>
-#include <stack>
+#include <queue>
+#include "EventSystem.hpp"
 
 namespace YxGUI {
 	class Canvas:
@@ -13,8 +14,10 @@ namespace YxGUI {
 		~Canvas();
 		void Draw();
 		bool HandleEvent(SDL_Event &e);
+		void Reset();// 有UI移除时必须调用，否则可能产生野指针
 	private:
-		std::list<Selectable*> _frameSelectObjs;
-		std::stack<Graphic*> _frameGraphicObjs;
+		std::list<Graphic*> _frameSelectObjs;
+		std::queue<Graphic*> _frameGraphicObjs;
+		EventSystem *_eventSystem;
 	};
 }

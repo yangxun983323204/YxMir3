@@ -1,5 +1,4 @@
 #include "LoginView.h"
-#include "../WILIndex.h"
 #include "../MyGfx.h"
 #include "../Common.h"
 #include "../SoundMgr.h"
@@ -43,22 +42,37 @@
 #define _TOP_LOGIN_BTN				65
 
 LoginView::LoginView() {
+	ImageLib lib;
+	lib.Load(".\\Data\\Interface1c.wil");
+	GuiHelper helper(&lib);
+
 	MyGfx::Instance()->Resize(640, 480);
 	UI = new YxGUI::Canvas();
 	UI->SetLocalSize(640,480);
-	Bg = new YxGUI::Image();
+
+	Bg = helper.CreateImage(IMG_IDX_LOGIN_BACK);
 	UI->AddChild(Bg);
-	/*Login = new YxGUI::Button();
-	UI->AddChild(Login);
-	Exit = new YxGUI::Button();
-	UI->AddChild(Exit);*/
-
-	_lib.Load(".\\Data\\Interface1c.wil");
-
-	auto sBg = _lib.LoadImage(IMG_IDX_LOGIN_BACK);
 	Bg->SetLocalPos(_LEFT_INTRO, _TOP_INTRO);
-	Bg->SetSprite(MyGfx::CreateSpriteFromImage(sBg),true);
-	Bg->SetAsNativeSize();
+
+	Border = helper.CreateImage(_IMG_IDX_LOGIN_BORDER);
+	UI->AddChild(Border);
+	Border->SetLocalPos(_LEFT_LOGIN, _TOP_LOGIN);
+
+	Login = helper.CreateButton(_IMG_IDX_BTN_LOGIN);
+	Border->AddChild(Login);
+	Login->SetLocalPos(_LEFT_LOGIN_BTN, _TOP_LOGIN_BTN);
+
+	New = helper.CreateButton(_IMG_IDX_BTN_NEW);
+	Border->AddChild(New);
+	New->SetLocalPos(_LEFT_NEW_BTN, _TOP_LOGIN_BTNS);
+
+	Change = helper.CreateButton(_IMG_IDX_BTN_CHANGE);
+	Border->AddChild(Change);
+	Change->SetLocalPos(_LEFT_CHANGE_BTN, _TOP_LOGIN_BTNS);
+
+	Exit = helper.CreateButton(_IMG_IDX_BTN_EXIT);
+	Border->AddChild(Exit);
+	Exit->SetLocalPos(_LEFT_EXIT_BTN, _TOP_LOGIN_BTNS);
 
 	SoundMgr::Instance()->PlayMusic("Opening.wav", true);
 }

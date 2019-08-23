@@ -33,4 +33,8 @@ namespace YxGUI {
 		if (_sprite)
 			MyGfx::Instance()->DrawCommand(_sprite, _wRect.x, _wRect.y, _wRect.w, _wRect.h, MyGfx::Layer::GUI);
 	}
+	bool Image::HasSprite()
+	{
+		return _sprite!=nullptr;
+	}
 }

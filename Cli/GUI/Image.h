@@ -11,6 +11,7 @@ namespace YxGUI {
 		void SetSprite(Sprite *sprite,bool manage);
 		void SetAsNativeSize();
 		virtual void Draw();
+		bool HasSprite();
 	protected:
 		Sprite *_sprite;
 		bool _manageImg;

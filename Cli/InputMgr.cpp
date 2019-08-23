@@ -55,19 +55,27 @@ void InputMgr::OnSdlEvent(SDL_Event *e)
 		if (onSysQuit)
 			onSysQuit();
 	}
-	else if (e->type == SDL_MOUSEBUTTONDOWN)
+	else if (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN ||
+		e->type == SDL_MOUSEBUTTONUP || e->type == SDL_MOUSEWHEEL)
 	{
-		_mouseStatus[e->button.button] = 1;
-		_mousePos.x = e->motion.x;
-		_mousePos.y = e->motion.y;
+		if (!onUICheck || !onUICheck(e))// UI未处理事件
+		{
+			if (e->type == SDL_MOUSEBUTTONDOWN)
+			{
+				_mouseStatus[e->button.button] = 1;
+				_mousePos.x = e->motion.x;
+				_mousePos.y = e->motion.y;
+			}
+			else if (e->type == SDL_MOUSEMOTION)
+			{
+				_mousePos.x = e->motion.x;
+				_mousePos.y = e->motion.y;
+			}
+			else if (e->type == SDL_MOUSEBUTTONUP)
+			{
+				_mouseStatus[e->button.button] = 0;
+			}
+		}
 	}
-	else if (e->type == SDL_MOUSEMOTION)
-	{
-		_mousePos.x = e->motion.x;
-		_mousePos.y = e->motion.y;
-	}
-	else if (e->type == SDL_MOUSEBUTTONUP)
-	{
-		_mouseStatus[e->button.button] = 0;
-	}
+	
 }

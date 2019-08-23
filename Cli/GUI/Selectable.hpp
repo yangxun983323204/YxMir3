@@ -5,22 +5,17 @@ namespace YxGUI {
 	class Selectable :public Graphic 
 	{
 	public:
-		Selectable();
-		~Selectable();
-		virtual bool HandleEvent(SDL_Event &e);
+		Selectable() {
+			HitTestTarget = true;
+			_interactive = true;
+		}
+		~Selectable() {}
+		virtual bool HandleEvent(SDL_Event &e) {
+			return false;
+		}
+		virtual void OnHover(bool h) {};
+		virtual void OnFocus(bool f) {};
 	protected:
 
 	};
-
-	inline YxGUI::Selectable::Selectable()
-	{
-	}
-
-	inline YxGUI::Selectable::~Selectable()
-	{
-	}
-	inline bool YxGUI::Selectable::HandleEvent(SDL_Event &e)
-	{
-		return false;
-	}
 }

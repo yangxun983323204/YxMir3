@@ -13,13 +13,18 @@ namespace YxGUI {
 		Yx::Delegate<void()> onClick;
 		Button();
 		~Button();
-		void SetSprite(Sprite* sp,bool manage);
+		void SetNormalSprite(Sprite* sp,bool manage);
+		void SetHighLightSprite(Sprite* sp, bool manage);
 		void SetText(wstring str);
+		void SetAsSpriteSize();
 		virtual void Draw();
 		virtual bool HandleEvent(SDL_Event &e);
+		virtual void OnHover(bool h);
 	protected:
-		Image *_image;
+		Image *_imageNormal;
+		Image *_imageHighlight;
 		Text *_text;
 		ClickDetector _detector;
+		bool _hover;
 	};
 }

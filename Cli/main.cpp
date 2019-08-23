@@ -19,10 +19,12 @@ int main(int argc, char* argv[])
 	SoundMgr *soudMgr = SoundMgr::Instance();
 	soudMgr->PlayMusic("start.mp3", true);
 	InputMgr input;
+	LoginView *login = new LoginView();
 	input.SetGfx(gfx);
 	input.onSysQuit += [&gfx]() { gfx->Exit(); };
-
-	LoginView *login = new LoginView();
+	input.onUICheck = [login](SDL_Event *e) {
+		return login->HandleEvent(*e);
+	};
 
 	gfx->onDraw += [gfx, &input, &soudMgr,&login](uint32_t deltaMs) {
 		input.Update(deltaMs);

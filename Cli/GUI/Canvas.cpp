@@ -1,13 +1,17 @@
 #include "Canvas.h"
+#include "Graphic.h"
+
 using namespace YxGUI;
 
 Canvas::Canvas()
 {
+	_eventSystem = new EventSystem(this);
 	_frameSelectObjs.resize(20);
 }
 
 Canvas::~Canvas()
 {
+	delete _eventSystem;
 }
 void Canvas::Draw()
 {
@@ -21,7 +25,7 @@ void Canvas::Draw()
 	}
 	while (!_frameGraphicObjs.empty())
 	{
-		Graphic *g = _frameGraphicObjs.top();
+		Graphic *g = _frameGraphicObjs.front();
 		_frameGraphicObjs.pop();
 		g->Draw();
 		for each (auto g in g->_children)
@@ -34,31 +38,11 @@ void Canvas::Draw()
 }
 bool Canvas::HandleEvent(SDL_Event & e)
 {
+	return _eventSystem->HandleEvent(e);
 	_frameSelectObjs.clear();
-	if (Visiable)
-	{
-		for each (auto g in _children)
-		{
-			if (g->Visiable && g->HitTestTarget && typeid(g) == typeid(Selectable*))
-				_frameGraphicObjs.push(g);
-		}
-	}
-	while (!_frameGraphicObjs.empty())
-	{
-		Graphic *g = _frameGraphicObjs.top();
-		_frameGraphicObjs.pop();
-		g->Draw();
-		_frameSelectObjs.push_front((Selectable*)g);
-		for each (auto g in g->_children)
-		{
-			if (g->Visiable && g->HitTestTarget && typeid(g) == typeid(Selectable*))
-				_frameGraphicObjs.push(g);
-		}
-	}
-	for each (auto g in _frameSelectObjs)
-	{
-		if (g->HandleEvent(e))
-			return true;
-	}
-	return false;
+}
+
+void YxGUI::Canvas::Reset()
+{
+	_eventSystem->ClearFocus();
 }

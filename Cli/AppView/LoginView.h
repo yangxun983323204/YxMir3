@@ -1,9 +1,5 @@
 #pragma once
-#include "../SDLInc.h"
-#include "../GUI/Graphic.h"
-#include "../GUI/Canvas.h"
-#include "../GUI/Image.h"
-#include "../GUI/Button.h"
+#include "GuiHelper.hpp"
 
 class LoginView 
 {
@@ -15,8 +11,10 @@ public:
 public:
 	YxGUI::Canvas *UI;
 	YxGUI::Image *Bg;
+	YxGUI::Image *Border;
 	YxGUI::Button *Login;
+	YxGUI::Button *New;
+	YxGUI::Button *Change;
 	YxGUI::Button *Exit;
 private:
-	ImageLib _lib;
 };

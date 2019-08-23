@@ -4,9 +4,14 @@ namespace YxGUI {
 
 	Button::Button()
 	{
-		_image = new YxGUI::Image();
+		_hover = false;
+		_imageNormal = new YxGUI::Image();
+		_imageNormal->HitTestTarget = false;
+		_imageHighlight = new YxGUI::Image();
+		_imageHighlight->HitTestTarget = false;
 		_text = nullptr;
-		AddChild(_image);
+		AddChild(_imageNormal);
+		AddChild(_imageHighlight);
 		_detector.onClick = [this](uint8_t idx) {
 			if (this->onClick)
 				this->onClick();
@@ -16,23 +21,40 @@ namespace YxGUI {
 	Button::~Button()
 	{
 	}
-	inline void Button::SetSprite(Sprite * sp, bool manage)
+	void Button::SetNormalSprite(Sprite * sp, bool manage)
 	{
-		_image->SetSprite(sp, manage);
+		_imageNormal->SetSprite(sp, manage);
+		_imageNormal->SetAsNativeSize();
+	}
+	void Button::SetHighLightSprite(Sprite * sp, bool manage)
+	{
+		_imageHighlight->SetSprite(sp, manage);
+		_imageHighlight->SetAsNativeSize();
 	}
 	inline void Button::SetText(wstring str)
 	{
 		if (!_text) {
 			_text = new Text();
 			AddChild(_text);
+			_text->HitTestTarget = false;
 		}
 		_text->SetString(str);
 	}
+	void Button::SetAsSpriteSize()
+	{
+		auto rect = _imageNormal->GetLocalRect();
+		SetLocalSize(rect.w, rect.h);
+	}
 	inline void Button::Draw()
 	{
-		_image->Draw();
-		if (_text)
-			_text->Draw();
+		if (_hover && _imageHighlight->HasSprite()) {
+			_imageNormal->Visiable = false;
+			_imageHighlight->Visiable = true;
+		}
+		else {
+			_imageNormal->Visiable = true;
+			_imageHighlight->Visiable = false;
+		}
 	}
 	inline bool Button::HandleEvent(SDL_Event & e)
 	{
@@ -40,18 +62,18 @@ namespace YxGUI {
 		switch (e.type)
 		{
 		case SDL_MOUSEBUTTONDOWN:
-			pos={ e.motion.x,e.motion.y };
-			if (!HitTest(&pos))
-				return false;
+			_hover = false;
 			_detector.Down(e.button.button, e.motion.x, e.motion.y);
 			return true;
 		case SDL_MOUSEBUTTONUP:
-			pos={ e.motion.x,e.motion.y };
-			if (!HitTest(&pos))
-				return false;
+			_hover = true;
 			_detector.Up(e.button.button, e.motion.x, e.motion.y);
 			return true;
 		}
 		return false;
+	}
+	void Button::OnHover(bool h)
+	{
+		_hover = h;
 	}
 }

@@ -13,6 +13,8 @@ public:
 	Yx::Delegate<void(Vector2UInt pos)> onTarget;
 	Yx::Delegate<void(Direction dir)> onGather;
 
+	std::function<bool(SDL_Event* e)> onUICheck;
+
 	Yx::Delegate<void()> onSysQuit;
 
 	InputMgr();
@@ -28,4 +30,3 @@ private:
 	void HandleMouse();
 	void OnSdlEvent(SDL_Event* e);
 };
-

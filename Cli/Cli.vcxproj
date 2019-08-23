@@ -149,12 +149,14 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="ActorRenderer.h" />
     <ClInclude Include="AnimDef.h" />
+    <ClInclude Include="AppView\GuiHelper.hpp" />
     <ClInclude Include="AppView\LoginView.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Delegate.hpp" />
     <ClInclude Include="GUI\Button.h" />
     <ClInclude Include="GUI\Canvas.h" />
     <ClInclude Include="GUI\ClickDetector.hpp" />
+    <ClInclude Include="GUI\EventSystem.hpp" />
     <ClInclude Include="GUI\Graphic.h" />
     <ClInclude Include="GUI\Image.h" />
     <ClInclude Include="GUI\Selectable.hpp" />

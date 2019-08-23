@@ -11,6 +11,8 @@ namespace YxGUI {
 	class Graphic
 	{
 		friend class Canvas;
+		friend class Selectable;
+		friend class EventSystem;
 	public:
 		bool Visiable;
 		bool HitTestTarget;// 是否参与点击检测
@@ -47,6 +49,8 @@ namespace YxGUI {
 		float _wScaleY;
 	    // 计算屏幕绝对坐标
 		void CalcWorldRect();
+	private:
+		bool _interactive;
 	};
 }
 

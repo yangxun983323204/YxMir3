@@ -6,6 +6,7 @@ Graphic::Graphic()
 {
 	Visiable = true;
 	HitTestTarget = true;
+	_interactive = false;
 	_parent = nullptr;
 	_lRect = {0,0,100,50};
 	_focus = false;
@@ -106,7 +107,7 @@ void YxGUI::Graphic::SetIndexInParent(uint32_t idx)
 
 bool YxGUI::Graphic::HitTest(SDL_Point *p)
 {
-	return SDL_PointInRect(p, &_lRect);
+	return SDL_PointInRect(p, &_wRect);
 }
 
 float YxGUI::Graphic::GetLocalScaleX()
