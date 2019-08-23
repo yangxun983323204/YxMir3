@@ -16,6 +16,7 @@ public:
 		Orth,
 		Proj,
 	};
+	MyColor Color;
 	int16_t PivotX;
 	int16_t PivotY;
 	bool HasShadow;
@@ -31,6 +32,7 @@ public:
 		HasShadow = false;
 		_shadow = nullptr;
 		_shadowType = ShadowType::Proj;
+		Color = { 255,255,255,255 };
 	}
 	~Sprite()
 	{
@@ -48,6 +50,10 @@ public:
 	inline uint16_t h()
 	{
 		return OverridH == 0 ? Surface->h : OverridH;
+	}
+	inline void ApplyColor() {
+		SDL_SetSurfaceColorMod(Surface, Color.r, Color.g, Color.b);
+		SDL_SetSurfaceAlphaMod(Surface, Color.a);
 	}
 private:
 	Sprite* _shadow;

@@ -114,6 +114,9 @@
     <ClInclude Include="GUI\EventSystem.hpp">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\InputField.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="AppView\LoginView.cpp">
       <Filter>AppView</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\InputField.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -10,6 +10,8 @@ namespace YxGUI {
 		~Image();
 		void SetSprite(Sprite *sprite,bool manage);
 		void SetAsNativeSize();
+		void SetColor(MyColor col);
+		MyColor GetColor();
 		virtual void Draw();
 		bool HasSprite();
 	protected:

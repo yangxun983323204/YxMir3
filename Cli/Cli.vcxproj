@@ -159,6 +159,7 @@
     <ClInclude Include="GUI\EventSystem.hpp" />
     <ClInclude Include="GUI\Graphic.h" />
     <ClInclude Include="GUI\Image.h" />
+    <ClInclude Include="GUI\InputField.h" />
     <ClInclude Include="GUI\Selectable.hpp" />
     <ClInclude Include="GUI\Text.h" />
     <ClInclude Include="HeroRenderer.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="GUI\Canvas.cpp" />
     <ClCompile Include="GUI\Graphic.cpp" />
     <ClCompile Include="GUI\Image.cpp" />
+    <ClCompile Include="GUI\InputField.cpp" />
     <ClCompile Include="GUI\Text.cpp" />
     <ClCompile Include="HeroRenderer.cpp" />
     <ClCompile Include="ImageLib.cpp" />

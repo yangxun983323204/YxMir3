@@ -28,6 +28,21 @@ namespace YxGUI {
 			CalcWorldRect();
 		}
 	}
+	void Image::SetColor(MyColor col)
+	{
+		if (_sprite)
+		{
+			_sprite->Color = col;
+		}
+	}
+	MyColor Image::GetColor()
+	{
+		if (_sprite)
+		{
+			return _sprite->Color;
+		}
+		return MyColor();
+	}
 	void Image::Draw()
 	{
 		if (_sprite)

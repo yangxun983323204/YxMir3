@@ -16,5 +16,8 @@ public:
 	YxGUI::Button *New;
 	YxGUI::Button *Change;
 	YxGUI::Button *Exit;
+	YxGUI::Image *InputBg;
+	YxGUI::InputField *ID;
+	YxGUI::InputField *PW;
 private:
 };

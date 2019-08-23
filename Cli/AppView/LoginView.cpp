@@ -20,12 +20,13 @@
 #define _LEFT_ID_PASS				150
 #define _TOP_ID_PASS				65
 
-#define IMG_IDX_LOGIN_BACK			0
+
 #define _LEFT_INTRO				0
 #define _TOP_INTRO				60
 #define _RIGHT_INTRO			640
 #define _BOTTOM_INTRO			420
 
+#define  IMG_IDX_LOGIN_BACK			0
 #define _IMG_IDX_LOGIN_BORDER		1
 #define _IMG_IDX_LOGIN_IDPASS		2
 #define _IMG_IDX_BTN_LOGIN			10
@@ -56,6 +57,7 @@ LoginView::LoginView() {
 
 	Border = helper.CreateImage(_IMG_IDX_LOGIN_BORDER);
 	UI->AddChild(Border);
+	Border->SetColor({255,255,255,128});
 	Border->SetLocalPos(_LEFT_LOGIN, _TOP_LOGIN);
 
 	Login = helper.CreateButton(_IMG_IDX_BTN_LOGIN);
@@ -73,6 +75,18 @@ LoginView::LoginView() {
 	Exit = helper.CreateButton(_IMG_IDX_BTN_EXIT);
 	Border->AddChild(Exit);
 	Exit->SetLocalPos(_LEFT_EXIT_BTN, _TOP_LOGIN_BTNS);
+
+	InputBg = helper.CreateImage(_IMG_IDX_LOGIN_IDPASS);
+	Border->AddChild(InputBg);
+	InputBg->SetLocalPos(_LEFT_ID_PASS, _TOP_ID_PASS);
+
+	ID = helper.CreateInputField(-1);
+	Border->AddChild(ID);
+	ID->SetLocalPos(POS_ID_INS_X, POS_ID_INS_Y);
+
+	PW = helper.CreateInputField(-1);
+	Border->AddChild(PW);
+	PW->SetLocalPos(POS_PASS_INS_X, POS_PASS_INS_Y);
 
 	SoundMgr::Instance()->PlayMusic("Opening.wav", true);
 }

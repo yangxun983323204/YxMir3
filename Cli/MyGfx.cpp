@@ -148,8 +148,10 @@ void MyGfx::DrawCache()
 	for (; p < end; p++)
 	{
 		GetDrawRect(p._Ptr,false, &srcRect, &dstRect);
-		if (SDL_HasIntersection(&dstRect, &mScreenRect))
+		if (SDL_HasIntersection(&dstRect, &mScreenRect)) {
+			p->sprite->ApplyColor();
 			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
+		}
 	}
 	mGuiCache.clear();
 	//

@@ -45,7 +45,7 @@ namespace YxGUI {
 		if (_autoSize != a)
 		{
 			_autoSize = a;
-			if (_autoSize)
+			if (_autoSize && _sprite)
 			{
 				_lRect.w = _sprite->w();
 				_lRect.h = _sprite->h();

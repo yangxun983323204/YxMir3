@@ -68,6 +68,12 @@ struct MyColor
 		b = (c16 & 0x001F) << 3;
 		a = 0xFF;
 	}
+	MyColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+		this->r = r;
+		this->g = g;
+		this->b = b;
+		this->a = a;
+	}
 	float RateR() { return r / 255.0f; }
 	float RateG() { return g / 255.0f; }
 	float RateB() { return b / 255.0f; }

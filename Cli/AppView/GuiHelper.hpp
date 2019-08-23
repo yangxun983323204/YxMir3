@@ -4,6 +4,7 @@
 #include "../GUI/Canvas.h"
 #include "../GUI/Image.h"
 #include "../GUI/Button.h"
+#include "../GUI/InputField.h"
 
 class GuiHelper
 {
@@ -12,7 +13,7 @@ public:
 	{
 		_lib = lib;
 	}
-	YxGUI::Image *CreateImage(uint32_t idx,bool manageSp = true)
+	YxGUI::Image *CreateImage(int32_t idx,bool manageSp = true)
 	{
 		auto img = new YxGUI::Image();
 		auto raw = _lib->LoadImage(idx);
@@ -20,7 +21,7 @@ public:
 		img->SetAsNativeSize();
 		return img;
 	}
-	YxGUI::Button *CreateButton(uint32_t idx, bool manageSp = true)
+	YxGUI::Button *CreateButton(int32_t idx, bool manageSp = true)
 	{
 		auto btn = new YxGUI::Button();
 		auto raw0 = _lib->LoadImage(idx);
@@ -29,6 +30,17 @@ public:
 		btn->SetHighLightSprite(MyGfx::CreateSpriteFromImage(raw1), manageSp);
 		btn->SetAsSpriteSize();
 		return btn;
+	}
+	YxGUI::InputField *CreateInputField(int32_t idx, bool manageSp = true)
+	{
+		auto input = new YxGUI::InputField();
+		if (idx>=0)
+		{
+			auto raw = _lib->LoadImage(idx);
+			input->SetBackground(MyGfx::CreateSpriteFromImage(raw), true);
+			input->SetAsBgSize();
+		}
+		return input;
 	}
 
 private:
