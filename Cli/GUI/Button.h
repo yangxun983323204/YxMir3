@@ -15,6 +15,7 @@ namespace YxGUI {
 		~Button();
 		void SetNormalSprite(Sprite* sp,bool manage);
 		void SetHighLightSprite(Sprite* sp, bool manage);
+		void SetPressSprite(Sprite* sp, bool manage);
 		void SetText(wstring str);
 		void SetAsSpriteSize();
 		virtual void Draw();
@@ -23,8 +24,9 @@ namespace YxGUI {
 	protected:
 		Image *_imageNormal;
 		Image *_imageHighlight;
+		Image *_imagePress;
 		Text *_text;
 		ClickDetector _detector;
-		bool _hover;
+		bool _press;
 	};
 }

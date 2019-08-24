@@ -117,6 +117,15 @@
     <ClInclude Include="GUI\InputField.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="AppView\SelectActorView.h">
+      <Filter>AppView</Filter>
+    </ClInclude>
+    <ClInclude Include="AppView\ViewMgr.h">
+      <Filter>AppView</Filter>
+    </ClInclude>
+    <ClInclude Include="AppView\MyView.hpp">
+      <Filter>AppView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -187,6 +196,12 @@
     </ClCompile>
     <ClCompile Include="GUI\InputField.cpp">
       <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="AppView\SelectActorView.cpp">
+      <Filter>AppView</Filter>
+    </ClCompile>
+    <ClCompile Include="AppView\ViewMgr.cpp">
+      <Filter>AppView</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

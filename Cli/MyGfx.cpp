@@ -4,7 +4,7 @@
 #include "Utils.h"
 
 MyGfx *MyGfx::_inst = nullptr;
-TTF_Font *MyGfx::gFont = TTF_OpenFont("./Fonts/STSONG.TTF", 16);
+TTF_Font *MyGfx::gFont = nullptr;
 
 MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 {
@@ -15,7 +15,7 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 	SDL_Init(SDL_INIT_VIDEO);
 	if (gFont == nullptr) {
 		TTF_Init();
-		gFont = TTF_OpenFont("./Fonts/STSONG.TTF", 28);
+		gFont = TTF_OpenFont("./Fonts/STSONG.TTF", 16);
 	}
 	mScreenRect.x = mScreenRect.y = 0;
 	mScreenRect.w = w;
@@ -60,6 +60,10 @@ void MyGfx::SetFPS(uint16_t requireFPS)
 
 void MyGfx::Resize(uint16_t w, uint16_t h)
 {
+	if (mScreenRect.w == w && mScreenRect.h == h)
+	{
+		return;
+	}
 	SDL_SetWindowSize(mWindow, w, h);
 	mScreenRect.w = w;
 	mScreenRect.h = h;
@@ -71,15 +75,14 @@ void MyGfx::Resize(uint16_t w, uint16_t h)
 
 void MyGfx::DrawString(std::wstring str, int x, int y)
 {
-	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, YxUtils::Wstr2Str(str).c_str(), SDL_Color{0,255,0,255});
+	auto sp = CreateTextSprite(str);
 	TempDrawInfo info;
 	info.x = x;
 	info.y = y;
-	info.w = textSurface->w;
-	info.h = textSurface->h;
+	info.w = sp->Surface->w;
+	info.h = sp->Surface->h;
 	mTopCache.push_back(info);
-	mTopCache[mTopCache.size()-1].sprite = new Sprite();
-	mTopCache[mTopCache.size() - 1].sprite->Surface = textSurface;
+	mTopCache[mTopCache.size()-1].sprite = sp;
 }
 
 void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
@@ -239,7 +242,7 @@ MyGfx * MyGfx::Instance()
 
 Sprite * MyGfx::CreateTextSprite(std::wstring str)
 {
-	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, YxUtils::Wstr2Str(str).c_str(), SDL_Color{ 0,255,0,255 });
+	SDL_Surface* textSurface = TTF_RenderUTF8_Solid(gFont, YxUtils::Wstr2Str(str).c_str(), SDL_Color{ 255,255,255,255 });
 	Sprite *sp = new Sprite();
 	sp->Surface = textSurface;
 	return sp;

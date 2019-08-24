@@ -55,8 +55,7 @@ void InputMgr::OnSdlEvent(SDL_Event *e)
 		if (onSysQuit)
 			onSysQuit();
 	}
-	else if (e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN ||
-		e->type == SDL_MOUSEBUTTONUP || e->type == SDL_MOUSEWHEEL)
+	else
 	{
 		if (!onUICheck || !onUICheck(e))// UI未处理事件
 		{

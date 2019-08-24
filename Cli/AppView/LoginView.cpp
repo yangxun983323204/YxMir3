@@ -2,6 +2,7 @@
 #include "../MyGfx.h"
 #include "../Common.h"
 #include "../SoundMgr.h"
+#include "ViewMgr.h"
 
 #define LOGIN_BUTTON_COUNT			4
 #define LOGIN_INPUT_COUNT			2
@@ -81,14 +82,19 @@ LoginView::LoginView() {
 	InputBg->SetLocalPos(_LEFT_ID_PASS, _TOP_ID_PASS);
 
 	ID = helper.CreateInputField(-1);
-	Border->AddChild(ID);
-	ID->SetLocalPos(POS_ID_INS_X, POS_ID_INS_Y);
+	UI->AddChild(ID);
+	ID->MaxChar = 12;
+	ID->SetLocalSize(96, 20);
+	ID->SetLocalPos(POS_ID_INS_X+6, POS_ID_INS_Y+4);// 有点偏，修正下值
 
 	PW = helper.CreateInputField(-1);
-	Border->AddChild(PW);
-	PW->SetLocalPos(POS_PASS_INS_X, POS_PASS_INS_Y);
+	UI->AddChild(PW);
+	PW->MaxChar = 12;
+	PW->IsPassword = true;
+	PW->SetLocalSize(96, 20);
+	PW->SetLocalPos(POS_PASS_INS_X+6, POS_PASS_INS_Y+4);
 
-	SoundMgr::Instance()->PlayMusic("Opening.wav", true);
+	Binding();
 }
 
 LoginView::~LoginView() 
@@ -104,4 +110,25 @@ void LoginView::Draw()
 bool LoginView::HandleEvent(SDL_Event & e)
 {
 	return UI->HandleEvent(e);
+}
+
+void LoginView::OnShow()
+{
+	UI->Visiable = true;
+	SoundMgr::Instance()->PlayMusic("Opening.wav", 0, true);
+}
+
+void LoginView::OnHide()
+{
+	UI->Visiable = false;
+}
+
+void LoginView::Binding()
+{
+	Login->onClick += [this]() {
+		ViewMgr::Instance()->ShowView(ViewMgr::ViewIndex::Select);// test
+	};
+	Exit->onClick += [this]() {
+		MyGfx::Instance()->Exit();
+	};
 }

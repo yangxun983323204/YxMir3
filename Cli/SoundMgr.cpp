@@ -52,22 +52,24 @@ bool SoundMgr::GetBgmFileName(char * mapName, char * mp3Name)
 	return false;
 }
 
-void SoundMgr::PlayMusic(char * fileName, bool loop)
+void SoundMgr::PlayMusic(char * fileName,uint32_t fade, bool loop)
 {
 	string path = fileName;
 	path = "./Sound/" + path;
+	if(_bgmMusic){
+		BgmFadeOut(0);
+		Mix_FreeMusic(_bgmMusic);
+		_bgmMusic = nullptr;
+	}
 	_bgmMusic = Mix_LoadMUS(path.c_str());
-	BgmFadeIn(0, loop);
+	BgmFadeIn(fade, loop);
 }
 
 void SoundMgr::PlayBgm(char * mapName, bool loop)
 {
 	char mp3[10];
 	GetBgmFileName(mapName, mp3);
-	string path = mp3;
-	path = "./Sound/" + path;
-	_bgmMusic = Mix_LoadMUS(path.c_str());
-	BgmFadeIn(5000, loop);
+	PlayMusic(mp3,5000,loop);
 }
 
 void SoundMgr::StopBgm()

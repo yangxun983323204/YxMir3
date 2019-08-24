@@ -10,6 +10,11 @@ namespace YxGUI {
 
 	Text::~Text()
 	{
+		if (_sprite)
+		{
+			delete _sprite;
+			_sprite = nullptr;
+		}
 	}
 	wstring Text::GetString()
 	{

@@ -11,6 +11,7 @@ namespace YxGUI {
 		:public Selectable
 	{
 	public:
+		uint16_t MaxChar;
 		bool IsPassword;
 		InputField();
 		~InputField();
@@ -25,7 +26,8 @@ namespace YxGUI {
 		YxGUI::Image *_bg;
 		YxGUI::Image *_cursor;
 		YxGUI::Text *_text;
-		bool _focus;
 		wstring _str;
+		uint16_t _twinkleSpanFrame;
+		uint16_t _currentFrame;
 	};
 }

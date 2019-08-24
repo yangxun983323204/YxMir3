@@ -20,6 +20,7 @@ public:
 	static SpriteMgr *Instance();
 	
 	const static uint8_t IdxBuiltinCross;
+	const static uint8_t IdxBuiltinVLine;
 private:
 	SpriteMgr();
 

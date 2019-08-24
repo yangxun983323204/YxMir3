@@ -9,13 +9,14 @@ uint16_t SpriteMgr::BuiltinSpriteCount = 0;
 Sprite** SpriteMgr::BuiltinSprite = nullptr;
 
 const uint8_t SpriteMgr::IdxBuiltinCross = 0;
+const uint8_t SpriteMgr::IdxBuiltinVLine = 1;
 
 void SpriteMgr::Init()
 {
 	if (SpriteMgr::Inited)
 		return;
 	Inited = true;
-	BuiltinSpriteCount = 1;
+	BuiltinSpriteCount = 2;
 	BuiltinSprite = new Sprite*[BuiltinSpriteCount];
 	uint8_t size = 15;
 	uint8_t half_up = ceil(size / 2.0f);
@@ -33,6 +34,13 @@ void SpriteMgr::Init()
 		p[i * size + half_down] = 0xff0000ff;
 	}
 	BuiltinSprite[IdxBuiltinCross] = cross;
+	// "|"·ûºÅ¾«Áé
+	auto vline = new Sprite();
+	vline->PivotX =  CellW / 2;
+	vline->PivotY = -half_down + CellH / 2;
+	vline->Surface = SDL_CreateRGBSurface(0, 1, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
+	SDL_FillRect(vline->Surface, 0, 0xffffffff);
+	BuiltinSprite[IdxBuiltinVLine] = vline;
 }
 //
 

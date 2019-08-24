@@ -15,23 +15,30 @@ Canvas::~Canvas()
 }
 void Canvas::Draw()
 {
+	// 深度优先遍历节点
 	if (Visiable)
 	{
-		for each (auto g in _children)
+		if (Visiable && _children.size()>0)
 		{
-			if (g->Visiable)
-				_frameGraphicObjs.push(g);
+			auto p = _children.rbegin();
+			for (; p != _children.rend(); p++)
+			{
+				if ((*p)->Visiable)
+					_frameGraphicObjs.push((*p));
+			}
 		}
 	}
 	while (!_frameGraphicObjs.empty())
 	{
-		Graphic *g = _frameGraphicObjs.front();
+		Graphic *g = _frameGraphicObjs.top();
 		_frameGraphicObjs.pop();
-		g->Draw();
-		for each (auto g in g->_children)
+		if(g->Visiable)
+			g->Draw();
+		auto p = g->_children.rbegin();
+		for (; p != g->_children.rend(); p++)
 		{
-			if (g->Visiable)
-				_frameGraphicObjs.push(g);
+			if ((*p)->Visiable)
+				_frameGraphicObjs.push((*p));
 		}
 	}
 

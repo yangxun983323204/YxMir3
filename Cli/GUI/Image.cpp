@@ -9,6 +9,11 @@ namespace YxGUI {
 
 	Image::~Image()
 	{
+		if (_sprite && _manageImg)
+		{
+			delete _sprite;
+			_sprite = nullptr;
+		}
 	}
 	void Image::SetSprite(Sprite * sprite, bool manage)
 	{

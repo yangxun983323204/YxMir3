@@ -8,7 +8,7 @@
 #include "SpriteMgr.h"
 #include "SoundMgr.h"
 #include "InputMgr.h"
-#include "./AppView/LoginView.h"
+#include "./AppView/ViewMgr.h"
 
 
 int main(int argc, char* argv[])
@@ -17,24 +17,24 @@ int main(int argc, char* argv[])
 	MyGfx *gfx = new MyGfx(L"YxMir3", 800, 600);
 	auto sMgr = SpriteMgr::Instance();
 	SoundMgr *soudMgr = SoundMgr::Instance();
-	soudMgr->PlayMusic("start.mp3", true);
 	InputMgr input;
-	LoginView *login = new LoginView();
+	auto viewMgr = ViewMgr::Instance();
+	viewMgr->ShowView(ViewMgr::ViewIndex::Login);
 	input.SetGfx(gfx);
 	input.onSysQuit += [&gfx]() { gfx->Exit(); };
-	input.onUICheck = [login](SDL_Event *e) {
-		return login->HandleEvent(*e);
+	input.onUICheck = [viewMgr](SDL_Event *e) {
+		return viewMgr->Current()->HandleEvent(*e);
 	};
 
-	gfx->onDraw += [gfx, &input, &soudMgr,&login](uint32_t deltaMs) {
+	gfx->onDraw += [gfx, &input, &soudMgr,&viewMgr](uint32_t deltaMs) {
 		input.Update(deltaMs);
 		soudMgr->Update();
-		login->Draw();
+		viewMgr->Current()->Draw();
 		gfx->DrawCache();
 	};
 
 	gfx->RunLoop();
-	delete login;
+	delete viewMgr;
 	SoundMgr::Destroy();
 	delete sMgr;
 	delete gfx;

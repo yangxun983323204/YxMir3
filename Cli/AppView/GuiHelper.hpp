@@ -28,6 +28,7 @@ public:
 		auto raw1 = _lib->LoadImage(idx+1);
 		btn->SetNormalSprite(MyGfx::CreateSpriteFromImage(raw0), manageSp);
 		btn->SetHighLightSprite(MyGfx::CreateSpriteFromImage(raw1), manageSp);
+		btn->SetPressSprite(MyGfx::CreateSpriteFromImage(raw0), false);
 		btn->SetAsSpriteSize();
 		return btn;
 	}

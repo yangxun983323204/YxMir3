@@ -4,14 +4,21 @@ namespace YxGUI {
 
 	Button::Button()
 	{
-		_hover = false;
+		_press = false;
 		_imageNormal = new YxGUI::Image();
 		_imageNormal->HitTestTarget = false;
+		AddChild(_imageNormal);
+
 		_imageHighlight = new YxGUI::Image();
 		_imageHighlight->HitTestTarget = false;
-		_text = nullptr;
-		AddChild(_imageNormal);
 		AddChild(_imageHighlight);
+
+		_imagePress = new YxGUI::Image();
+		_imagePress->HitTestTarget = false;
+		AddChild(_imagePress);
+
+		_text = nullptr;
+		
 		_detector.onClick = [this](uint8_t idx) {
 			if (this->onClick)
 				this->onClick();
@@ -31,6 +38,11 @@ namespace YxGUI {
 		_imageHighlight->SetSprite(sp, manage);
 		_imageHighlight->SetAsNativeSize();
 	}
+	void Button::SetPressSprite(Sprite * sp, bool manage)
+	{
+		_imagePress->SetSprite(sp, manage);
+		_imagePress->SetAsNativeSize();
+	}
 	inline void Button::SetText(wstring str)
 	{
 		if (!_text) {
@@ -47,13 +59,21 @@ namespace YxGUI {
 	}
 	inline void Button::Draw()
 	{
-		if (_hover && _imageHighlight->HasSprite()) {
+		if (_press && _imagePress->HasSprite())
+		{
+			_imageNormal->Visiable = false;
+			_imageHighlight->Visiable = false;
+			_imagePress->Visiable = true;
+		}
+		else if (_hover && _imageHighlight->HasSprite()) {
 			_imageNormal->Visiable = false;
 			_imageHighlight->Visiable = true;
+			_imagePress->Visiable = false;
 		}
 		else {
 			_imageNormal->Visiable = true;
 			_imageHighlight->Visiable = false;
+			_imagePress->Visiable = false;
 		}
 	}
 	inline bool Button::HandleEvent(SDL_Event & e)
@@ -62,11 +82,11 @@ namespace YxGUI {
 		switch (e.type)
 		{
 		case SDL_MOUSEBUTTONDOWN:
-			_hover = false;
+			_press = true;
 			_detector.Down(e.button.button, e.motion.x, e.motion.y);
 			return true;
 		case SDL_MOUSEBUTTONUP:
-			_hover = true;
+			_press = false;
 			_detector.Up(e.button.button, e.motion.x, e.motion.y);
 			return true;
 		}

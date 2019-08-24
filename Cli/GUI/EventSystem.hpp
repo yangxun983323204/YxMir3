@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <list>
-#include <queue>
+#include <stack>
 #include "Graphic.h"
 #include "Selectable.hpp"
 
@@ -13,61 +13,80 @@ namespace YxGUI {
 			_focus = nullptr;
 			_hover = nullptr;
 		}
+
 		~EventSystem() {
 			_focus = nullptr; 
 			_hover = nullptr;
 		}
+
 		bool HandleEvent(SDL_Event &e)
 		{
+			// 深度优先遍历节点
 			_frameSelectObjs.clear();
-			if (_root->Visiable)
+			if (_root->Visiable && _root->_children.size()>0)
 			{
-				for each (auto g in _root->_children)
+				auto p = _root->_children.rbegin();
+				for (; p != _root->_children.rend(); p++)
 				{
-					if (g->Visiable && g->HitTestTarget)
-						_frameGraphicObjs.push(g);
+					if ((*p)->Visiable)
+						_frameGraphicObjs.push((*p));
 				}
 			}
 			while (!_frameGraphicObjs.empty())
 			{
-				Graphic *g = _frameGraphicObjs.front();
+				Graphic *g = _frameGraphicObjs.top();
 				_frameGraphicObjs.pop();
-				_frameSelectObjs.push_front(g);
-				for each (auto g in g->_children)
-				{
-					if (g->Visiable && g->HitTestTarget)
-						_frameGraphicObjs.push(g);
-				}
-			}
-			SDL_Point pos{ e.motion.x,e.motion.y };
-			for each (auto g in _frameSelectObjs)
-			{
-				if (g->HitTest(&pos))
-				{
-					if (_hover && (void*)_hover != (void*)g)
-						_hover->OnHover(false);
-					if (g->_interactive)
+				if(g->HitTestTarget)
+					_frameSelectObjs.push_front(g);
+				if (g->_children.size() > 0) {
+					auto p = g->_children.rbegin();
+					for (; p != g->_children.rend(); p++)
 					{
-						Selectable* p = (Selectable*)g;
-						_hover = p;
-						_hover->OnHover(true);
-						if (e.type == SDL_MOUSEBUTTONDOWN)
-						{
-							if (_focus && (void*)_focus != (void*)g)
-								_focus->OnFocus(false);
-							_focus = p;
-							_focus->OnFocus(true);
-						}
-						p->HandleEvent(e);
+						if ((*p)->Visiable)
+							_frameGraphicObjs.push((*p));
 					}
-					return true;
 				}
 			}
-			if (_hover)
+			bool isMouseEvent = false;
+			if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONUP)
+				isMouseEvent = true;
+			if (isMouseEvent)
 			{
-				_hover->OnHover(false);
-				_hover = nullptr;
+				SDL_Point pos{ e.motion.x,e.motion.y };
+				for each (auto g in _frameSelectObjs)
+				{
+					if (g->HitTest(&pos))
+					{
+						if (_hover && (void*)_hover != (void*)g)
+							_hover->OnHover(false);
+						if (g->_interactive)
+						{
+							Selectable* p = (Selectable*)g;
+							_hover = p;
+							_hover->OnHover(true);
+							if (e.type == SDL_MOUSEBUTTONDOWN)
+							{
+								if (_focus && (void*)_focus != (void*)g)
+									_focus->OnFocus(false);
+								_focus = p;
+								_focus->OnFocus(true);
+							}
+							p->HandleEvent(e);
+						}
+						return true;
+					}
+				}
+				if (_hover)
+				{
+					_hover->OnHover(false);
+					_hover = nullptr;
+				}
 			}
+			else {
+				if (_focus)
+					return _focus->HandleEvent(e);
+			}
+			
 			return false;
 		}
 
@@ -85,7 +104,7 @@ namespace YxGUI {
 
 	private:
 		std::list<Graphic*> _frameSelectObjs;
-		std::queue<Graphic*> _frameGraphicObjs;
+		std::stack<Graphic*> _frameGraphicObjs;
 		Graphic *_root;
 		Selectable *_focus;
 		Selectable *_hover;

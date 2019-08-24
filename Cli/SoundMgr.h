@@ -34,7 +34,7 @@ public:
 	~SoundMgr();
 	// 解析一些奇奇怪怪的文件格式
 	bool GetBgmFileName(char *mapName, char *mp3Name);
-	void PlayMusic(char* fileName, bool loop);
+	void PlayMusic(char* fileName, uint32_t fade, bool loop);
 	void PlayBgm(char* mapName,bool loop);
 	void StopBgm();
 	void Update();
