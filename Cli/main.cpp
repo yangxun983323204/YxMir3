@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 {
 	//Test();
 	MyGfx *gfx = new MyGfx(L"YxMir3", 800, 600);
-	auto sMgr = SpriteMgr::Instance();
+	auto sMgr = SpriteMgr::Main();
 	SoundMgr *soudMgr = SoundMgr::Instance();
 	InputMgr input;
 	auto viewMgr = ViewMgr::Instance();
@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
 	gfx->onDraw += [gfx, &input, &soudMgr,&viewMgr](uint32_t deltaMs) {
 		input.Update(deltaMs);
 		soudMgr->Update();
-		viewMgr->Current()->Draw();
+		viewMgr->Current()->Draw(deltaMs);
 		gfx->DrawCache();
 	};
 

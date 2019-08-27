@@ -5,6 +5,7 @@
 #include "../GUI/Image.h"
 #include "../GUI/Button.h"
 #include "../GUI/InputField.h"
+#include "../SoundMgr.h"
 
 class GuiHelper
 {
@@ -30,6 +31,9 @@ public:
 		btn->SetHighLightSprite(MyGfx::CreateSpriteFromImage(raw1), manageSp);
 		btn->SetPressSprite(MyGfx::CreateSpriteFromImage(raw0), false);
 		btn->SetAsSpriteSize();
+		btn->onClick += [btn]() {
+			SoundMgr::Instance()->PlayEffect("105.wav", 0, false);
+		};
 		return btn;
 	}
 	YxGUI::InputField *CreateInputField(int32_t idx, bool manageSp = true)

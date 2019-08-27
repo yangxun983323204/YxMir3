@@ -24,18 +24,18 @@ void HeroRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite * actorSprite
 	// get shadow
 	auto f = mActor->GetFeature();
 	assert(f.IsMan() || f.IsWoman());
-	shadow = SpriteMgr::Instance()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
+	shadow = SpriteMgr::Main()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
 	// get weapon
 	uint32_t fWeapon;
 	if (f.Weapon == 254)// 3g?
 		fWeapon = ((f.Weapon - 2) % 10)*_MAX_WEAPON_FRAME + _anim.Current - _MAX_HERO_FRAME*f.Dress;
 	else
 		fWeapon = ((f.Weapon - 1) % 10)*_MAX_WEAPON_FRAME + _anim.Current - _MAX_HERO_FRAME*f.Dress;
-	weapon = SpriteMgr::Instance()->GetSprite(f.WeaponImgLibIdx(), fWeapon);
+	weapon = SpriteMgr::Main()->GetSprite(f.WeaponImgLibIdx(), fWeapon);
 	// todo get horse
 	// get hair
 	uint32_t fHair = f.Hair*_MAX_HERO_FRAME - _MAX_HERO_FRAME + _anim.Current - _MAX_HERO_FRAME*f.Dress;
-	hair = SpriteMgr::Instance()->GetSprite(f.HairImgLibIdx(), fHair);
+	hair = SpriteMgr::Main()->GetSprite(f.HairImgLibIdx(), fHair);
 	// todo get effect
 	// todo get shield
 

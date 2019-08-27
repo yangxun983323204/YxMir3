@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "../Singleton.hpp"
-#include "MyView.hpp"
+#include "MyView.h"
 #include "LoginView.h"
 #include "SelectActorView.h"
 

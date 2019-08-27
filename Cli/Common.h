@@ -21,7 +21,7 @@ struct Vector2UInt
 	{
 		return this->x == v2.x && this->y == v2.y;
 	}
-	static uint32_t Distance(Vector2UInt &v1, Vector2UInt &v2)
+	static double Distance(Vector2UInt &v1, Vector2UInt &v2)
 	{
 		return sqrt(pow(v1.x-v2.x,2)+pow(v1.y-v2.y,2));
 	}
@@ -275,7 +275,7 @@ struct Feature
 		case ActorGender::Npc:
 			return _IMAGE_NPC;
 		default:
-			break;
+			return _IMAGE_MONSTER1;
 		}
 	}
 

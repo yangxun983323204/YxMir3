@@ -65,7 +65,7 @@ void ActorRenderer::Draw(uint32_t delta)
 		auto gfx = MyGfx::Instance();
 		// 绘制坐标信息
 		gfx->DrawCommand(
-			SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
+			SpriteMgr::Main()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
 			pos.x, pos.y, MyGfx::Layer::Top);
 		char msg[256];
 		auto wpos = mActor->GetPos();
@@ -82,11 +82,11 @@ void ActorRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite *actorSprite
 	//Sprite* shadow = nullptr;
 	//auto f = mActor->GetFeature();
 	//if (f.IsMan() || f.IsWoman())
-	//	shadow = SpriteMgr::Instance()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
+	//	shadow = SpriteMgr::Main()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
 	//else if (f.IsMonster() && f.Dress >= 200)// 3G?
-	//	shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + 1, _anim.Current);
+	//	shadow = SpriteMgr::Main()->GetSprite(mImgLibIdx + 1, _anim.Current);
 	//else
-	//	shadow = SpriteMgr::Instance()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, _anim.Current);
+	//	shadow = SpriteMgr::Main()->GetSprite(mImgLibIdx + _MAX_MONSTER_IMAGE, _anim.Current);
 	//if (shadow)
 	//	gfx->DrawCommand(shadow, pos.x + actorSprite->ShadowPosX, pos.y + actorSprite->ShadowPosY, MyGfx::Layer::Top);
 	//// todo draw weapon
@@ -107,7 +107,7 @@ bool ActorRenderer::HasActor()
 Sprite * ActorRenderer::GetSprite(uint32_t delta)
 {
 	_anim.Update(delta);
-	return SpriteMgr::Instance()->GetSprite(mImgLibIdx, _anim.Current);;
+	return SpriteMgr::Main()->GetSprite(mImgLibIdx, _anim.Current);;
 }
 
 void ActorRenderer::CaclScreenPos(int32_t & x, int32_t & y)

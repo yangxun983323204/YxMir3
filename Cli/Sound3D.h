@@ -8,6 +8,7 @@ class Sound3D
 {
 	friend class SoundMgr;
 public:
+	bool Is3D;
 	Sound3D();
 	~Sound3D();
 	void LoadWave(int num);

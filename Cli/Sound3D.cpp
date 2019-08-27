@@ -2,6 +2,7 @@
 
 Sound3D::Sound3D()
 {
+	Is3D = true;
 	_wav = nullptr;
 	_dirty = true;
 	_mgr = SoundMgr::Instance();

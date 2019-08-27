@@ -18,7 +18,7 @@ namespace YxGUI {
 
 		_cursor = new Image();
 		AddChild(_cursor);
-		_cursor->SetSprite(SpriteMgr::Instance()->GetBuiltinSprite(SpriteMgr::IdxBuiltinVLine), false);
+		_cursor->SetSprite(SpriteMgr::Main()->GetBuiltinSprite(SpriteMgr::IdxBuiltinVLine), false);
 		_cursor->SetAsNativeSize();
 		_cursor->HitTestTarget = false;
 		_cursor->Visiable = false;

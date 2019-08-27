@@ -123,7 +123,7 @@
     <ClInclude Include="AppView\ViewMgr.h">
       <Filter>AppView</Filter>
     </ClInclude>
-    <ClInclude Include="AppView\MyView.hpp">
+    <ClInclude Include="AppView\MyView.h">
       <Filter>AppView</Filter>
     </ClInclude>
   </ItemGroup>
@@ -201,6 +201,9 @@
       <Filter>AppView</Filter>
     </ClCompile>
     <ClCompile Include="AppView\ViewMgr.cpp">
+      <Filter>AppView</Filter>
+    </ClCompile>
+    <ClCompile Include="AppView\MyView.cpp">
       <Filter>AppView</Filter>
     </ClCompile>
   </ItemGroup>

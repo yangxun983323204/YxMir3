@@ -44,9 +44,8 @@
 #define _TOP_LOGIN_BTN				65
 
 LoginView::LoginView() {
-	ImageLib lib;
-	lib.Load(".\\Data\\Interface1c.wil");
-	GuiHelper helper(&lib);
+	auto lib = _spriteMgr.GetLib(IdxInterface);
+	GuiHelper helper(lib);
 
 	MyGfx::Instance()->Resize(640, 480);
 	UI = new YxGUI::Canvas();
@@ -102,7 +101,7 @@ LoginView::~LoginView()
 	delete UI;
 }
 
-void LoginView::Draw()
+void LoginView::Draw(uint32_t ms)
 {
 	UI->Draw();
 }
@@ -126,7 +125,13 @@ void LoginView::OnHide()
 void LoginView::Binding()
 {
 	Login->onClick += [this]() {
-		ViewMgr::Instance()->ShowView(ViewMgr::ViewIndex::Select);// test
+		// test
+		auto selView = (SelectActorView*)ViewMgr::Instance()->ShowView(ViewMgr::ViewIndex::Select);
+		SelectActorView::Role roles[3] = {
+			{L"A",0,0}, { L"B",1,1 } ,{ L"C",0,2 }
+		};
+		selView->SetRoleList(roles, 2);
+
 	};
 	Exit->onClick += [this]() {
 		MyGfx::Instance()->Exit();

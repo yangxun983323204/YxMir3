@@ -8,6 +8,7 @@ SoundMgr::SoundMgr()
 	LoadWaveFileList("SoundList.wwl");
 	LoadBgmFileList("BgmList.wwl");
 	_bgmMusic = nullptr;
+	_Fx = nullptr;
 }
 
 SoundMgr::~SoundMgr()
@@ -16,7 +17,7 @@ SoundMgr::~SoundMgr()
 	if (_bgmFileList) delete[] _bgmFileList;
 	
 	if (_waveList){
-		for (int i = 0; i < _waveListHeader->FieldCount; i++)
+		for (uint32_t i = 0; i < _waveListHeader->FieldCount; i++)
 		{
 			delete _waveList[i];
 		}
@@ -29,19 +30,26 @@ SoundMgr::~SoundMgr()
 		Mix_FreeMusic(_bgmMusic);
 		_bgmMusic = nullptr;
 	}
+	if (_Fx)
+	{
+		_Fx->Stop();
+		delete _Fx;
+		_Fx = nullptr;
+	}
+	
 	Mix_CloseAudio();
 }
 
 bool SoundMgr::GetBgmFileName(char * mapName, char * mp3Name)
 {
-	for (int i = 0; i < _bgmListHeader->FieldCount; i++)
+	for (uint32_t i = 0; i < _bgmListHeader->FieldCount; i++)
 	{
 		if (_bgmFileList[i]=='[')
 		{
 			i++;
 			if (strcmp(_bgmFileList+i,mapName)==0)
 			{
-				i += strlen(mapName);
+				i += (int)strlen(mapName);
 				while (_bgmFileList[i] == 0)
 					i++;
 				strcpy(mp3Name, _bgmFileList + i);
@@ -50,6 +58,19 @@ bool SoundMgr::GetBgmFileName(char * mapName, char * mp3Name)
 		}
 	}
 	return false;
+}
+
+void SoundMgr::PlayEffect(char * wavFile, uint32_t fade, bool loop)
+{
+	if (_Fx==nullptr)
+		_Fx = new Sound3D();
+
+	_Fx->Stop();
+	string path = "./Sound/";
+	path +=wavFile;
+	_Fx->LoadWave(path);
+	_Fx->Is3D = false;
+	_Fx->Play(loop);
 }
 
 void SoundMgr::PlayMusic(char * fileName,uint32_t fade, bool loop)
@@ -82,11 +103,11 @@ void SoundMgr::Update()
 	for each (auto kv in _sounds)
 	{
 		Sound3D *sound = kv.second;
-		if (sound && sound->_isPlaying)
+		if (sound && sound->_isPlaying && sound->Is3D)
 		{
 			int rawAngle = (int(atan2(sound->_pos.y - Pos.y, sound->_pos.x - Pos.x) * Rad2Deg) + 360) % 360;
 			int clockwizeAngle = (rawAngle + 90) % 360;
-			Mix_SetPosition(kv.first, clockwizeAngle, Vector2UInt::Distance(Pos, sound->_pos));
+			Mix_SetPosition((int)kv.first, clockwizeAngle, Vector2UInt::Distance(Pos, sound->_pos));
 		}
 	}
 }
@@ -116,7 +137,7 @@ void SoundMgr::LoadWaveFileList(string fileName)
 		fread(_waveListHeader, sizeof(WaveListHeader), 1, file);
 		_waveList = new WaveListNode*[_waveListHeader->FieldCount];
 		int count = 0;
-		for (int i = 0; i < _waveListHeader->ListCount; i++)
+		for (uint32_t i = 0; i < _waveListHeader->ListCount; i++)
 		{
 			auto node = new WaveListNode();
 			memset(node, 0, sizeof(WaveListNode));

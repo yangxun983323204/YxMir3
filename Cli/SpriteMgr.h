@@ -9,21 +9,25 @@ using std::map;
 class SpriteMgr
 {
 public:
+	SpriteMgr();
 	~SpriteMgr();
-
-	void InitLibs();
+	// 是否是主要资源的管理器，不做成单例，ui精灵的是分开管理的
+	bool IsMain() { return _isMain; }
+	void InitMainLibs();
+	// 手动初始化wil信息，主管理器不支持此方法
+	bool ManulInitLibs(uint32_t fileIdx,std::string filePath);
 	Sprite *GetSprite(uint32_t fileIdx,uint32_t imgIdx);
 	// 有些影子是用原图变换出来的，并无直接素材
 	Sprite *GetShadow(Sprite *base,Sprite::ShadowType type);
 	Sprite *GetBuiltinSprite(uint8_t idx);
+	ImageLib* GetLib(uint32_t idx) { return &mLibs[idx]; }
 
-	static SpriteMgr *Instance();
+	static SpriteMgr *Main();
 	
 	const static uint8_t IdxBuiltinCross;
 	const static uint8_t IdxBuiltinVLine;
 private:
-	SpriteMgr();
-
+	bool _isMain;
 	struct LibImgCache
 	{
 		uint16_t size;

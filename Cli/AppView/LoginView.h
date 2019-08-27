@@ -1,6 +1,6 @@
 #pragma once
 #include "GuiHelper.hpp"
-#include "MyView.hpp"
+#include "MyView.h"
 
 class LoginView :
 	public MyView
@@ -8,7 +8,7 @@ class LoginView :
 public:
 	LoginView();
 	~LoginView();
-	virtual void Draw();
+	virtual void Draw(uint32_t ms);
 	virtual bool HandleEvent(SDL_Event &e);
 	virtual void OnShow();
 	virtual void OnHide();

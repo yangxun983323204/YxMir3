@@ -34,6 +34,7 @@ public:
 	~SoundMgr();
 	// 解析一些奇奇怪怪的文件格式
 	bool GetBgmFileName(char *mapName, char *mp3Name);
+	void PlayEffect(char* wavFile, uint32_t fade, bool loop);
 	void PlayMusic(char* fileName, uint32_t fade, bool loop);
 	void PlayBgm(char* mapName,bool loop);
 	void StopBgm();
@@ -53,6 +54,7 @@ private:
 	WaveListHeader *_waveListHeader;
 	WaveListNode **_waveList;
 	Mix_Music *_bgmMusic;
+	Sound3D *_Fx;
 	std::map<uint32_t, Sound3D*> _sounds;
 	static void OnChannelFinished(int channel);
 };

@@ -107,7 +107,7 @@ void YxGUI::Graphic::SetIndexInParent(uint32_t idx)
 
 bool YxGUI::Graphic::HitTest(SDL_Point *p)
 {
-	return SDL_PointInRect(p, &_wRect);
+	return SDL_PointInRect(p, &_wRect) == SDL_bool::SDL_TRUE;
 }
 
 float YxGUI::Graphic::GetLocalScaleX()
@@ -154,8 +154,8 @@ void YxGUI::Graphic::CalcWorldRect()
 	}
 	else 
 	{
-		_wRect.w *= _lScaleX;
-		_wRect.h *= _lScaleY;
+		_wRect.w = (int)(_wRect.w * _lScaleX);
+		_wRect.h = (int)(_wRect.h * _lScaleY);
 	}
 	// 更新子元素
 	for (auto iter = _children.begin(); iter != _children.end();iter++)

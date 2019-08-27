@@ -154,7 +154,7 @@ void MapRenderer::DrawBG()
 		return;
 	mRedrawBG = false;
 	auto gfx = MyGfx::Instance();
-	auto sMgr = SpriteMgr::Instance();
+	auto sMgr = SpriteMgr::Main();
 	// 屏幕可以容纳17*17个cell,也就是可以容纳8.5*8.5个tile
 	for (int x = mTileState.MinX; x <= mTileState.MaxX; x++)
 	{
@@ -188,7 +188,7 @@ void MapRenderer::DrawBG()
 void MapRenderer::DrawMid()
 {
 	auto gfx = MyGfx::Instance();
-	auto sMgr = SpriteMgr::Instance();
+	auto sMgr = SpriteMgr::Main();
 	int fileIdx;
 	int imgIdx;
 	bool blend;

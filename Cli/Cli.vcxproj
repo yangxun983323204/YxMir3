@@ -151,7 +151,7 @@
     <ClInclude Include="AnimDef.h" />
     <ClInclude Include="AppView\GuiHelper.hpp" />
     <ClInclude Include="AppView\LoginView.h" />
-    <ClInclude Include="AppView\MyView.hpp" />
+    <ClInclude Include="AppView\MyView.h" />
     <ClInclude Include="AppView\SelectActorView.h" />
     <ClInclude Include="AppView\ViewMgr.h" />
     <ClInclude Include="Common.h" />
@@ -186,6 +186,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorRenderer.cpp" />
     <ClCompile Include="AppView\LoginView.cpp" />
+    <ClCompile Include="AppView\MyView.cpp" />
     <ClCompile Include="AppView\SelectActorView.cpp" />
     <ClCompile Include="AppView\ViewMgr.cpp" />
     <ClCompile Include="GUI\Button.cpp" />

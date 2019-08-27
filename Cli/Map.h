@@ -63,7 +63,7 @@ struct CellInfo
 	inline unsigned char Obj2AnimTickType() { return Obj2Ani & 0x70 >> 4; }
 	inline short Obj1AnimCount() { return Obj1Ani & 0x0f; }
 	inline short Obj2AnimCount() { return Obj2Ani & 0x0f; }
-	inline bool HasDoor() { return DoorOffset & 0x80 > 0 && DoorIndex & 0x7f>0; }
+	inline bool HasDoor() { return (DoorOffset & 0x80) > 0 && (DoorIndex & 0x7f)>0; }
 	inline uint32_t DoorImgIdx() { return DoorOffset & 0x7f; }
 	inline bool Walkable() { return Flag & 0x01 ? true : false; }
 	// ext
@@ -72,42 +72,56 @@ struct CellInfo
 			return FileIndex1();
 		else if (idx == 2)
 			return FileIndex2();
+		else
+			return 0;
 	}
 	inline uint32_t ImgIndexOf(uint8_t idx) {
 		if (idx == 1)
 			return Obj1;
 		else if (idx == 2)
 			return Obj2;
+		else
+			return 0;
 	}
 	inline bool FileEnableOf(uint8_t idx) {
 		if (idx == 1)
 			return File1Enable();
 		else if (idx == 2)
 			return File2Enable();
+		else
+			return false;
 	}
 	inline bool HasAnimOf(uint8_t idx) {
 		if (idx == 1)
 			return HasAnim1();
 		else if (idx == 2)
 			return HasAnim2();
+		else
+			return false;
 	}
 	inline bool ObjBlendOf(uint8_t idx) {
 		if (idx == 1)
 			return Obj1Blend();
 		else if (idx == 2)
 			return Obj2Blend();
+		else
+			return false;
 	}
 	inline unsigned char AnimTickTypeOf(uint8_t idx) {
 		if (idx == 1)
 			return Obj1AnimTickType();
 		else if (idx == 2)
 			return Obj2AnimTickType();
+		else
+			return 0;
 	}
 	inline short AnimCountOf(uint8_t idx) {
 		if (idx == 1)
 			return Obj1AnimCount();
 		else if (idx == 2)
 			return Obj2AnimCount();
+		else
+			return 0;
 	}
 };
 

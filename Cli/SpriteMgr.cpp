@@ -46,6 +46,9 @@ void SpriteMgr::Init()
 
 SpriteMgr::SpriteMgr()
 {
+	_isMain = false;
+	memset((void*)&mLibs, 0, sizeof(ImageLib)*_MAX_IMAGE);
+	memset((void*)&mSpriteMap, 0, sizeof(LibImgCache)*_MAX_IMAGE);
 	Init();
 }
 
@@ -59,7 +62,7 @@ SpriteMgr::~SpriteMgr()
 	}
 }
 
-void SpriteMgr::InitLibs()
+void SpriteMgr::InitMainLibs()
 {
 	for (size_t i = 0; i < _MAX_IMAGE; i++)
 	{
@@ -73,6 +76,22 @@ void SpriteMgr::InitLibs()
 			mSpriteMap[i].sprites = nullptr;
 		}
 	}
+}
+
+bool SpriteMgr::ManulInitLibs(uint32_t fileIdx, std::string filePath)
+{
+	if (_isMain)
+		return false;
+	if (fileIdx >= _MAX_IMAGE)
+		return false;
+	if (mLibs[fileIdx].IsLoaded())
+		return false;
+	if (mLibs[fileIdx].Load(filePath)) {
+		auto record = &mSpriteMap[fileIdx];
+		record->size = mLibs[fileIdx].ImgCount();
+		record->sprites = new Sprite*[record->size]{ nullptr };
+	}
+	return true;
 }
 
 Sprite * SpriteMgr::GetSprite(uint32_t fileIdx, uint32_t imgIdx)
@@ -116,12 +135,13 @@ Sprite * SpriteMgr::GetBuiltinSprite(uint8_t idx)
 	return BuiltinSprite[idx];
 }
 
-SpriteMgr * SpriteMgr::Instance()
+SpriteMgr * SpriteMgr::Main()
 {
 	if (_inst == nullptr)
 	{
 		_inst = new SpriteMgr();
-		_inst->InitLibs();
+		_inst->InitMainLibs();
+		_inst->_isMain = true;
 	}
 	return _inst;
 }
@@ -188,5 +208,6 @@ void SpriteMgr::ClearCache()
 		}
 		delete mSpriteMap[i].sprites;
 		mSpriteMap[i].sprites = nullptr;
+		mSpriteMap[i].size = 0;
 	}
 }

@@ -54,7 +54,7 @@ void TestMapLoad()
 void TestDrawMapRect() 
 {
 	MyGfx *gfx = new MyGfx(L"map viewer",LayoutW,LayoutH);
-	auto sMgr = SpriteMgr::Instance();
+	auto sMgr = SpriteMgr::Main();
 	gfx->mDebug = true;
 	Map map;
 	map.Load("Map/0.map");
@@ -89,7 +89,7 @@ void TestDrawMapRect()
 void TestMapRender()
 {
 	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
-	auto sMgr = SpriteMgr::Instance();
+	auto sMgr = SpriteMgr::Main();
 	Map map;
 	map.Load("Map/0.map");
 	MapRenderer *renderer = new MapRenderer();
@@ -138,7 +138,7 @@ void TestMapRender()
 void TestActorRender() 
 {
 	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
-	auto sMgr = SpriteMgr::Instance();
+	auto sMgr = SpriteMgr::Main();
 	Map map;
 	map.Load("Map/0.map");
 	MapRenderer *renderer = new MapRenderer();
@@ -210,7 +210,7 @@ void TestActorRender()
 void TestInputMgr() 
 {
 	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
-	auto sMgr = SpriteMgr::Instance();
+	auto sMgr = SpriteMgr::Main();
 	Map map;
 	map.Load("Map/0.map");
 	SoundMgr *soudMgr = SoundMgr::Instance();

@@ -78,7 +78,6 @@ namespace YxGUI {
 	}
 	inline bool Button::HandleEvent(SDL_Event & e)
 	{
-		SDL_Point pos;
 		switch (e.type)
 		{
 		case SDL_MOUSEBUTTONDOWN:
