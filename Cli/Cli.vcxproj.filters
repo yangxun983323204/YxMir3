@@ -126,6 +126,9 @@
     <ClInclude Include="AppView\MyView.h">
       <Filter>AppView</Filter>
     </ClInclude>
+    <ClInclude Include="License.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -205,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="AppView\MyView.cpp">
       <Filter>AppView</Filter>
+    </ClCompile>
+    <ClCompile Include="License.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

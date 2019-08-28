@@ -3,6 +3,7 @@
 #include "../Common.h"
 #include "../SoundMgr.h"
 #include "ViewMgr.h"
+#include "../License.h"
 
 #define LOGIN_BUTTON_COUNT			4
 #define LOGIN_INPUT_COUNT			2
@@ -104,6 +105,7 @@ LoginView::~LoginView()
 void LoginView::Draw(uint32_t ms)
 {
 	UI->Draw();
+	License::DrawLicense();
 }
 
 bool LoginView::HandleEvent(SDL_Event & e)

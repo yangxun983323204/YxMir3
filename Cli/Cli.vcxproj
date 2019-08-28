@@ -168,6 +168,7 @@
     <ClInclude Include="HeroRenderer.h" />
     <ClInclude Include="ImageLib.h" />
     <ClInclude Include="InputMgr.h" />
+    <ClInclude Include="License.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapRenderer.h" />
     <ClInclude Include="MyGfx.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="HeroRenderer.cpp" />
     <ClCompile Include="ImageLib.cpp" />
     <ClCompile Include="InputMgr.cpp" />
+    <ClCompile Include="License.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapRenderer.cpp" />
