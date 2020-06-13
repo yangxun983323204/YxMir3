@@ -15,7 +15,7 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 	SDL_Init(SDL_INIT_VIDEO);
 	if (gFont == nullptr) {
 		TTF_Init();
-		gFont = TTF_OpenFont("./Fonts/STSONG.TTF", 16);
+		gFont = TTF_OpenFont("./Fonts/msyh.ttf", 16);
 	}
 	mScreenRect.x = mScreenRect.y = 0;
 	mScreenRect.w = w;

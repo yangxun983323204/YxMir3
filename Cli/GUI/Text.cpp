@@ -39,6 +39,14 @@ namespace YxGUI {
 					CalcWorldRect();
 				}
 			}
+			else {
+				if (_autoSize)
+				{
+					_lRect.w = 0;
+					_lRect.h = 0;
+					CalcWorldRect();
+				}
+			}
 		}
 	}
 	bool Text::GetAutoSize()

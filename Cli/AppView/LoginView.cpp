@@ -105,7 +105,7 @@ LoginView::~LoginView()
 void LoginView::Draw(uint32_t ms)
 {
 	UI->Draw();
-	License::DrawLicense();
+	//License::DrawLicense();
 }
 
 bool LoginView::HandleEvent(SDL_Event & e)

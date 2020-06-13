@@ -4,7 +4,8 @@
 
 SoundMgr::SoundMgr()
 {
-	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 512);
+	Mix_Init(MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_MP3);
+	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024);
 	LoadWaveFileList("SoundList.wwl");
 	LoadBgmFileList("BgmList.wwl");
 	_bgmMusic = nullptr;
@@ -38,6 +39,7 @@ SoundMgr::~SoundMgr()
 	}
 	
 	Mix_CloseAudio();
+	Mix_Quit();
 }
 
 bool SoundMgr::GetBgmFileName(char * mapName, char * mp3Name)
