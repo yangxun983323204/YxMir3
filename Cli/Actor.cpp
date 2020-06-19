@@ -58,7 +58,7 @@ void Actor::SetDir(Direction dir)
 		onMotionChange();
 }
 
-Vector2UInt Actor::GetPos()
+Vector2Float Actor::GetPos()
 {
 	return mPos;
 }
@@ -68,7 +68,7 @@ Action Actor::GetAction()
 	return _action;
 }
 
-void Actor::SetPos(Vector2UInt v2i)
+void Actor::SetPos(Vector2Float v2i)
 {
 	if (mPos == v2i)
 		return;
@@ -118,8 +118,10 @@ void Actor::Update(uint32_t delta)
 	if (!_action.IsDone()) 
 	{
 		if (_moveState.IsScrolling()) {
-			if(!_moveState.Update(delta))
-				SetPos(Vector2UInt{ mPos.x - _moveState.xDir*_moveState.count, mPos.y - _moveState.yDir*_moveState.count });
+			/*if(!_moveState.Update(delta))
+				SetPos(Vector2Float{ mPos.x - _moveState.xDir*_moveState.count, mPos.y - _moveState.yDir*_moveState.count });
+			else*/
+			SetPos(Vector2Float{ mPos.x - _moveState.xScrolled, mPos.y - _moveState.yScrolled });
 		}
 
 		_action.Update(delta);

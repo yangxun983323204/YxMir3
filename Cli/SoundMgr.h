@@ -29,7 +29,7 @@ class SoundMgr:
 {
 	friend class Sound3D;
 public:
-	Vector2UInt Pos;
+	Vector2Float Pos;
 	SoundMgr();
 	~SoundMgr();
 	// 解析一些奇奇怪怪的文件格式

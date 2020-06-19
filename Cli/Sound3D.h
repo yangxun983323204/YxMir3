@@ -15,10 +15,10 @@ public:
 	void LoadWave(string file);
 	void Play(bool loop);
 	void Stop();
-	void UpdatePos(Vector2UInt pos);
+	void UpdatePos(Vector2Float pos);
 	
 private:
-	Vector2UInt _pos;
+	Vector2Float _pos;
 	Mix_Chunk *_wav;
 	int _channel;
 	SoundMgr *_mgr;

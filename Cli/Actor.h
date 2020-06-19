@@ -26,15 +26,16 @@ public:
 	void SetMotion(uint8_t m);
 	Direction GetDir();
 	void SetDir(Direction dir);
-	Vector2UInt GetPos();
+	Vector2Float GetPos();
 	Action GetAction();
 	void SetMap(Map *map) { _map = map; }
-	void SetPos(Vector2UInt v2i);
+	void SetPos(Vector2Float v2i);
 	void Update(uint32_t delta);
 	void HandleAction(Action &act);
 	void CompleteMove() {
 		_moveState.CompleteIt();
-		SetPos(Vector2UInt{ mPos.x - _moveState.xDir*_moveState.count, mPos.y - _moveState.yDir*_moveState.count });
+		//SetPos(Vector2Float{ mPos.x - _moveState.xDir*_moveState.count, mPos.y - _moveState.yDir*_moveState.count });
+		SetPos(Vector2Float{ mPos.x - _moveState.xScrolled, mPos.y - _moveState.yScrolled });
 	}
 protected:
 	virtual bool HandleActionImpl(Action &act)=0;
@@ -56,7 +57,7 @@ protected:
 	Feature mFeature;
 	uint8_t mMotion;
 	Direction mDir;// todo 针对数种特殊生物的处理
-	Vector2UInt mPos;
+	Vector2Float mPos;
 	uint8_t mMoveSpeed;
 	uint8_t mLightRange;
 

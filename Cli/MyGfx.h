@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include "Delegate.hpp"
+#include "Base3DDef.h"
 
 using Yx::Delegate;
 
@@ -71,6 +72,7 @@ struct DrawInfo
 	{
 		sprite = nullptr;
 	}
+	virtual ~DrawInfo() {}
 	// 不能在析构释放精灵，因为是gfx在统一管理
 };
 
@@ -106,6 +108,7 @@ public:
 	MyGfx(std::wstring title,uint16_t w,uint16_t h);
 	~MyGfx();
 
+	void SetViewPoint(Vector2Float &&worldPos);
 	const SDL_Rect *GetRenderRect();
 	void SetFPS(uint16_t requireFPS);
 	void Resize(uint16_t w, uint16_t h);
@@ -132,7 +135,8 @@ private:
 	SDL_Window *mWindow;
 
 	SDL_Rect mScreenRect;
-
+	Vector2Float _viewPoint;
+	Vector2Float _worldOffset;
 	std::vector<DrawInfo> mMidCache;
 	std::vector<DrawInfo> mTopCache;
 	std::vector<DrawInfo> mGuiCache;
@@ -145,6 +149,10 @@ private:
 	uint32_t mFrameTime;//ms
 	uint32_t mCurrFrameTime;//ms
 
+	inline void WorldToScreen(__in SDL_Rect &world,__out SDL_Rect &screen) {
+		screen.x = world.x + _worldOffset.x;
+		screen.y = world.y + _worldOffset.y;
+	}
 	static bool DrawInfoSort(const DrawInfo &a, const DrawInfo &b);
 	static MyGfx *_inst;
 };

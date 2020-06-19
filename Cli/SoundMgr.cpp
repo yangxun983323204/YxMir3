@@ -109,7 +109,7 @@ void SoundMgr::Update()
 		{
 			int rawAngle = (int(atan2(sound->_pos.y - Pos.y, sound->_pos.x - Pos.x) * Rad2Deg) + 360) % 360;
 			int clockwizeAngle = (rawAngle + 90) % 360;
-			Mix_SetPosition((int)kv.first, clockwizeAngle, Vector2UInt::Distance(Pos, sound->_pos));
+			Mix_SetPosition((int)kv.first, clockwizeAngle, Vector2Float::Distance(Pos, sound->_pos));
 		}
 	}
 }

@@ -9,8 +9,8 @@ public:
 	MapRenderer();
 	~MapRenderer();
 	void SetMap(Map *map);
-	void SetPos(Vector2UInt pos);
-	Vector2UInt GetPos();
+	void SetPos(Vector2Float pos);
+	Vector2Float GetPos();
 	Vector2Float GetCellScrollOffset();
 	void Draw(uint32_t delta);
 	void SetScrollSpeed(float cellPerSec);
@@ -19,7 +19,7 @@ public:
 	void CompleteScroll() {
 		mRedrawBG = true;
 		mScrollState.CompleteIt();
-		SetPos(Vector2UInt{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
+		SetPos(Vector2Float{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
 	}
 	bool mDebug;
 private:
@@ -41,7 +41,7 @@ private:
 	void DrawDebugGrid();
 
 	Map *mMap;
-	Vector2UInt mPos;
+	Vector2Float mPos;
 	DrawState mCellState;
 	DrawState mTileState;
 	MoveState mScrollState;

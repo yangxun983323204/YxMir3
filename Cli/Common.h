@@ -1,75 +1,7 @@
 ﻿#pragma once
 #include <stdint.h>
+#include "Base3DDef.h"
 #include "WilIndex.h"
-
-// 为了让角色居中，因此让屏幕水平和竖直方向都显示奇数个格子
-#define CellW 48
-#define CellH 32
-#define XCount 17
-#define YCount 17
-#define LayoutW  CellW*XCount
-#define LayoutH  CellH*YCount
-#define PI 3.1415926f
-#define Rad2Deg (360 / (PI * 2))
-
-struct Vector2UInt
-{
-	uint32_t x;
-	uint32_t y;
-
-	bool operator ==(const Vector2UInt &v2) 
-	{
-		return this->x == v2.x && this->y == v2.y;
-	}
-	static double Distance(Vector2UInt &v1, Vector2UInt &v2)
-	{
-		return sqrt(pow(v1.x-v2.x,2)+pow(v1.y-v2.y,2));
-	}
-};
-
-struct Vector2Int
-{
-	int32_t x;
-	int32_t y;
-};
-
-struct Vector2Byte
-{
-	int8_t x;
-	int8_t y;
-};
-
-struct Vector2Float
-{
-	float x;
-	float y;
-};
-// 方向值和游戏对象的素材索引有关联，不可随意
-enum class Direction
-{
-	Up = 0,
-	UpRight,
-	Right,
-	DownRight,
-	Down,
-	DownLeft,
-	Left,
-	UpLeft
-};
-
-enum class Horizontal
-{
-	None = -1,
-	Left = 6,
-	Right = 2
-};
-
-enum class Vertical
-{
-	None = -1,
-	Up = 0,
-	Down = 4
-};
 
 #define _MAX_HERO_KIND				10
 #define _MAX_MON_KIND				255

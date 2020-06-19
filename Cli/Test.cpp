@@ -95,7 +95,7 @@ void TestMapRender()
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
-	renderer->SetPos(Vector2UInt{ 400, 400 });
+	renderer->SetPos(Vector2Float{ 400, 400 });
 	gfx->onDraw += [gfx, renderer](uint32_t deltaMs) {
 		renderer->Draw(deltaMs);
 		gfx->DrawCache();
@@ -144,7 +144,7 @@ void TestActorRender()
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
-	renderer->SetPos(Vector2UInt{ 400, 390 });
+	renderer->SetPos(Vector2Float{ 400, 390 });
 
 	Hero actor;
 	actor.SetPos({ 400,390 });
@@ -242,6 +242,7 @@ void TestInputMgr()
 		actor.Update(deltaMs);
 		renderer->Draw(deltaMs);
 		aRenderer->Draw(deltaMs);
+		gfx->SetViewPoint(Vector2Float{ (float)actor.GetPos().x, (float)actor.GetPos().y});
 		gfx->DrawCache();
 		soudMgr->Pos = actor.GetPos();
 		soudMgr->Update();

@@ -20,14 +20,14 @@ void MapRenderer::SetMap(Map * map)
 	mMap = map;
 }
 
-void MapRenderer::SetPos(Vector2UInt pos)
+void MapRenderer::SetPos(Vector2Float pos)
 {
 	mPos = pos;
 	mScrollState.Reset();
 	CalcTileDrawState(mPos.x, mPos.y, mTileState);
 }
 
-Vector2UInt MapRenderer::GetPos()
+Vector2Float MapRenderer::GetPos()
 {
 	return mPos;
 }
@@ -43,7 +43,7 @@ void MapRenderer::Draw(uint32_t delta)
 		mRedrawBG = true;
 		if (!mScrollState.Update(delta))// 如果返回false，说明滚动结束
 		{
-			SetPos(Vector2UInt{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
+			SetPos(Vector2Float{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
 		}
 	}
 	DrawBG();

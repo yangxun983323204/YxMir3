@@ -47,6 +47,14 @@ MyGfx::~MyGfx()
 SDL_Rect srcRect;
 SDL_Rect dstRect;
 
+void MyGfx::SetViewPoint(Vector2Float && worldPos)
+{
+	_viewPoint = worldPos;
+	// 左上角为屏幕原点
+	_worldOffset.x = _viewPoint.x - mScreenRect.w / 2.0;
+	_worldOffset.y = _viewPoint.y - mScreenRect.h / 2.0;
+}
+
 const SDL_Rect * MyGfx::GetRenderRect()
 {
 	return &mScreenRect;
@@ -102,6 +110,7 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, int w, int h, Layer layer
 	{
 	case MyGfx::Bottom:
 		GetDrawRect(&info,false, &srcRect, &dstRect);
+		WorldToScreen(dstRect, dstRect);
 		SDL_BlitSurface(sprite->Surface, &srcRect, mBgSurface, &dstRect);
 		break;
 	case MyGfx::Mid:
@@ -123,14 +132,15 @@ void MyGfx::DrawCache()
 	if (mDebug)
 		DrawString(L"fps:" + std::to_wstring(mFPS), 0, 0);
 
-	SDL_FillRect(mScreenSurface, 0, 0xffffffff);
+	//SDL_FillRect(mScreenSurface, 0, 0xffffffff);
 	SDL_BlitSurface(mBgSurface, 0, mScreenSurface, 0);
 	// draw mid
 	auto p = mMidCache.begin();
 	auto end = mMidCache.end();
-	for (; p < end; p++)
+	for (; p != end; p++)
 	{
 		GetDrawRect(p._Ptr,true, &srcRect, &dstRect);
+		WorldToScreen(dstRect, dstRect);
 		if(SDL_HasIntersection(&dstRect, &mScreenRect))
 			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
 	}
@@ -138,9 +148,10 @@ void MyGfx::DrawCache()
 	// draw top
 	p = mTopCache.begin();
 	end = mTopCache.end();
-	for (; p < end; p++)
+	for (; p != end; p++)
 	{
 		GetDrawRect(p._Ptr,true, &srcRect, &dstRect);
+		WorldToScreen(dstRect, dstRect);
 		if (SDL_HasIntersection(&dstRect, &mScreenRect))
 			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
 	}
@@ -148,7 +159,7 @@ void MyGfx::DrawCache()
 	// draw gui
 	p = mGuiCache.begin();
 	end = mGuiCache.end();
-	for (; p < end; p++)
+	for (; p != end; p++)
 	{
 		GetDrawRect(p._Ptr,false, &srcRect, &dstRect);
 		if (SDL_HasIntersection(&dstRect, &mScreenRect)) {

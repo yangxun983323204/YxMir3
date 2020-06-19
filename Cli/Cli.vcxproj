@@ -154,6 +154,7 @@
     <ClInclude Include="AppView\MyView.h" />
     <ClInclude Include="AppView\SelectActorView.h" />
     <ClInclude Include="AppView\ViewMgr.h" />
+    <ClInclude Include="Base3DDef.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Delegate.hpp" />
     <ClInclude Include="GUI\Button.h" />

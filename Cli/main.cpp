@@ -1,6 +1,6 @@
 #include "SDLInc.h"
 #include <stdio.h>
-//#include "Test.h"
+#include "Test.h"
 #include "Common.h"
 #include "Singleton.hpp"
 #include "Delegate.hpp"
@@ -13,7 +13,7 @@
 
 int main(int argc, char* argv[])
 {
-	//Test();
+	Test();
 	MyGfx *gfx = new MyGfx(L"YxMir3", 800, 600);
 	auto sMgr = SpriteMgr::Main();
 	SoundMgr *soudMgr = SoundMgr::Instance();
