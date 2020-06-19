@@ -2,7 +2,8 @@
 
 
 
-Actor::Actor()
+Actor::Actor() 
+	:_action{_MT_STAND,ActorGender::Man,Direction::Down}
 {
 	mMotion = 0;
 	mDir = Direction::Down;
@@ -10,7 +11,7 @@ Actor::Actor()
 	mLightRange = 72;
 	_action.Enable = true;
 	_actionCache.Enable = false;
-	_moveState.Reset();
+	_moveInfo.Reset();
 }
 
 
@@ -58,7 +59,7 @@ void Actor::SetDir(Direction dir)
 		onMotionChange();
 }
 
-Vector2Float Actor::GetPos()
+Vector2Float Actor::GetWPos()
 {
 	return mPos;
 }
@@ -68,47 +69,16 @@ Action Actor::GetAction()
 	return _action;
 }
 
-void Actor::SetPos(Vector2Float v2i)
+void Actor::SetWPos(Vector2Float world)
 {
-	if (mPos == v2i)
+	if (mPos == world)
 		return;
-	mPos = v2i;
+	mPos = world;
 }
-bool Actor::Move(Direction dir, uint16_t speed)
+bool Actor::Move(Direction dir, float cellPerMs)
 {
-	uint32_t ms = GetAction().Duration;
-	_moveState.scrollSpeed = speed / (ms/1000.0f);
-	uint8_t cnt = speed;
-	switch (dir)
-	{
-	case Direction::Up:
-		_moveState.Set(Horizontal::None, Vertical::Up, cnt);
-		break;
-	case Direction::UpRight:
-		_moveState.Set(Horizontal::Right, Vertical::Up, cnt);
-		break;
-	case Direction::Right:
-		_moveState.Set(Horizontal::Right, Vertical::None, cnt);
-		break;
-	case Direction::DownRight:
-		_moveState.Set(Horizontal::Right, Vertical::Down, cnt);
-		break;
-	case Direction::Down:
-		_moveState.Set(Horizontal::None, Vertical::Down, cnt);
-		break;
-	case Direction::DownLeft:
-		_moveState.Set(Horizontal::Left, Vertical::Down, cnt);
-		break;
-	case Direction::Left:
-		_moveState.Set(Horizontal::Left, Vertical::None, cnt);
-		break;
-	case Direction::UpLeft:
-		_moveState.Set(Horizontal::Left, Vertical::Up, cnt);
-		break;
-	default:
-		_moveState.Set(Horizontal::None, Vertical::None, cnt);
-		break;
-	}
+	auto xy = DecomposeDir(dir);
+	_moveInfo.Set(std::get<0>(xy), std::get<1>(xy), cellPerMs);
 	SetDir(dir);
 	return true;
 }
@@ -117,22 +87,23 @@ void Actor::Update(uint32_t delta)
 {
 	if (!_action.IsDone()) 
 	{
-		if (_moveState.IsScrolling()) {
-			/*if(!_moveState.Update(delta))
-				SetPos(Vector2Float{ mPos.x - _moveState.xDir*_moveState.count, mPos.y - _moveState.yDir*_moveState.count });
-			else*/
-			SetPos(Vector2Float{ mPos.x - _moveState.xScrolled, mPos.y - _moveState.yScrolled });
+		if (_moveInfo.IsMoving()) {
+			_moveInfo.Update(delta);
+			SetWPos(Vector2Float{ mPos.x + _moveInfo.XDelta, mPos.y + _moveInfo.YDelta });
 		}
 
 		_action.Update(delta);
 		if (_action.IsDone()) 
 		{
-			if (_moveState.IsScrolling())
-				CompleteMove();
+			if (_moveInfo.IsMoving())
+			{
+				_moveInfo.Reset();
+				AlignWorld2Cell(mPos);
+			}
 			if (onActionCompleted)
 				onActionCompleted(&_action);
 		}
-		_actionCache.Enable = false;
+		_actionCache.Enable = false;// remove
 	}
 	else {
 		if (_actionCache.Enable) {

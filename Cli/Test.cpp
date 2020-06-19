@@ -56,25 +56,21 @@ void TestDrawMapRect()
 	MyGfx *gfx = new MyGfx(L"map viewer",LayoutW,LayoutH);
 	auto sMgr = SpriteMgr::Main();
 	gfx->mDebug = true;
+	gfx->SetViewPoint(Vector2Float{ 0,0 });
 	Map map;
 	map.Load("Map/0.map");
-	int offsetX = 0;
-	int offsetY = 0;
-	// 绘制从左上角开始的24*24个tile
-	for (size_t x = 0; x < 24; x++)
+	// 绘制从左上角开始的17*17个tile
+	for (size_t x = 0; x < CellCountX; x++)
 	{
-		for (size_t y = 0; y < 24; y++)
+		for (size_t y = 0; y < CellCountY; y++)
 		{
-			auto tile = map.TileAt(x*2 + offsetY, y*2 + offsetX);// 一个tile横竖都是2个cell，因此坐标要乘以2
+			auto tile = map.TileAt(x*CellPerTileX, y*CellPerTileY);// 一个tile横竖都是2个cell，因此坐标要乘以2
 			int fileIdx = tile.FileIndex;
-			ImageLib::ExFileIdx(fileIdx);
-			if ((fileIdx % 14) > 2)
-				continue;
-			if (fileIdx > 69)
+			if(!tile.RemapFileIndex(fileIdx))
 				continue;
 			auto sprite = sMgr->GetSprite(fileIdx, tile.TileIndex);
 			if(sprite)
-				gfx->DrawCommand(sprite, x*96, y*64,MyGfx::Layer::Bottom);
+				gfx->DrawCommand(sprite, x*TileW, y*TileH,MyGfx::Layer::Bottom);
 		}
 	}
 	gfx->DrawCache();
@@ -92,32 +88,42 @@ void TestMapRender()
 	auto sMgr = SpriteMgr::Main();
 	Map map;
 	map.Load("Map/0.map");
-	MapRenderer *renderer = new MapRenderer();
-	renderer->mDebug = true;
-	renderer->SetMap(&map);
-	renderer->SetPos(Vector2Float{ 400, 400 });
-	gfx->onDraw += [gfx, renderer](uint32_t deltaMs) {
-		renderer->Draw(deltaMs);
+	MapRenderer *mapRenderer = new MapRenderer();
+	mapRenderer->mDebug = true;
+	mapRenderer->SetMap(&map);
+	mapRenderer->SetViewPoint(Cell2World({398, 397 }));
+	gfx->SetViewPoint(Cell2World({ 398, 397 }));
+	MoveState move;
+	move.scrollSpeed = 4 / 1000.0f;
+	gfx->onDraw += [gfx, mapRenderer,&move](uint32_t deltaMs) {
+		if (move.IsScrolling()) {
+			move.Update(deltaMs);
+			auto deltaMove = Vector2Float{ move.xDelta,move.yDelta };
+			mapRenderer->SetViewPointDelta(deltaMove);
+			gfx->SetViewPointDelta(deltaMove);
+		}
+		mapRenderer->Draw(deltaMs);
 		gfx->DrawCache();
 	};
-	gfx->onEvent += [gfx, renderer](SDL_Event* e) {
+	gfx->onEvent += [gfx, mapRenderer,&move](SDL_Event* e) {
 		if (e->type == SDL_QUIT)
 			gfx->Exit();  
 		else if (e->type == SDL_EventType::SDL_KEYDOWN)
 		{
+			if (move.IsScrolling())return;
 			switch (e->key.keysym.sym)
 			{
 			case SDLK_UP:
-				renderer->Scroll(Horizontal::None, Vertical::Up);
+				move.Set(Horizontal::None, Vertical::Up);
 				break;
 			case SDLK_DOWN:
-				renderer->Scroll(Horizontal::None, Vertical::Down);
+				move.Set(Horizontal::None, Vertical::Down);
 				break;
 			case SDLK_LEFT:
-				renderer->Scroll(Horizontal::Left, Vertical::None);
+				move.Set(Horizontal::Left, Vertical::None);
 				break;
 			case SDLK_RIGHT:
-				renderer->Scroll(Horizontal::Right, Vertical::None);
+				move.Set(Horizontal::Right, Vertical::None);
 				break;
 			default:
 				break;
@@ -131,23 +137,25 @@ void TestMapRender()
 		}
 	};
 	gfx->RunLoop();
-	delete renderer;
+	delete mapRenderer;
 	delete sMgr;
 	delete gfx;
 }
 void TestActorRender() 
 {
 	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
+	gfx->mDebug = true;
 	auto sMgr = SpriteMgr::Main();
 	Map map;
 	map.Load("Map/0.map");
-	MapRenderer *renderer = new MapRenderer();
-	renderer->mDebug = true;
-	renderer->SetMap(&map);
-	renderer->SetPos(Vector2Float{ 400, 390 });
-
+	MapRenderer *mapRenderer = new MapRenderer();
+	mapRenderer->mDebug = true;
+	mapRenderer->SetMap(&map);
+	mapRenderer->SetViewPoint(Cell2World({ 400, 390 }));
+	gfx->SetViewPoint(Cell2World({ 400, 390 }));
 	Hero actor;
-	actor.SetPos({ 400,390 });
+	actor.SetMap(&map);
+	actor.SetWPos(Cell2World({ 400,390 }));
 	actor.SetFeature({
 		ActorGender::Woman,
 		8,2,32
@@ -155,16 +163,16 @@ void TestActorRender()
 	actor.SetMotion(_MT_RUN);
 	MyHeroRenderer aRenderer;
 	aRenderer.SetActor(&actor);
-	aRenderer.SetMapRenderer(renderer);
+	aRenderer.SetMapRenderer(mapRenderer);
 	aRenderer.Debug = true;
 
-	gfx->onDraw += [gfx, renderer,&aRenderer,&actor](uint32_t deltaMs) {
+	gfx->onDraw += [gfx, mapRenderer,&aRenderer,&actor](uint32_t deltaMs) {
 		actor.Update(deltaMs);
-		renderer->Draw(deltaMs);
+		mapRenderer->Draw(deltaMs);
 		aRenderer.Draw(deltaMs);
 		gfx->DrawCache();
 	};
-	gfx->onEvent += [gfx, renderer,&actor](SDL_Event* e) {
+	gfx->onEvent += [gfx, mapRenderer,&actor](SDL_Event* e) {
 		if (e->type == SDL_QUIT)
 			gfx->Exit();
 		else if (e->type == SDL_EventType::SDL_KEYDOWN)
@@ -173,23 +181,15 @@ void TestActorRender()
 			{
 			case SDLK_UP:
 				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Up));
-				//actor.SetDir(Direction::Up);
-				//renderer->Scroll(Map::Horizontal::None, Map::Vertical::Up);
 				break;
 			case SDLK_DOWN:
 				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Down));
-				//actor.SetDir(Direction::Down);
-				//renderer->Scroll(Map::Horizontal::None, Map::Vertical::Down);
 				break;
 			case SDLK_LEFT:
 				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Left));
-				//actor.SetDir(Direction::Left);
-				//renderer->Scroll(Map::Horizontal::Left, Map::Vertical::None);
 				break;
 			case SDLK_RIGHT:
 				actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Right));
-				//actor.SetDir(Direction::Right);
-				//renderer->Scroll(Map::Horizontal::Right, Map::Vertical::None);
 				break;
 			default:
 				break;
@@ -203,13 +203,14 @@ void TestActorRender()
 		}
 	};
 	gfx->RunLoop();
-	delete renderer;
+	delete mapRenderer;
 	delete sMgr;
 	delete gfx;
 }
 void TestInputMgr() 
 {
 	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
+	gfx->mDebug = false;
 	auto sMgr = SpriteMgr::Main();
 	Map map;
 	map.Load("Map/0.map");
@@ -220,7 +221,7 @@ void TestInputMgr()
 	renderer->SetMap(&map);
 	Hero actor;
 	actor.SetMap(&map);
-	actor.SetPos({ 398,391 });
+	actor.SetWPos(Cell2World({ 398,391 }));
 	actor.SetFeature({
 		ActorGender::Woman,
 		8,2,32
@@ -242,9 +243,8 @@ void TestInputMgr()
 		actor.Update(deltaMs);
 		renderer->Draw(deltaMs);
 		aRenderer->Draw(deltaMs);
-		gfx->SetViewPoint(Vector2Float{ (float)actor.GetPos().x, (float)actor.GetPos().y});
 		gfx->DrawCache();
-		soudMgr->Pos = actor.GetPos();
+		soudMgr->Pos = actor.GetWPos();
 		soudMgr->Update();
 	};
 

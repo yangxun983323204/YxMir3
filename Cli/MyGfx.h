@@ -107,12 +107,14 @@ public:
 
 	MyGfx(std::wstring title,uint16_t w,uint16_t h);
 	~MyGfx();
-
-	void SetViewPoint(Vector2Float &&worldPos);
+	// 设置视点，也就是屏幕中心的世界坐标
+	void SetViewPoint(Vector2Float worldPos);
+	void SetViewPointDelta(Vector2Float worldPos);
 	const SDL_Rect *GetRenderRect();
 	void SetFPS(uint16_t requireFPS);
 	void Resize(uint16_t w, uint16_t h);
-	void DrawString(std::wstring str,int x,int y);
+	void DrawWorldString(std::wstring str,int x,int y);
+	void DrawGuiString(std::wstring str, int x, int y);
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
 	void DrawCommand(Sprite * sprite, int x, int y,int w,int h, Layer layer);
 	void DrawCache();

@@ -109,24 +109,44 @@ struct MoveState
 	int8_t yNeedScroll;
 	float xScrolled;
 	float yScrolled;
+	float xDelta;
+	float yDelta;
 	int8_t xDir;
 	int8_t yDir;
 	float scrollSpeed;// 滚动cell数/每s
 	uint8_t count;
-
-	inline bool Update(uint32_t delta)
+private:
+	bool _isScrolling = false;
+public:
+	inline bool Update(uint32_t deltaMs)
 	{
-		xScrolled += (xDir * CellW * scrollSpeed * delta / 1000.0f);
-		yScrolled += (yDir * CellH * scrollSpeed * delta / 1000.0f);
-		if ((xDir != 0 && abs(xScrolled) >= abs(xNeedScroll)) || (yDir != 0 && abs(yScrolled) >= abs(yNeedScroll))) {
-			xScrolled = xNeedScroll; yScrolled = yNeedScroll;
+		bool xReach = abs(xNeedScroll) <= abs(xScrolled);
+		bool yReach = abs(yNeedScroll) <= abs(yScrolled);
+		if (_isScrolling && (xReach && yReach))
+		{
+			CompleteIt();
+			_isScrolling = false;
 			return false;
 		}
-		else
-			return true;
+		xDelta = (xDir * CellW * scrollSpeed * deltaMs);
+		yDelta = (yDir * CellH * scrollSpeed * deltaMs);
+		auto tx = xScrolled + xDelta;
+		auto ty = yScrolled += yDelta;
+		xReach = abs(xNeedScroll) <= abs(tx);
+		yReach = abs(yNeedScroll) <= abs(ty);
+		if ((xDir != 0 && xReach) || (yDir != 0 && yReach)) {
+			xDelta = xNeedScroll - xScrolled;
+			yDelta = yNeedScroll - yScrolled;
+			xScrolled = xNeedScroll; yScrolled = yNeedScroll;
+		}
+		else {
+			xScrolled = tx; yScrolled = ty;
+		}
+		return true;
 	}
 	inline void Reset()
 	{
+		_isScrolling = false;
 		xNeedScroll = 0; yNeedScroll = 0;
 		xScrolled = 0; yScrolled = 0;
 		xDir = 0; yDir = 0;
@@ -134,7 +154,7 @@ struct MoveState
 
 	inline bool IsScrolling()
 	{
-		return (xNeedScroll != xScrolled) || (yNeedScroll != yScrolled);
+		return _isScrolling;
 	}
 
 	inline void MoveState::Set(Horizontal x, Vertical y, uint8_t count = 1)
@@ -146,31 +166,91 @@ struct MoveState
 
 		this->count = count;
 		if (x == Horizontal::Right) {
-			xDir = -1;
-			xNeedScroll = -CellW*count;
-		}
-		else if (x == Horizontal::Left) {
 			xDir = 1;
 			xNeedScroll = CellW*count;
 		}
+		else if (x == Horizontal::Left) {
+			xDir = -1;
+			xNeedScroll = -CellW*count;
+		}
 
 		if (y == Vertical::Down) {
-			yDir = -1;
-			yNeedScroll = -CellH*count;
-		}
-		else if (y == Vertical::Up) {
 			yDir = 1;
 			yNeedScroll = CellH*count;
 		}
+		else if (y == Vertical::Up) {
+			yDir = -1;
+			yNeedScroll = -CellH*count;
+		}
 		xType = x;
 		yType = y;
+		_isScrolling = true;
 	}
 
 	inline void CompleteIt()
 	{
+		xDelta = xNeedScroll - xScrolled;
+		yDelta = yNeedScroll - yScrolled;
 		xScrolled = xNeedScroll;
 		yScrolled = yNeedScroll;
 	}
+};
+
+struct MoveInfo 
+{
+	Horizontal XDir;
+	Vertical YDir;
+	float XMoved;
+	float YMoved;
+	float XDelta;
+	float YDelta;
+	float MoveCellPerMs;// 滚动cell数/每ms
+	
+	inline void Update(uint32_t deltaMs)
+	{
+		XDelta = (_xDir * CellW * MoveCellPerMs * deltaMs);
+		YDelta = (_yDir * CellH * MoveCellPerMs * deltaMs);
+		XMoved += XDelta;
+		YMoved += YDelta;
+	}
+
+	inline void Reset()
+	{
+		_isMoving = false;
+		XMoved = 0; YMoved = 0;
+		_xDir = 0; _yDir = 0;
+	}
+
+	inline bool IsMoving()
+	{
+		return _isMoving;
+	}
+
+	inline void Set(Horizontal x, Vertical y,float cellPerMs)
+	{
+		Reset();
+		if (x == Horizontal::Right) {
+			_xDir = 1;
+		}
+		else if (x == Horizontal::Left) {
+			_xDir = -1;
+		}
+
+		if (y == Vertical::Down) {
+			_yDir = 1;
+		}
+		else if (y == Vertical::Up) {
+			_yDir = -1;
+		}
+		XDir = x;
+		YDir = y;
+		MoveCellPerMs = cellPerMs;
+		_isMoving = true;
+	}
+private:
+	int8_t _xDir;
+	int8_t _yDir;
+	bool _isMoving;
 };
 
 enum class ActorGender
@@ -249,3 +329,45 @@ struct FeatureEx
 	uint16_t DressColor;
 	uint16_t HairColor;
 };
+// 原工程的一个地图图集文件变换，不知为何要这样
+inline void ExFileIdx(int & n)
+{
+	int m = n;
+	//__asm
+	//{
+	//	pusha
+
+	//	xor     ecx, ecx
+	//	mov		ebx, 0eh
+	//	mov     ecx, m; cl = nFileIdx
+	//	; ..........................
+	//	mov     eax, 77777777h
+	//	imul    ecx
+	//	sub     edx, ecx
+	//	sar     edx, 3
+	//	mov     eax, edx
+	//	shr     eax, 1Fh; ·ûºÅÎ»
+	//	add     edx, eax
+	//	add     ecx, edx
+	//	mov     m, ecx
+
+	//	popa
+	//}
+#pragma region 64位c++改写
+	uint32_t b = 14;
+	int32_t c = m;
+	int32_t a = 0x77777777;
+	int64_t edx_eax = 0;
+	edx_eax = (int64_t)a*c;
+	a = edx_eax & 0x00000000ffffffff;
+	int32_t d = (edx_eax & 0xffffffff00000000) >> 32;
+	d -= c;
+	d >>= 3;
+	uint32_t a1 = d;
+	a1 >>= 0x1F;
+	d += a1;
+	c += d;
+	m = c;
+#pragma endregion
+	n = m;
+}

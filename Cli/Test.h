@@ -21,5 +21,7 @@ inline void Test()
 	//TestMapRender();
 	//TestActorRender();
 	TestInputMgr();
-	TestSoundMgr_LoadList();
+	//TestSoundMgr_LoadList();
+
+	exit(0);
 }

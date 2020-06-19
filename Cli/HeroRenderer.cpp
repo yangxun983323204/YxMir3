@@ -11,7 +11,7 @@ HeroRenderer::~HeroRenderer()
 {
 }
 
-void HeroRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite * actorSprite)
+void HeroRenderer::DrawImpl(uint32_t delta, Vector2Float pos, Sprite * actorSprite)
 {
 	Sprite* shadow = nullptr;
 	Sprite* weapon = nullptr;
@@ -103,5 +103,5 @@ void HeroRenderer::PlayActionSound()
 		_sound->LoadWave(waveNum);
 		_sound->Play(false);
 	}
-	_sound->UpdatePos(mActor->GetPos());
+	_sound->UpdatePos(mActor->GetWPos());
 }

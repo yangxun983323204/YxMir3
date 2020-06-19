@@ -119,7 +119,6 @@ public:
 	bool EnableAt(uint32_t index);
 	uint32_t ImgCount();
 
-	static void ExFileIdx(int &n);
 	const static uint32_t MaskR;
 	const static uint32_t MaskG;
 	const static uint32_t MaskB;

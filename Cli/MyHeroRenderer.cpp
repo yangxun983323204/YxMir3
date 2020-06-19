@@ -4,6 +4,7 @@
 
 MyHeroRenderer::MyHeroRenderer()
 {
+	mMapRenderer = nullptr;
 }
 
 
@@ -11,23 +12,17 @@ MyHeroRenderer::~MyHeroRenderer()
 {
 }
 
-void MyHeroRenderer::SetActor(Actor * actor)
+void MyHeroRenderer::SetMapRenderer(MapRenderer *mapRenderer)
 {
-	ActorRenderer::SetActor(actor);
-	actor->onActionStart += [this](Action *a){
-		if (a->Move) {
-			uint32_t ms = this->mActor->GetAction().Duration;
-			this->mMapRenderer->SetScrollSpeed(a->Arg.ui / (ms / 1000.0f));
-			this->mMapRenderer->Scroll(this->mActor->GetDir(), a->Arg.ui);
-		}
-	};
-	actor->onActionCompleted += [this](Action *a) {
-		this->mMapRenderer->CompleteScroll();
-	};
+	mMapRenderer = mapRenderer;
+	mMapRenderer->SetViewPoint(mActor->GetWPos());
 }
 
-void MyHeroRenderer::CaclScreenPos(int32_t & x, int32_t & y)
+void MyHeroRenderer::DrawImpl(uint32_t delta, Vector2Float pos, Sprite * actorSprite)
 {
-	x = (CellW * (int32_t)(floor(XCount / 2.0f)));
-	y = (CellH * (int32_t)(floor(YCount / 2.0f)));
+	if (mActor->GetAction().Move && !mActor->GetAction().IsDone()) {
+		MyGfx::Instance()->SetViewPoint(mActor->GetWPos());
+		mMapRenderer->SetViewPoint(mActor->GetWPos());
+	}
+	HeroRenderer::DrawImpl(delta,pos, actorSprite);
 }

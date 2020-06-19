@@ -8,9 +8,9 @@ public:
 	MyHeroRenderer();
 	~MyHeroRenderer();
 
-	virtual void SetActor(Actor *actor);
-
+	void SetMapRenderer(MapRenderer *mapRenderer);
 protected:
-	virtual void CaclScreenPos(int32_t &x, int32_t &y);
-};
+	MapRenderer *mMapRenderer;
 
+	virtual void DrawImpl(uint32_t delta, Vector2Float pos, Sprite *actorSprite);
+};

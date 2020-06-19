@@ -79,9 +79,9 @@ int16_t Map::h()
 		return -1;
 }
 
-TileInfo Map::TileAt(uint32_t x, uint32_t y)
+TileInfo Map::TileAt(uint32_t cellX, uint32_t cellY)
 {
-	auto idx = (y / 2) + (x / 2)*mHeader->Height / 2;
+	auto idx = (cellY / 2) + (cellX / 2)*mHeader->Height / 2;
 	return mTiles[idx];
 }
 
@@ -90,26 +90,27 @@ CellInfo Map::CellAt(uint32_t x, uint32_t y)
 	return mCells[y + x*mHeader->Height];
 }
 
-bool Map::InMap(uint32_t x, uint32_t y)
+bool Map::InMap(uint32_t cellX, uint32_t cellY)
 {
-	auto v = y + x*mHeader->Height;
-	return v>0 && v<mCellCount;
+	auto v = cellY + cellX *mHeader->Height;
+	return cellX < w() && cellY < h() && v>=0 && v<mCellCount;
 }
 
-bool Map::Walkable(uint32_t x, uint32_t y)
+bool Map::Walkable(uint32_t cellX, uint32_t cellY)
 {
-	auto v = y + x*mHeader->Height;
+	if (!InMap(cellX, cellY)) return false;
+	auto v = cellY + cellX *mHeader->Height;
 	return v>0 && v<mCellCount && mCells[v].Walkable();
 }
 
-bool Map::NextWalkable(uint32_t x, uint32_t y, Direction dir)
+bool Map::NextWalkable(uint32_t cellX, uint32_t cellY, Direction dir)
 {
-	return NextNWalkable(x, y, dir, 1);
+	return NextNWalkable(cellX, cellY, dir, 1);
 }
 
-bool Map::Next2Walkable(uint32_t x, uint32_t y, Direction dir)
+bool Map::Next2Walkable(uint32_t cellX, uint32_t cellY, Direction dir)
 {
-	return NextNWalkable(x,y,dir,2);
+	return NextNWalkable(cellX, cellY,dir,2);
 }
 
 void Map::Clear()

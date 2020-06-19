@@ -47,12 +47,19 @@ MyGfx::~MyGfx()
 SDL_Rect srcRect;
 SDL_Rect dstRect;
 
-void MyGfx::SetViewPoint(Vector2Float && worldPos)
+void MyGfx::SetViewPoint(Vector2Float worldPos)
 {
 	_viewPoint = worldPos;
 	// 左上角为屏幕原点
-	_worldOffset.x = _viewPoint.x - mScreenRect.w / 2.0;
-	_worldOffset.y = _viewPoint.y - mScreenRect.h / 2.0;
+	_worldOffset.x = -_viewPoint.x + mScreenRect.w / 2.0;
+	_worldOffset.y = -_viewPoint.y + mScreenRect.h / 2.0;
+}
+
+void MyGfx::SetViewPointDelta(Vector2Float pos)
+{
+	_viewPoint.x += pos.x;
+	_viewPoint.y += pos.y;
+	SetViewPoint(_viewPoint);
 }
 
 const SDL_Rect * MyGfx::GetRenderRect()
@@ -75,13 +82,13 @@ void MyGfx::Resize(uint16_t w, uint16_t h)
 	SDL_SetWindowSize(mWindow, w, h);
 	mScreenRect.w = w;
 	mScreenRect.h = h;
-	SDL_free(mScreenSurface);
+	if(mScreenSurface) SDL_free(mScreenSurface);
 	mScreenSurface = SDL_GetWindowSurface(mWindow);
-	SDL_free(mBgSurface);
+	if (mBgSurface) SDL_free(mBgSurface);
 	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
 }
 
-void MyGfx::DrawString(std::wstring str, int x, int y)
+void MyGfx::DrawWorldString(std::wstring str, int x, int y)
 {
 	auto sp = CreateTextSprite(str);
 	TempDrawInfo info;
@@ -91,6 +98,18 @@ void MyGfx::DrawString(std::wstring str, int x, int y)
 	info.h = sp->Surface->h;
 	mTopCache.push_back(info);
 	mTopCache[mTopCache.size()-1].sprite = sp;
+}
+
+void MyGfx::DrawGuiString(std::wstring str, int x, int y)
+{
+	auto sp = CreateTextSprite(str);
+	TempDrawInfo info;
+	info.x = x;
+	info.y = y;
+	info.w = sp->Surface->w;
+	info.h = sp->Surface->h;
+	mGuiCache.push_back(info);
+	mGuiCache[mGuiCache.size() - 1].sprite = sp;
 }
 
 void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
@@ -129,10 +148,8 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, int w, int h, Layer layer
 
 void MyGfx::DrawCache()
 {
-	if (mDebug)
-		DrawString(L"fps:" + std::to_wstring(mFPS), 0, 0);
-
-	//SDL_FillRect(mScreenSurface, 0, 0xffffffff);
+	if (mDebug) DrawGuiString(L"fps:" + std::to_wstring(mFPS), 0, 0);
+	SDL_FillRect(mScreenSurface, 0, 0xffffffff);
 	SDL_BlitSurface(mBgSurface, 0, mScreenSurface, 0);
 	// draw mid
 	auto p = mMidCache.begin();
@@ -196,6 +213,8 @@ void MyGfx::RunLoop()
 			preTime = currTime;
 			if (mCurrFrameTime > mFrameTime)
 			{
+				if (mDebug && mCurrFrameTime> mFrameTime*2)
+					mCurrFrameTime = mFrameTime;
 				mFPS = ceil(1 / (mCurrFrameTime/1000.0f));
 				if (onDraw)
 					onDraw(mCurrFrameTime);

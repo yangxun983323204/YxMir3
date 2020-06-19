@@ -9,32 +9,32 @@ public:
 	MapRenderer();
 	~MapRenderer();
 	void SetMap(Map *map);
-	void SetPos(Vector2Float pos);
+	void SetViewPoint(Vector2Float pos);
+	void SetViewPointDelta(Vector2Float pos);
+	Vector2Float GetViewPoint();
 	Vector2Float GetPos();
-	Vector2Float GetCellScrollOffset();
+	//Vector2Float GetCellScrollOffset();
 	void Draw(uint32_t delta);
-	void SetScrollSpeed(float cellPerSec);
-	void Scroll(Direction dir, uint8_t count=1);
-	void Scroll(Horizontal x, Vertical y, uint8_t count=1);
-	void CompleteScroll() {
+	//void SetScrollSpeed(float cellPerSec);
+	//void Scroll(Direction dir, uint8_t count=1);
+	//void Scroll(Horizontal x, Vertical y, uint8_t count=1);
+	/*void CompleteScroll() {
 		mRedrawBG = true;
 		mScrollState.CompleteIt();
 		SetPos(Vector2Float{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
-	}
+	}*/
 	bool mDebug;
 private:
-	struct DrawState
+	struct DrawRect
 	{
-		int OffsetX;
-		int OffsetY;
-		int MinX;
-		int MinY;
-		int MaxX;
-		int MaxY;
+		int MinCellX;
+		int MinCellY;
+		int MaxCellX;
+		int MaxCellY;
 	};
 
-	void CalcTileDrawState(uint16_t x, uint16_t y, DrawState & info);
-	void CalcCellDrawState(DrawState & info);
+	void CalcTileDrawRect();
+	void CalcCellDrawRect();
 	void DrawBG();
 	void DrawMid();
 	void DrawTop();
@@ -42,9 +42,9 @@ private:
 
 	Map *mMap;
 	Vector2Float mPos;
-	DrawState mCellState;
-	DrawState mTileState;
-	MoveState mScrollState;
+	DrawRect mCellState;
+	DrawRect mTileState;
+	//MoveState mScrollState;
 	bool mRedrawBG;
 };
 

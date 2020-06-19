@@ -26,30 +26,27 @@ public:
 	void SetMotion(uint8_t m);
 	Direction GetDir();
 	void SetDir(Direction dir);
-	Vector2Float GetPos();
+	Vector2Float GetWPos();
 	Action GetAction();
 	void SetMap(Map *map) { _map = map; }
-	void SetPos(Vector2Float v2i);
+	void SetWPos(Vector2Float world);
 	void Update(uint32_t delta);
 	void HandleAction(Action &act);
-	void CompleteMove() {
-		_moveState.CompleteIt();
-		//SetPos(Vector2Float{ mPos.x - _moveState.xDir*_moveState.count, mPos.y - _moveState.yDir*_moveState.count });
-		SetPos(Vector2Float{ mPos.x - _moveState.xScrolled, mPos.y - _moveState.yScrolled });
-	}
 protected:
 	virtual bool HandleActionImpl(Action &act)=0;
 	bool NextMoveable()
 	{
-		return _map->NextWalkable(mPos.x, mPos.y, mDir);
+		auto cPos = World2Cell(mPos);
+		return _map->NextWalkable(cPos.x, cPos.y, mDir);
 	}
 	bool Next2Moveable()
 	{
-		return _map->Next2Walkable(mPos.x, mPos.y, mDir);
+		auto cPos = World2Cell(mPos);
+		return _map->Next2Walkable(cPos.x, cPos.y, mDir);
 	}
-	bool Move(Direction dir, uint16_t speed);
+	bool Move(Direction dir, float cellPerMs);
 
-	MoveState _moveState;
+	MoveInfo _moveInfo;
 
 	uint32_t mGUID;
 	wstring mName;

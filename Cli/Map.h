@@ -32,6 +32,17 @@ struct TileInfo
 {
 	uint8_t FileIndex;
 	uint16_t TileIndex;
+
+	// 文件索引要做个变换，不知为何
+	inline bool RemapFileIndex(int &idx) {
+		ExFileIdx(idx);
+		if ((idx % 14) > 2)
+			return false;
+		if (idx > 69)
+			return false;
+
+		return true;
+	}
 };
 
 struct CellInfo
@@ -148,12 +159,12 @@ public:
 	void Load(string mapPath);
 	int16_t w();
 	int16_t h();
-	TileInfo TileAt(uint32_t x, uint32_t y);
+	TileInfo TileAt(uint32_t cellX, uint32_t cellY);
 	CellInfo CellAt(uint32_t x, uint32_t y);
-	bool InMap(uint32_t x, uint32_t y);
-	bool Walkable(uint32_t x, uint32_t y);
-	bool NextWalkable(uint32_t x, uint32_t y,Direction dir);
-	bool Next2Walkable(uint32_t x, uint32_t y, Direction dir);
+	bool InMap(uint32_t cellX, uint32_t cellY);
+	bool Walkable(uint32_t cellX, uint32_t cellY);
+	bool NextWalkable(uint32_t cellX, uint32_t cellY,Direction dir);
+	bool Next2Walkable(uint32_t cellX, uint32_t cellY, Direction dir);
 private:
 	void Clear();
 	bool NextNWalkable(uint32_t x, uint32_t y, Direction dir,int n);

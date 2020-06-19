@@ -13,20 +13,20 @@ Hero::~Hero()
 
 bool Hero::Walk(Action &act)
 {
-	if (_moveState.IsScrolling())
-		return false;
+	if (_moveInfo.IsMoving())
+		return false;// todo 存入cache
 	SetDir(act.Dir);
 	if (!NextMoveable())
 		return false;
 	SetMotion(_MT_WALK);
-	Actor::Move(act.Dir, _SPEED_WALK);
+	Actor::Move(act.Dir, _SPEED_WALK/ (float)act.Duration);
 	act.MarkMove(true, _SPEED_WALK);
 	return true;
 }
 
 bool Hero::Run(Action &act)
 {
-	if (_moveState.IsScrolling())
+	if (_moveInfo.IsMoving())
 		return false;
 	SetDir(act.Dir);
 	if (!Next2Moveable())// 第二格不能走，变为移动
@@ -37,7 +37,7 @@ bool Hero::Run(Action &act)
 	if (!NextMoveable())
 		return false;
 	SetMotion(_MT_RUN);
-	Actor::Move(act.Dir, _SPEED_RUN);
+	Actor::Move(act.Dir, _SPEED_RUN/(float)act.Duration);
 	act.MarkMove(true, _SPEED_RUN);
 	return true;
 }

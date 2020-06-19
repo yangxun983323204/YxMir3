@@ -9,7 +9,6 @@ using namespace std::placeholders;
 
 ActorRenderer::ActorRenderer()
 {
-	mMapRenderer = nullptr;
 	mActor = nullptr;
 	Debug = false;
 	_sound = new Sound3D();
@@ -19,12 +18,6 @@ ActorRenderer::ActorRenderer()
 ActorRenderer::~ActorRenderer()
 {
 	delete _sound;
-}
-
-void ActorRenderer::SetMapRenderer(MapRenderer *mapRenderer)
-{
-	mMapRenderer = mapRenderer;
-	mMapRenderer->SetPos(mActor->GetPos());
 }
 
 void ActorRenderer::SetActor(Actor * actor)
@@ -54,27 +47,26 @@ void ActorRenderer::Draw(uint32_t delta)
 {
 	if (mActor == nullptr)
 		return;
-	Vector2Int pos;
-	CaclScreenPos(pos.x, pos.y);
+	auto wpos = mActor->GetWPos();
 	auto sprite = GetSprite(delta);
 	if (sprite != nullptr)
 	{
-		DrawImpl(delta, pos, sprite);
+		DrawImpl(delta, wpos, sprite);
 	}
 	if (Debug) {
 		auto gfx = MyGfx::Instance();
 		// 绘制坐标信息
 		gfx->DrawCommand(
 			SpriteMgr::Main()->GetBuiltinSprite(SpriteMgr::IdxBuiltinCross),
-			pos.x, pos.y, MyGfx::Layer::Top);
+			wpos.x, wpos.y, MyGfx::Layer::Top);
 		char msg[256];
-		auto wpos = mActor->GetPos();
-		sprintf(msg,"(%d,%d)", wpos.x, wpos.y);
-		gfx->DrawString(YxUtils::Str2Wstr(msg), pos.x, pos.y+20);
+		auto cellPos = World2Cell(wpos);
+		sprintf(msg,"(%d,%d)", cellPos.x, cellPos.y);
+		gfx->DrawWorldString(YxUtils::Str2Wstr(msg), wpos.x, wpos.y+20);
 	}
 }
 
-void ActorRenderer::DrawImpl(uint32_t delta, Vector2Int pos, Sprite *actorSprite)
+void ActorRenderer::DrawImpl(uint32_t delta, Vector2Float pos, Sprite *actorSprite)
 {
 	// 暂时保留在这，等各子类完成，这个方法清空
 	//auto gfx = MyGfx::Instance();
@@ -108,21 +100,6 @@ Sprite * ActorRenderer::GetSprite(uint32_t delta)
 {
 	_anim.Update(delta);
 	return SpriteMgr::Main()->GetSprite(mImgLibIdx, _anim.Current);;
-}
-
-void ActorRenderer::CaclScreenPos(int32_t & x, int32_t & y)
-{
-	auto centerPos = mMapRenderer->GetPos();
-	auto myPos = mActor->GetPos();
-	auto scroll = mMapRenderer->GetCellScrollOffset();
-	x = myPos.x - centerPos.x;
-	y = myPos.y - centerPos.y;
-	x *= CellW;
-	y *= CellH;
-	x += (CellW * XCount / 2);
-	y += (CellH * YCount / 2);
-	x += scroll.x;
-	y += scroll.y;
 }
 
 void ActorRenderer::OnMotionChanged()
