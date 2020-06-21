@@ -102,7 +102,7 @@ Image *ImageLib::LoadImageExt(uint32_t index, MyColor chooseColor1, MyColor choo
 	Image *img = new Image(block3);
 	dataLen = block3->ImgLength;
 	img->Pixels = new MyColor[img->Width * img->Height];
-	memset(reinterpret_cast<void*>(img->Pixels), 0, img->Width*img->Height * sizeof(MyColor));// 置为黑色
+	memset(reinterpret_cast<void*>(img->Pixels), 0, img->Width*img->Height * sizeof(MyColor));// 置为黑色透明
 	auto rawbuffer = new int16_t[dataLen];
 	fseek(mWilFile, address, SEEK_SET);
 	fseek(mWilFile, WilOffset(mVersion), SEEK_CUR);

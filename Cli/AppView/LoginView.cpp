@@ -45,7 +45,7 @@
 #define _TOP_LOGIN_BTN				65
 
 LoginView::LoginView() {
-	auto lib = _spriteMgr.GetLib(IdxInterface);
+	auto lib = _spriteMgr->GetLib(IdxInterface);
 	GuiHelper helper(lib);
 
 	MyGfx::Instance()->Resize(640, 480);

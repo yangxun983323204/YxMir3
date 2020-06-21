@@ -31,7 +31,7 @@ namespace YxGUI {
 			}
 			if (!_str.empty())
 			{
-				_sprite = MyGfx::CreateTextSprite(_str);
+				_sprite = MyGfx::Instance()->CreateTextSprite(_str);
 				if (_autoSize)
 				{
 					_lRect.w = _sprite->w();

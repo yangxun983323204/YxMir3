@@ -101,6 +101,10 @@
 #define _SPEED_RUN					2
 #define _SPEED_HORSERUN				3
 
+const static uint16_t TILE_ANIM_DELAY[]{
+	150,200,250,300,350,400,420,450
+};
+
 struct MoveState
 {
 	Horizontal xType;

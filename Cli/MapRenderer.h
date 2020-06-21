@@ -13,16 +13,7 @@ public:
 	void SetViewPointDelta(Vector2Float pos);
 	Vector2Float GetViewPoint();
 	Vector2Float GetPos();
-	//Vector2Float GetCellScrollOffset();
 	void Draw(uint32_t delta);
-	//void SetScrollSpeed(float cellPerSec);
-	//void Scroll(Direction dir, uint8_t count=1);
-	//void Scroll(Horizontal x, Vertical y, uint8_t count=1);
-	/*void CompleteScroll() {
-		mRedrawBG = true;
-		mScrollState.CompleteIt();
-		SetPos(Vector2Float{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
-	}*/
 	bool mDebug;
 private:
 	struct DrawRect
@@ -35,6 +26,7 @@ private:
 
 	void CalcTileDrawRect();
 	void CalcCellDrawRect();
+	void UpdateAnimTile(uint32_t delta);
 	void DrawBG();
 	void DrawMid();
 	void DrawTop();
@@ -44,7 +36,8 @@ private:
 	Vector2Float mPos;
 	DrawRect mCellState;
 	DrawRect mTileState;
-	//MoveState mScrollState;
+	uint32_t _animTileTime[8];
+	uint8_t _animTileState[8][16];// 有8种帧速，0~15个动画帧图
 	bool mRedrawBG;
 };
 

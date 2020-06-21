@@ -12,7 +12,7 @@ public:
 	virtual void OnShow() {};
 	virtual void OnHide() {};
 protected:
-	static SpriteMgr _spriteMgr;
+	static SpriteMgr *_spriteMgr;
 	static bool _inited;
 
 public:

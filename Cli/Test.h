@@ -10,6 +10,7 @@ void TestMapRender();
 void TestActorRender();
 void TestInputMgr();
 void TestSoundMgr_LoadList();
+void TestMidBgShadowTwinkle();
 
 inline void Test() 
 {
@@ -22,6 +23,7 @@ inline void Test()
 	//TestActorRender();
 	TestInputMgr();
 	//TestSoundMgr_LoadList();
+	//TestMidBgShadowTwinkle();
 
 	exit(0);
 }

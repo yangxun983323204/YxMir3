@@ -25,21 +25,23 @@ void SpriteMgr::Init()
 	auto cross = new Sprite();
 	cross->PivotX = -half_down + CellW / 2;// 坐标在左上角，因此要绘制在格子中心，需要向右下移半格
 	cross->PivotY = -half_down + CellH / 2;
-	cross->Surface = SDL_CreateRGBSurface(0, size, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
-	SDL_FillRect(cross->Surface, 0, 0);
-	auto p = (uint32_t*)(cross->Surface->pixels);
+	auto surface = SDL_CreateRGBSurface(0, size, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
+	SDL_FillRect(surface, 0, 0);
+	auto p = (uint32_t*)(surface->pixels);
 	for (uint8_t i = 0; i < size; i++)
 	{
 		p[half_down * size + i] = 0xff0000ff;
 		p[i * size + half_down] = 0xff0000ff;
 	}
+	MyGfx::Instance()->SetSpriteFromSurface(cross, surface);
 	BuiltinSprite[IdxBuiltinCross] = cross;
 	// "|"符号精灵
 	auto vline = new Sprite();
 	vline->PivotX =  CellW / 2;
 	vline->PivotY = -half_down + CellH / 2;
-	vline->Surface = SDL_CreateRGBSurface(0, 1, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
-	SDL_FillRect(vline->Surface, 0, 0xffffffff);
+	surface = SDL_CreateRGBSurface(0, 1, size, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
+	SDL_FillRect(surface, 0, 0xffffffff);
+	MyGfx::Instance()->SetSpriteFromSurface(vline, surface);
 	BuiltinSprite[IdxBuiltinVLine] = vline;
 }
 //
@@ -107,7 +109,7 @@ Sprite * SpriteMgr::GetSprite(uint32_t fileIdx, uint32_t imgIdx)
 	}
 	else {
 		auto img = mLibs[fileIdx].LoadImage(imgIdx);
-		Sprite *sprite = MyGfx::CreateSpriteFromImage(img);
+		Sprite *sprite = MyGfx::Instance()->CreateSpriteFromImage(img);
 		delete img;
 		assert(sprite != nullptr);
 		mSpriteMap[fileIdx].sprites[imgIdx] = sprite;
@@ -123,9 +125,9 @@ Sprite * SpriteMgr::GetShadow(Sprite * base, Sprite::ShadowType type)
 			base->_shadow = nullptr;
 		}
 		if (type == Sprite::ShadowType::Orth)
-			base->_shadow = CreateOrthShadow(base);
+			base->_shadow = CreateOrthShadow(base );
 		else if (type == Sprite::ShadowType::Proj)
-			base->_shadow = CreateProjShadow(base);
+			base->_shadow = CreateProjShadow(base );
 	}
 	return base->_shadow;
 }
@@ -148,7 +150,7 @@ SpriteMgr * SpriteMgr::Main()
 
 Sprite * SpriteMgr::CreateOrthShadow(Sprite * base)
 {
-	auto src = base->Surface;
+	auto src = base->_surf;
 	auto dst = SDL_CreateRGBSurface(
 		0, src->w, src->h,
 		32, 0xff000000, 0x00ff0000, 0x0000ff00, 0xff);
@@ -159,14 +161,14 @@ Sprite * SpriteMgr::CreateOrthShadow(Sprite * base)
 		pDst[i] = pSrc[i] != 0u ? 0x00000080u : 0u;
 	}
 	auto shadow = new Sprite();
-	shadow->Surface = dst;
+	MyGfx::Instance()->SetSpriteFromSurface(shadow, dst);
 	return shadow;
 }
 const static uint8_t projX = 36;
 // 矩形变换为平行四边形，顶边水平右移projX,竖直除以2
 Sprite * SpriteMgr::CreateProjShadow(Sprite * base)
 {
-	auto src = base->Surface;
+	auto src = base->_surf;
 	int sw = src->w;
 	int sh = src->h;
 	int w = src->w + projX;
@@ -192,7 +194,7 @@ Sprite * SpriteMgr::CreateProjShadow(Sprite * base)
 		}
 	}
 	auto shadow = new Sprite();
-	shadow->Surface = dst;
+	MyGfx::Instance()->SetSpriteFromSurface(shadow, dst);
 	return shadow;
 }
 

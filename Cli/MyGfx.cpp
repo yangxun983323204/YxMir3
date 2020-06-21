@@ -8,8 +8,9 @@ TTF_Font *MyGfx::gFont = nullptr;
 
 MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 {
+	LockFrameTime = false;
 	mCurrFrameTime = 0;
-	SetFPS(120);
+	SetFPS(60);
 	_inst = this;
 	mWindow = nullptr;
 	SDL_Init(SDL_INIT_VIDEO);
@@ -21,8 +22,10 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 	mScreenRect.w = w;
 	mScreenRect.h = h;
 	mWindow = SDL_CreateWindow(YxUtils::Wstr2Str(title).c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
-	mScreenSurface = SDL_GetWindowSurface(mWindow);
-	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
+	_renderer = SDL_CreateRenderer(mWindow, -1, SDL_RendererFlags::SDL_RENDERER_ACCELERATED|SDL_RendererFlags::SDL_RENDERER_PRESENTVSYNC);
+	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 0xFF);
+	SDL_SetRenderDrawBlendMode(_renderer, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+	mBottomCache.reserve(w * h);
 	mMidCache.reserve(w * h);
 	mTopCache.reserve(w * h);
 	mGuiCache.reserve(w * h);
@@ -31,8 +34,7 @@ MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 
 MyGfx::~MyGfx()
 {
-	SDL_FreeSurface(mBgSurface);
-	SDL_FreeSurface(mScreenSurface);
+	SDL_DestroyRenderer(_renderer);
 	SDL_DestroyWindow(mWindow);
 
 	if (_inst == this) {
@@ -40,6 +42,7 @@ MyGfx::~MyGfx()
 		TTF_CloseFont(gFont);
 		gFont = nullptr;
 		TTF_Quit();
+		IMG_Quit();
 		SDL_Quit();
 	}
 }
@@ -82,34 +85,39 @@ void MyGfx::Resize(uint16_t w, uint16_t h)
 	SDL_SetWindowSize(mWindow, w, h);
 	mScreenRect.w = w;
 	mScreenRect.h = h;
-	if(mScreenSurface) SDL_free(mScreenSurface);
-	mScreenSurface = SDL_GetWindowSurface(mWindow);
-	if (mBgSurface) SDL_free(mBgSurface);
-	mBgSurface = SDL_CreateRGBSurface(0, mScreenSurface->w, mScreenSurface->h, 32, 0, 0, 0, 0);
+	if (_renderer)
+	{
+		_renderer = SDL_CreateRenderer(mWindow, -1, SDL_RendererFlags::SDL_RENDERER_ACCELERATED | SDL_RendererFlags::SDL_RENDERER_PRESENTVSYNC);
+		SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 0xFF);
+	}
 }
 
-void MyGfx::DrawWorldString(std::wstring str, int x, int y)
+void MyGfx::DrawWorldString(std::wstring str, int x, int y, MyColor color)
 {
 	auto sp = CreateTextSprite(str);
-	TempDrawInfo info;
+	sp->Color = color;
+	DrawInfo info;
 	info.x = x;
 	info.y = y;
-	info.w = sp->Surface->w;
-	info.h = sp->Surface->h;
-	mTopCache.push_back(info);
-	mTopCache[mTopCache.size()-1].sprite = sp;
+	info.w = sp->TexW;
+	info.h = sp->TexH;
+	info.sprite = sp;
+	mTopCache.push_back(std::move(info));
+	mTopCache[mTopCache.size()-1].manage = false;
 }
 
-void MyGfx::DrawGuiString(std::wstring str, int x, int y)
+void MyGfx::DrawGuiString(std::wstring str, int x, int y, MyColor color)
 {
 	auto sp = CreateTextSprite(str);
-	TempDrawInfo info;
+	sp->Color = color;
+	DrawInfo info;
 	info.x = x;
 	info.y = y;
-	info.w = sp->Surface->w;
-	info.h = sp->Surface->h;
-	mGuiCache.push_back(info);
-	mGuiCache[mGuiCache.size() - 1].sprite = sp;
+	info.w = sp->TexW;
+	info.h = sp->TexH;
+	info.sprite = sp;
+	mGuiCache.push_back(std::move(info));
+	mGuiCache[mGuiCache.size() - 1].manage = false;
 }
 
 void MyGfx::DrawCommand(Sprite * sprite, int x, int y, Layer layer)
@@ -128,18 +136,16 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, int w, int h, Layer layer
 	switch (layer)
 	{
 	case MyGfx::Bottom:
-		GetDrawRect(&info,false, &srcRect, &dstRect);
-		WorldToScreen(dstRect, dstRect);
-		SDL_BlitSurface(sprite->Surface, &srcRect, mBgSurface, &dstRect);
+		mBottomCache.push_back(std::move(info));
 		break;
 	case MyGfx::Mid:
-		mMidCache.push_back(info);
+		mMidCache.push_back(std::move(info));
 		break;
 	case MyGfx::Top:
-		mTopCache.push_back(info);
+		mTopCache.push_back(std::move(info));
 		break;
 	case MyGfx::GUI:
-		mGuiCache.push_back(info);
+		mGuiCache.push_back(std::move(info));
 		break;
 	default:
 		break;
@@ -148,18 +154,28 @@ void MyGfx::DrawCommand(Sprite * sprite, int x, int y, int w, int h, Layer layer
 
 void MyGfx::DrawCache()
 {
-	if (mDebug) DrawGuiString(L"fps:" + std::to_wstring(mFPS), 0, 0);
-	SDL_FillRect(mScreenSurface, 0, 0xffffffff);
-	SDL_BlitSurface(mBgSurface, 0, mScreenSurface, 0);
+	SDL_RenderClear(_renderer);
+	if (mDebug) DrawGuiString(L"fps:" + std::to_wstring(mFPS), 0, 0, {255,0,0,255});
+	// bottom
+	auto p = mBottomCache.begin();
+	auto end = mBottomCache.end();
+	for (; p != end; p++)
+	{
+		GetDrawRect(p._Ptr, true, &srcRect, &dstRect);
+		WorldToScreen(dstRect, dstRect);
+		if (SDL_HasIntersection(&dstRect, &mScreenRect))
+			SDL_RenderCopy(_renderer, p->sprite->_texture, &srcRect, &dstRect);
+	}
+	mBottomCache.clear();
 	// draw mid
-	auto p = mMidCache.begin();
-	auto end = mMidCache.end();
+	p = mMidCache.begin();
+	end = mMidCache.end();
 	for (; p != end; p++)
 	{
 		GetDrawRect(p._Ptr,true, &srcRect, &dstRect);
 		WorldToScreen(dstRect, dstRect);
 		if(SDL_HasIntersection(&dstRect, &mScreenRect))
-			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
+			SDL_RenderCopy(_renderer, p->sprite->_texture, &srcRect, &dstRect);
 	}
 	mMidCache.clear();
 	// draw top
@@ -169,8 +185,10 @@ void MyGfx::DrawCache()
 	{
 		GetDrawRect(p._Ptr,true, &srcRect, &dstRect);
 		WorldToScreen(dstRect, dstRect);
-		if (SDL_HasIntersection(&dstRect, &mScreenRect))
-			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
+		if (SDL_HasIntersection(&dstRect, &mScreenRect)) {
+			p->sprite->ApplyColor();
+			SDL_RenderCopy(_renderer, p->sprite->_texture, &srcRect, &dstRect);
+		}
 	}
 	mTopCache.clear();
 	// draw gui
@@ -181,12 +199,12 @@ void MyGfx::DrawCache()
 		GetDrawRect(p._Ptr,false, &srcRect, &dstRect);
 		if (SDL_HasIntersection(&dstRect, &mScreenRect)) {
 			p->sprite->ApplyColor();
-			SDL_BlitSurface(p->sprite->Surface, &srcRect, mScreenSurface, &dstRect);
+			SDL_RenderCopy(_renderer, p->sprite->_texture, &srcRect, &dstRect);
 		}
 	}
 	mGuiCache.clear();
 	//
-	SDL_UpdateWindowSurface(mWindow);
+	SDL_RenderPresent(_renderer);
 }
 
 void MyGfx::RunLoop()
@@ -213,8 +231,7 @@ void MyGfx::RunLoop()
 			preTime = currTime;
 			if (mCurrFrameTime > mFrameTime)
 			{
-				if (mDebug && mCurrFrameTime> mFrameTime*2)
-					mCurrFrameTime = mFrameTime;
+				if (LockFrameTime) mCurrFrameTime = mFrameTime;
 				mFPS = ceil(1 / (mCurrFrameTime/1000.0f));
 				if (onDraw)
 					onDraw(mCurrFrameTime);
@@ -238,11 +255,49 @@ Sprite* MyGfx::CreateSpriteFromImage(Image * image)
 	sprite->ShadowPosX = image->ShadowPosX;
 	sprite->ShadowPosY = image->ShadowPosY;
 
-	sprite->Surface = SDL_CreateRGBSurfaceFrom(
+	auto surface = SDL_CreateRGBSurfaceFrom(
 		(void*)(image->Pixels), 
 		image->Width, image->Height,
 		32, 4 * image->Width,
 		ImageLib::MaskR, ImageLib::MaskG, ImageLib::MaskB, ImageLib::MaskA);
+
+	sprite->_texture = SDL_CreateTextureFromSurface(_renderer, surface);
+	sprite->TexW = surface->w;
+	sprite->TexH = surface->h;
+	if(sprite->HasShadow)
+		sprite->_surf = surface;
+	else {
+		sprite->_surf = nullptr;
+		SDL_FreeSurface(surface);
+	}
+
+	return sprite;
+}
+
+Sprite* MyGfx::CreateSpriteFromImage(SDL_Renderer* renderer,Image * image)
+{
+	auto sprite = new Sprite();
+	sprite->PivotX = image->PivotX;
+	sprite->PivotY = image->PivotY;
+	sprite->HasShadow = image->HasShadow != 0;
+	sprite->ShadowPosX = image->ShadowPosX;
+	sprite->ShadowPosY = image->ShadowPosY;
+
+	auto surface = SDL_CreateRGBSurfaceFrom(
+		(void*)(image->Pixels),
+		image->Width, image->Height,
+		32, 4 * image->Width,
+		ImageLib::MaskR, ImageLib::MaskG, ImageLib::MaskB, ImageLib::MaskA);
+
+	sprite->_texture = SDL_CreateTextureFromSurface(renderer, surface);
+	sprite->TexW = surface->w;
+	sprite->TexH = surface->h;
+	if (sprite->HasShadow)
+		sprite->_surf = surface;
+	else {
+		sprite->_surf = nullptr;
+		SDL_FreeSurface(surface);
+	}
 
 	return sprite;
 }
@@ -274,7 +329,7 @@ Sprite * MyGfx::CreateTextSprite(std::wstring str)
 {
 	SDL_Surface* textSurface = TTF_RenderUTF8_Solid(gFont, YxUtils::Wstr2Str(str).c_str(), SDL_Color{ 255,255,255,255 });
 	Sprite *sp = new Sprite();
-	sp->Surface = textSurface;
+	SetSpriteFromSurface(sp, textSurface);
 	return sp;
 }
 

@@ -11,6 +11,7 @@ using Yx::Delegate;
 class Sprite
 {
 	friend class SpriteMgr;
+	friend class MyGfx;
 public:
 	enum class ShadowType 
 	{
@@ -23,13 +24,16 @@ public:
 	bool HasShadow;
 	int16_t ShadowPosX;
 	int16_t ShadowPosY;
-	SDL_Surface* Surface;
 	uint16_t OverridW;
 	uint16_t OverridH;
+	uint16_t TexW;
+	uint16_t TexH;
+	inline SDL_Texture* GetTex() { return _texture; }
 
 	Sprite() {
 		PivotX = PivotY = ShadowPosX = ShadowPosY = OverridW = OverridH = 0;
-		Surface = nullptr;
+		_texture = nullptr;
+		_surf = nullptr;
 		HasShadow = false;
 		_shadow = nullptr;
 		_shadowType = ShadowType::Proj;
@@ -37,26 +41,34 @@ public:
 	}
 	~Sprite()
 	{
-		SDL_FreeSurface(Surface);
+		SDL_DestroyTexture(_texture);
+		_texture = nullptr;
 		if (_shadow != nullptr) {
 			delete _shadow;
 			_shadow = nullptr;
+		}
+		if (_surf)
+		{
+			SDL_FreeSurface(_surf);
+			_surf = nullptr;
 		}
 	}
 
 	inline uint16_t w()
 	{
-		return OverridW == 0 ? Surface->w : OverridW;
+		return OverridW == 0 ? TexW : OverridW;
 	}
 	inline uint16_t h()
 	{
-		return OverridH == 0 ? Surface->h : OverridH;
+		return OverridH == 0 ? TexH : OverridH;
 	}
 	inline void ApplyColor() {
-		SDL_SetSurfaceColorMod(Surface, Color.r, Color.g, Color.b);
-		SDL_SetSurfaceAlphaMod(Surface, Color.a);
+		SDL_SetTextureColorMod(_texture, Color.r, Color.g, Color.b);
+		SDL_SetTextureAlphaMod(_texture, Color.a);
 	}
 private:
+	SDL_Texture *_texture;
+	SDL_Surface* _surf;
 	Sprite* _shadow;
 	ShadowType _shadowType;
 };
@@ -68,19 +80,45 @@ struct DrawInfo
 	int16_t y;
 	int16_t w;
 	int16_t h;
+	bool manage;
 	DrawInfo()
 	{
+		manage = true;
 		sprite = nullptr;
 	}
-	virtual ~DrawInfo() {}
-	// 不能在析构释放精灵，因为是gfx在统一管理
-};
+	~DrawInfo() {
+		if (!manage) {
+			delete sprite;
+			sprite = nullptr;
+		}
+	}
+	
+	DrawInfo(const DrawInfo& src) = delete;
+	DrawInfo& operator=(const DrawInfo&& src) = delete;
 
-struct TempDrawInfo :public DrawInfo{
-	~TempDrawInfo()
+	DrawInfo(DrawInfo&& src)
 	{
-		delete sprite;
-		sprite = nullptr;
+		sprite={ src.sprite };
+		x=src.x;
+		y=src.y;
+		w=src.w;
+		h=src.h;
+		manage = src.manage;
+		src.sprite = nullptr;
+	}
+
+	DrawInfo& operator=(DrawInfo&& src)
+	{
+		if (this != &src) {
+			sprite = { src.sprite };
+			x = src.x;
+			y = src.y;
+			w = src.w;
+			h = src.h;
+			manage = src.manage;
+			src.sprite = nullptr;
+		}
+		return *this;
 	}
 };
 
@@ -113,25 +151,33 @@ public:
 	const SDL_Rect *GetRenderRect();
 	void SetFPS(uint16_t requireFPS);
 	void Resize(uint16_t w, uint16_t h);
-	void DrawWorldString(std::wstring str,int x,int y);
-	void DrawGuiString(std::wstring str, int x, int y);
+	void DrawWorldString(std::wstring str,int x,int y, MyColor color = { 255,255,255,255 });
+	void DrawGuiString(std::wstring str, int x, int y, MyColor color = { 255,255,255,255 });
 	void DrawCommand(Sprite * sprite, int x, int y, Layer layer);
 	void DrawCommand(Sprite * sprite, int x, int y,int w,int h, Layer layer);
 	void DrawCache();
 	void RunLoop();
 	void Exit();
 
-	static Sprite* CreateSpriteFromImage(Image *image);
+	Sprite* CreateSpriteFromImage(Image *image);
+	static Sprite* CreateSpriteFromImage(SDL_Renderer* renderer, Image * image);
+	inline void SetSpriteFromSurface(Sprite* sprite,SDL_Surface *surface)
+	{
+		sprite->_texture = SDL_CreateTextureFromSurface(_renderer, surface);
+		sprite->TexW = surface->w;
+		sprite->TexH = surface->h;
+		SDL_FreeSurface(surface);
+	}
+	// 不管理生命周期
+	Sprite *CreateTextSprite(std::wstring str);
 	static inline void MyGfx::GetDrawRect(DrawInfo *info,bool useOffset, __out SDL_Rect* srcRect, __out SDL_Rect* dstRect);
 	static MyGfx *Instance();
-	// 不管理生命周期
-	static Sprite *CreateTextSprite(std::wstring str);
 
 	Delegate<void(uint32_t deltaMs)> onDraw;
 	Delegate<void(SDL_Event*)> onEvent;
 
 	bool mDebug;
-
+	bool LockFrameTime;
 	static TTF_Font *gFont;
 private:
 	SDL_Window *mWindow;
@@ -139,11 +185,13 @@ private:
 	SDL_Rect mScreenRect;
 	Vector2Float _viewPoint;
 	Vector2Float _worldOffset;
+	std::vector<DrawInfo> mBottomCache;
 	std::vector<DrawInfo> mMidCache;
 	std::vector<DrawInfo> mTopCache;
 	std::vector<DrawInfo> mGuiCache;
-	SDL_Surface* mScreenSurface;
-	SDL_Surface* mBgSurface;
+	//SDL_Surface* mScreenSurface;
+	SDL_Renderer *_renderer;
+	//SDL_Surface* mBgSurface;
 	uint16_t mRequireFPS;
 	uint16_t mFPS;
 

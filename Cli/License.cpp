@@ -233,5 +233,6 @@ void License::Init()
 	_inited = true;
 	_sprite = new Sprite();
 	auto rwops = SDL_RWFromConstMem((const void*)fileData, sizeof(fileData));
-	_sprite->Surface = IMG_LoadTyped_RW(rwops, 1, "PNG");
+	auto surface = IMG_LoadTyped_RW(rwops, 1, "PNG");
+	MyGfx::Instance()->SetSpriteFromSurface(_sprite, surface);
 }

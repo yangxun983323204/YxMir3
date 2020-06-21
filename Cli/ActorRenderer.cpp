@@ -48,6 +48,8 @@ void ActorRenderer::Draw(uint32_t delta)
 	if (mActor == nullptr)
 		return;
 	auto wpos = mActor->GetWPos();
+	wpos.x -= HalfCW;
+	wpos.y -= HalfCH;
 	auto sprite = GetSprite(delta);
 	if (sprite != nullptr)
 	{
@@ -62,7 +64,7 @@ void ActorRenderer::Draw(uint32_t delta)
 		char msg[256];
 		auto cellPos = World2Cell(wpos);
 		sprintf(msg,"(%d,%d)", cellPos.x, cellPos.y);
-		gfx->DrawWorldString(YxUtils::Str2Wstr(msg), wpos.x, wpos.y+20);
+		gfx->DrawWorldString(YxUtils::Str2Wstr(msg), wpos.x, wpos.y + 20, {255,0,0,255});
 	}
 }
 

@@ -32,18 +32,18 @@ void TestMyGfxCreateSpriteFromImage()
 	
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window* window = NULL;
-	SDL_Surface* screenSurface = NULL;
 	window = SDL_CreateWindow("TestWIL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, img->Width, img->Height, SDL_WINDOW_SHOWN);
-	screenSurface = SDL_GetWindowSurface(window);
-	auto sprite = MyGfx::CreateSpriteFromImage(img);
-	SDL_BlitSurface(sprite->Surface, NULL, screenSurface, NULL);
-	SDL_UpdateWindowSurface(window);
-	SDL_Delay(1000);
-	SDL_FreeSurface(sprite->Surface);
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+	auto sprite = MyGfx::CreateSpriteFromImage(renderer,img);
+	delete img;
+	SDL_RenderCopy(renderer, sprite->GetTex(), NULL, NULL);
+	SDL_RenderPresent(renderer);
+	SDL_Delay(5000);
+	delete sprite;
+	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	//Quit SDL subsystems
 	SDL_Quit();
-	delete img;
 }
 void TestMapLoad()
 {
@@ -56,7 +56,7 @@ void TestDrawMapRect()
 	MyGfx *gfx = new MyGfx(L"map viewer",LayoutW,LayoutH);
 	auto sMgr = SpriteMgr::Main();
 	gfx->mDebug = true;
-	gfx->SetViewPoint(Vector2Float{ 0,0 });
+	gfx->SetViewPoint(Cell2World({ 0,0 }));
 	Map map;
 	map.Load("Map/0.map");
 	// 绘制从左上角开始的17*17个tile
@@ -210,12 +210,12 @@ void TestActorRender()
 void TestInputMgr() 
 {
 	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
-	gfx->mDebug = false;
 	auto sMgr = SpriteMgr::Main();
 	Map map;
 	map.Load("Map/0.map");
 	SoundMgr *soudMgr = SoundMgr::Instance();
 	soudMgr->PlayBgm("0", true);
+	Mix_VolumeMusic(20);
 	MapRenderer *renderer = new MapRenderer();
 	renderer->mDebug = true;
 	renderer->SetMap(&map);
@@ -259,4 +259,44 @@ void TestSoundMgr_LoadList()
 {
 	SoundMgr *soudMgr = SoundMgr::Instance();
 	SoundMgr::Destroy();
+}
+void TestMidBgShadowTwinkle()
+{
+	MyGfx *gfx = new MyGfx(L"比奇城", LayoutW, LayoutH);
+	gfx->LockFrameTime = true;
+	auto sMgr = SpriteMgr::Main();
+	Map map;
+	map.Load("Map/0.map");
+	MapRenderer *renderer = new MapRenderer();
+	renderer->mDebug = true;
+	renderer->SetMap(&map);
+	Hero actor;
+	actor.SetMap(&map);
+	actor.SetWPos(Cell2World({ 388,370 }));
+	actor.SetFeature({
+		ActorGender::Woman,
+		8,2,32
+		});
+	actor.HandleAction(Action(_MT_STAND, ActorGender::Man, Direction::Down));
+	MyHeroRenderer *aRenderer = new MyHeroRenderer();
+	aRenderer->SetActor(&actor);
+	aRenderer->SetMapRenderer(renderer);
+	aRenderer->Debug = true;
+	InputMgr input;
+	input.SetGfx(gfx);
+	input.onSysQuit += [&gfx]() { gfx->Exit(); };
+	gfx->onDraw += [gfx, renderer, &input, &aRenderer, &actor](uint32_t deltaMs) {
+		actor.HandleAction(Action(_MT_WALK, ActorGender::Man, Direction::Right));
+		actor.Update(deltaMs);
+		renderer->Draw(deltaMs);
+		aRenderer->Draw(deltaMs);
+		gfx->DrawCache();
+	};
+
+	gfx->RunLoop();
+	delete aRenderer;
+	delete renderer;
+	SoundMgr::Destroy();
+	delete sMgr;
+	delete gfx;
 }

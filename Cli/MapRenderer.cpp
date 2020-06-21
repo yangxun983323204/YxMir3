@@ -10,6 +10,8 @@ MapRenderer::MapRenderer()
 	//mScrollState.Reset();
 	mTileState = { 0,0,0,0 };
 	mCellState = { 0,0,0,0 };
+	memset(static_cast<void*>(&_animTileTime), 0, sizeof(uint8_t) * 8);
+	memset(static_cast<void*>(&_animTileState), 0, sizeof(uint8_t) * 8 * 16);
 }
 
 MapRenderer::~MapRenderer()
@@ -46,74 +48,15 @@ Vector2Float MapRenderer::GetPos()
 	return mPos;
 }
 
-//Vector2Float MapRenderer::GetCellScrollOffset()
-//{
-//	return Vector2Float{ mScrollState.xScrolled, mScrollState.yScrolled };
-//}
-
 void MapRenderer::Draw(uint32_t delta)
 {
-	//if (mScrollState.IsScrolling()) {
-	//	mRedrawBG = true;
-	//	if (!mScrollState.Update(delta))// 如果返回false，说明滚动结束
-	//	{
-	//		SetPos(Vector2Float{ mPos.x - mScrollState.xDir*mScrollState.count, mPos.y - mScrollState.yDir*mScrollState.count });
-	//	}
-	//}
+	UpdateAnimTile(delta);
 	DrawBG();
 	DrawMid();
 	DrawTop();
 	if (mDebug)
 		DrawDebugGrid();
 }
-//void MapRenderer::SetScrollSpeed(float cellPerSec)
-//{
-//	mScrollState.scrollSpeed = cellPerSec;
-//}
-//void MapRenderer::Scroll(Direction dir,uint8_t count)
-//{
-//	Horizontal x = Horizontal::None;
-//	Vertical y = Vertical::None;
-//	switch (dir)
-//	{
-//	case Direction::Up:
-//		y = Vertical::Up;
-//		break;
-//	case Direction::UpRight:
-//		x = Horizontal::Right;
-//		y = Vertical::Up;
-//		break;
-//	case Direction::Right:
-//		x = Horizontal::Right;
-//		break;
-//	case Direction::DownRight:
-//		x = Horizontal::Right;
-//		y = Vertical::Down;
-//		break;
-//	case Direction::Down:
-//		y = Vertical::Down;
-//		break;
-//	case Direction::DownLeft:
-//		x = Horizontal::Left;
-//		y = Vertical::Down;
-//		break;
-//	case Direction::Left:
-//		x = Horizontal::Left;
-//		break;
-//	case Direction::UpLeft:
-//		x = Horizontal::Left;
-//		y = Vertical::Up;
-//		break;
-//	default:
-//		break;
-//	}
-//	Scroll(x, y, count);
-//}
-//void MapRenderer::Scroll(Horizontal x, Vertical y, uint8_t count)
-//{
-//	if(!mScrollState.IsScrolling())
-//		mScrollState.Set(x, y, count);
-//}
 
 void MapRenderer::CalcTileDrawRect()
 {
@@ -144,6 +87,25 @@ void MapRenderer::CalcCellDrawRect()
 	mCellState.MaxCellX = posXRight / CellW + halfX + ext;
 	mCellState.MinCellY = posYLeft / CellH - halfY - ext;
 	mCellState.MaxCellY = posYRight / CellH + halfY + ext;
+}
+void MapRenderer::UpdateAnimTile(uint32_t delta)
+{
+	for (size_t i = 0; i < 8; i++)
+	{
+		_animTileTime[i] += delta;
+		if (_animTileTime[i] >= TILE_ANIM_DELAY[i])
+		{
+			for (size_t j = 0; j < 16; j++)
+			{
+				_animTileState[i][j] += 1;
+				if (_animTileState[i][j] >= j)
+				{
+					_animTileState[i][j] = 0;
+				}
+			}
+			_animTileTime[i] = 0;
+		}
+	}
 }
 void MapRenderer::DrawBG()
 {
@@ -189,7 +151,7 @@ void MapRenderer::DrawMid()
 			if (x<0 || y<0 || !mMap->InMap(x, y))
 				continue;
 			auto cell = mMap->CellAt(x, y);
-			for (uint8_t i = 1; i < 3; i++)// 依次绘制左侧和右侧
+			for (uint8_t i = 1; i < 3; ++i)// 依次绘制左侧和右侧
 			{
 				if (cell.FileEnableOf(i))
 				{
@@ -203,15 +165,15 @@ void MapRenderer::DrawMid()
 						{
 							if (cell.ObjBlendOf(i))
 								blend = true;
-							//imgIdx += mMap->mAnimTileFrame[cell.Obj1AnimTickType()][cell.Obj1AnimCount()];// todo
+							imgIdx += _animTileState[cell.Obj1AnimTickType()][cell.Obj1AnimCount()];
 						}
 						auto sprite = sMgr->GetSprite(fileIdx, imgIdx);
 						if (sprite != nullptr) {
 							sprite->PivotX = 0;
 							sprite->PivotY = 0;
-							// 地表物体图片的原点是左下角，因此注意这里绘制坐标中的y减去了图片高度
+							// 地表物体图片的原点是左下角,对齐的也是cell的左下解，因此这里绘制坐标中的y减去了图片高度，并把原点从cell左下角移到cell左上角
 							drawX = x*CellW;
-							drawY = y*CellH - sprite->h();
+							drawY = y*CellH - sprite->h() + CellH;
 							gfx->DrawCommand(sprite, drawX, drawY, MyGfx::Layer::Mid);
 						}
 					}

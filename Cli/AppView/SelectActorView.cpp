@@ -39,14 +39,14 @@
 
 SelectActorView::SelectActorView()
 {
-	auto lib = _spriteMgr.GetLib(IdxInterface);;
+	auto lib = _spriteMgr->GetLib(IdxInterface);;
 	GuiHelper helper(lib);
 
 	MyGfx::Instance()->Resize(640, 480);
 	UI = new YxGUI::Canvas();
 	UI->SetLocalSize(640, 480);
 
-	_bg = _spriteMgr.GetSprite(IdxInterface, IMG_IDX_SELECT_CHR_BACK);
+	_bg = _spriteMgr->GetSprite(IdxInterface, IMG_IDX_SELECT_CHR_BACK);
 
 	Create = helper.CreateButton(IMG_IDX_SELECT_CREATE, true);
 	UI->AddChild(Create);
@@ -89,7 +89,7 @@ void SelectActorView::Draw(uint32_t ms)
 	for (size_t i = 0; i < _roleCount; i++)
 	{
 		int idx = IDX_IMG_MALE_WAR + _roles[i].Gender * 300 + _roles[i].Job * 600;
-		auto sp = _spriteMgr.GetSprite(IdxInterface, idx);
+		auto sp = _spriteMgr->GetSprite(IdxInterface, idx);
 		x = posArray[i + _roleCount - 1].x;
 		y = posArray[i + _roleCount - 1].y;
 		MyGfx::Instance()->DrawCommand(sp, x, y, MyGfx::Layer::Mid);
