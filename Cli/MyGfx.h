@@ -178,6 +178,7 @@ public:
 
 	bool mDebug;
 	bool LockFrameTime;
+	bool PixelPerfect;
 	static TTF_Font *gFont;
 private:
 	SDL_Window *mWindow;

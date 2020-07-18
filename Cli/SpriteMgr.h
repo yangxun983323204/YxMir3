@@ -18,7 +18,7 @@ public:
 	bool ManulInitLibs(uint32_t fileIdx,std::string filePath);
 	Sprite *GetSprite(uint32_t fileIdx,uint32_t imgIdx);
 	// 有些影子是用原图变换出来的，并无直接素材
-	Sprite *GetShadow(Sprite *base,Sprite::ShadowType type);
+	Sprite *GetShadow(Sprite *base);
 	Sprite *GetBuiltinSprite(uint8_t idx);
 	ImageLib* GetLib(uint32_t idx) { return &mLibs[idx]; }
 

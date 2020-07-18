@@ -117,16 +117,12 @@ Sprite * SpriteMgr::GetSprite(uint32_t fileIdx, uint32_t imgIdx)
 	}
 }
 
-Sprite * SpriteMgr::GetShadow(Sprite * base, Sprite::ShadowType type)
+Sprite * SpriteMgr::GetShadow(Sprite * base)
 {
-	if (base->_shadow == nullptr || base->_shadowType != type) {
-		if (base->_shadow) {
-			delete base->_shadow;
-			base->_shadow = nullptr;
-		}
-		if (type == Sprite::ShadowType::Orth)
+	if (base->_shadow == nullptr) {
+		if (base->_shadowType == Sprite::ShadowType::Orth)
 			base->_shadow = CreateOrthShadow(base );
-		else if (type == Sprite::ShadowType::Proj)
+		else if (base->_shadowType == Sprite::ShadowType::Proj)
 			base->_shadow = CreateProjShadow(base );
 	}
 	return base->_shadow;
@@ -164,10 +160,11 @@ Sprite * SpriteMgr::CreateOrthShadow(Sprite * base)
 	MyGfx::Instance()->SetSpriteFromSurface(shadow, dst);
 	return shadow;
 }
-const static uint8_t projX = 36;
+static uint8_t projX = 36;
 // 矩形变换为平行四边形，顶边水平右移projX,竖直除以2
 Sprite * SpriteMgr::CreateProjShadow(Sprite * base)
 {
+	projX = (uint8_t)(base->h() * 0.5f);
 	auto src = base->_surf;
 	int sw = src->w;
 	int sh = src->h;

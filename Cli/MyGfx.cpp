@@ -8,6 +8,7 @@ TTF_Font *MyGfx::gFont = nullptr;
 
 MyGfx::MyGfx(std::wstring title, uint16_t w, uint16_t h)
 {
+	PixelPerfect = true;
 	LockFrameTime = false;
 	mCurrFrameTime = 0;
 	SetFPS(60);
@@ -52,7 +53,28 @@ SDL_Rect dstRect;
 
 void MyGfx::SetViewPoint(Vector2Float worldPos)
 {
+	if (worldPos == _viewPoint)
+		return;
+
+	int8_t dirx = 0,diry = 0; 
+	if (PixelPerfect)
+	{
+		if (worldPos.x > _viewPoint.x)
+			dirx = 1;
+		else if (worldPos.x < _viewPoint.x)
+			dirx = -1;
+
+		if (worldPos.y > _viewPoint.y)
+			diry = 1;
+		else if (worldPos.y < _viewPoint.y)
+			diry = -1;
+	}
 	_viewPoint = worldPos;
+	// 像素完美
+	if (dirx != 0)
+		_viewPoint.x = dirx > 0 ? floor(_viewPoint.x) : ceil(_viewPoint.x);
+	if (diry != 0)
+		_viewPoint.y = diry > 0 ? floor(_viewPoint.y) : ceil(_viewPoint.y);
 	// 左上角为屏幕原点
 	_worldOffset.x = -_viewPoint.x + mScreenRect.w / 2.0;
 	_worldOffset.y = -_viewPoint.y + mScreenRect.h / 2.0;
@@ -60,9 +82,10 @@ void MyGfx::SetViewPoint(Vector2Float worldPos)
 
 void MyGfx::SetViewPointDelta(Vector2Float pos)
 {
-	_viewPoint.x += pos.x;
-	_viewPoint.y += pos.y;
-	SetViewPoint(_viewPoint);
+	Vector2Float vp = _viewPoint;
+	vp.x += pos.x;
+	vp.y += pos.y;
+	SetViewPoint(vp);
 }
 
 const SDL_Rect * MyGfx::GetRenderRect()
@@ -280,6 +303,7 @@ Sprite* MyGfx::CreateSpriteFromImage(SDL_Renderer* renderer,Image * image)
 	sprite->PivotX = image->PivotX;
 	sprite->PivotY = image->PivotY;
 	sprite->HasShadow = image->HasShadow != 0;
+	sprite->_shadowType = image->HasShadow == 49 ? Sprite::ShadowType::Orth : Sprite::ShadowType::Proj;
 	sprite->ShadowPosX = image->ShadowPosX;
 	sprite->ShadowPosY = image->ShadowPosY;
 

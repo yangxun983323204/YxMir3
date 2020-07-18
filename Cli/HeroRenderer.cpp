@@ -15,6 +15,7 @@ void HeroRenderer::DrawImpl(uint32_t delta, Vector2Float pos, Sprite * actorSpri
 {
 	Sprite* shadow = nullptr;
 	Sprite* weapon = nullptr;
+	//Sprite* weaponShadow = nullptr;
 	Sprite* horse = nullptr;
 	Sprite* hair = nullptr;
 	Sprite* effect = nullptr;
@@ -24,7 +25,7 @@ void HeroRenderer::DrawImpl(uint32_t delta, Vector2Float pos, Sprite * actorSpri
 	// get shadow
 	auto f = mActor->GetFeature();
 	assert(f.IsMan() || f.IsWoman());
-	shadow = SpriteMgr::Main()->GetShadow(actorSprite, Sprite::ShadowType::Proj);
+	shadow = SpriteMgr::Main()->GetShadow(actorSprite);
 	// get weapon
 	uint32_t fWeapon;
 	if (f.Weapon == 254)// 3g?
@@ -32,6 +33,7 @@ void HeroRenderer::DrawImpl(uint32_t delta, Vector2Float pos, Sprite * actorSpri
 	else
 		fWeapon = ((f.Weapon - 1) % 10)*_MAX_WEAPON_FRAME + _anim.Current - _MAX_HERO_FRAME*f.Dress;
 	weapon = SpriteMgr::Main()->GetSprite(f.WeaponImgLibIdx(), fWeapon);
+	//weaponShadow = SpriteMgr::Main()->GetShadow(weapon, Sprite::ShadowType::Orth);
 	// todo get horse
 	// get hair
 	uint32_t fHair = f.Hair*_MAX_HERO_FRAME - _MAX_HERO_FRAME + _anim.Current - _MAX_HERO_FRAME*f.Dress;
@@ -42,6 +44,8 @@ void HeroRenderer::DrawImpl(uint32_t delta, Vector2Float pos, Sprite * actorSpri
 	// 按从底至顶的顺序绘制一系列元素
 	if (shadow)
 		gfx->DrawCommand(shadow, pos.x + actorSprite->ShadowPosX, pos.y + actorSprite->ShadowPosY, MyGfx::Layer::Mid);
+	//if (weaponShadow)
+		//gfx->DrawCommand(weaponShadow, pos.x, pos.y, MyGfx::Layer::Mid);
 	auto dir = mActor->GetDir();
 	// 在某些方向，先画人再画武器，在另一些方向则相反
 	if (dir > Direction::Up && dir <= Direction::Down)

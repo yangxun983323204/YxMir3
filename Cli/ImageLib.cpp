@@ -42,6 +42,10 @@ bool ImageLib::Load(string path)
 	fclose(fpeekVer);
 
 	FILE* f = fopen(mWixPath.c_str(), "rb");
+	if (f == nullptr) {
+		mLoaded = false;
+		return false;
+	}
 	mIdx3 = new Index3();
 	fread(reinterpret_cast<void*>(mIdx3), sizeof(Index3) - 4, 1, f);
 	mIdx3->Data = new int32_t[mIdx3->ImgCount];
